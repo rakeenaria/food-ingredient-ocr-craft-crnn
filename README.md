@@ -118,3 +118,33 @@ Hasil akan tersimpan di:
 
 - README ini difokuskan pada inference (`demo.py`), bukan langkah training ulang.
 - Konfigurasi command mengacu ke `fine_tuned_model/opt.txt` pada repository ini.
+
+## Reproducibility
+
+Environment used for experiments in this project:
+- Python: 3.x (recommended 3.9+)
+- Framework: PyTorch
+- OCR pipeline: CRAFT + TRBA (TPS-ResNet-BiLSTM-Attn)
+- Inference entry point: `demo.py`
+
+For exact model-specific settings, see `fine_tuned_model/opt.txt`.
+
+## Known Limitations
+
+- Teks yang sangat blur, resolusi sangat rendah, atau glare/reflection kuat masih dapat menurunkan akurasi.
+- Layout yang sangat padat dan overlap antar kata bisa memengaruhi proses line/word grouping.
+- Model saat ini ditujukan untuk domain label bahan makanan berbahasa Inggris; performa pada domain lain bisa menurun.
+
+## Citation
+
+Jika repository ini membantu riset Anda, silakan sitasi paper berikut (update metadata saat paper sudah final):
+
+```bibtex
+@article{alireza2026craftcrnn,
+  title   = {Pengembangan Sistem OCR untuk Pengenalan Teks Daftar Bahan pada Label Makanan Berbasis CRAFT dan CRNN},
+  author  = {Alireza, Rakeen Aria and Kurniawardhani, Arrie},
+  journal = {JPIT},
+  year    = {2026},
+  note    = {Manuscript under review}
+}
+```
