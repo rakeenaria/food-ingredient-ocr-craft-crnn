@@ -1,8 +1,6 @@
 ﻿# OCR Daftar Bahan Makanan (CRAFT + CRNN)
 
 Repository ini berisi implementasi sistem OCR untuk membaca teks daftar bahan pada label makanan kemasan.
-Isi README diselaraskan dengan rancangan paper:
-**"Pengembangan Sistem OCR untuk Pengenalan Teks Daftar Bahan pada Label Makanan Berbasis CRAFT dan CRNN"**.
 
 Fokus repository ini adalah **menjalankan inference dengan `demo.py`** menggunakan kombinasi:
 - CRAFT untuk deteksi teks.
