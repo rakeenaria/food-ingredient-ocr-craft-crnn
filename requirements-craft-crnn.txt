@@ -1,0 +1,11 @@
+torch
+torchvision
+opencv-python
+numpy
+scipy
+scikit-image
+lmdb
+pillow
+natsort
+nltk
+fire
