@@ -15,7 +15,7 @@ Pipeline sistem di `demo.py`:
 4. Pengenalan kata dengan model CRNN TRBA.
 5. Rekonstruksi hasil menjadi teks daftar bahan utuh.
 
-## Ringkasan Dataset dan Fine-Tuning (Sesuai Paper)
+## Ringkasan Dataset dan Fine-Tuning
 
 - Sumber domain data: dataset label makanan berbahasa Inggris dari Kaggle.
 - Data awal: 182 citra label.
@@ -42,7 +42,7 @@ Pipeline sistem di `demo.py`:
 | TRBA awal | 0.924 | 0.082 | 0.221 | 0.793 |
 | Fine-tuned | 0.970 | 0.028 | 0.046 | 0.953 |
 
-Catatan tambahan dari paper:
+Catatan tambahan:
 - Total kata evaluasi eksternal: 613 kata.
 - Total kesalahan turun dari 125 menjadi 24 (penurunan 80.8%).
 
