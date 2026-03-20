@@ -24,13 +24,22 @@ dist/
 *.ckpt
 *.onnx
 
-# Runtime outputs
+# Runtime outputs (legacy)
 craft_crops/
 craft_results/
 easyocr_results/
 paddle_results/
 tesseract_results/
 result/
+
+# Runtime outputs (canonical)
+outputs/crops/*
+outputs/craft/*
+!outputs/crops/.gitkeep
+!outputs/craft/.gitkeep
+!outputs/examples/
+!outputs/examples/**
+!outputs/README.md
 
 # Local datasets / experiment folders (large)
 data/
@@ -40,6 +49,8 @@ data/*
 !data/valid/
 data/valid/*
 !data/valid/gt.txt
+!data/sample_inputs/
+!data/sample_inputs/README.md
 
 dataset_ingredients/
 word_dataset/
@@ -78,6 +89,7 @@ safe_files.txt
 
 # Notebooks
 *.ipynb
+!notebooks/*.ipynb
 
 # Local-only extra sample folders
 bahan_indo/
