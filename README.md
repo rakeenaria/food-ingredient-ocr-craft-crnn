@@ -19,20 +19,7 @@ Why this matters:
 |---|---|
 | Input image | `bahan/bahan_4.jpg`<img width="438" height="327" alt="bahan_4" src="https://github.com/user-attachments/assets/8682ea93-c2e2-4bce-a021-4b023f7637bc" />|
 | CRAFT detected regions | `craft_results/bahan_4_overlay.jpg` ![bahan_4_overlay](https://github.com/user-attachments/assets/f5c6aa70-b1c4-46b5-9707-8b34d6b25095)|
-| Final OCR reconstruction | `craft_results/merged.txt` 
-bahan_4	BEST INGREDIENTS:
-Organic Whole Grain Wheat Flour (organic
-graham flour)! Organic Wheat Flour, Organic
-Cane Sugar, Organic Expeller-pressed
-Sunflower Oil, Organic Honey Organic
-Molasses, Leavening (baking soda,
-ammonium bicarbonate and cream of- tartar),
-Organic Vanilla Flavor, Organic Brown Sugar
-Flavor, Seart Salt," Organic Rosemary Extract
-(to protect flavor).
-CONTAINS WHEAT INGREDIENTS.
-Mader on shared equipment that" alsow
-processes milk. and soy. |
+| Final OCR reconstruction | `craft_results/merged.txt` bahan_4	BEST INGREDIENTS: Organic Whole Grain Wheat Flour (organic graham flour)! Organic Wheat Flour, Organic Cane Sugar, Organic Expeller-pressed Sunflower Oil, Organic Honey Organic Molasses, Leavening (baking soda, ammonium bicarbonate and cream of- tartar), Organic Vanilla Flavor, Organic Brown Sugar Flavor, Seart Salt," Organic Rosemary Extract (to protect flavor). CONTAINS WHEAT INGREDIENTS. Mader on shared equipment that" alsow processes milk. and soy. |
 
 If demo assets are not available yet, use this placeholder structure:
 - `outputs/examples/input_example.jpg`
