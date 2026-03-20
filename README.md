@@ -88,7 +88,11 @@ craft_crops/bahan_1_line1_word2.png\tSUGAR
 
 `craft_results/merged.txt`
 ```text
-sample_image\tINGREDIENTS SUGAR PALM OIL COCOA POWDER SALT
+bahan_1 INGREDIENTS: Chicken...
+
+bahan_2 BEST INGREDIENTS: Whey Powder...
+
+bahan_3 Ingredients: Milk...
 ```
 
 ## Tech Stack
