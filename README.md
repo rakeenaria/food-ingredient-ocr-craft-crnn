@@ -133,17 +133,3 @@ For exact model-specific settings, see `fine_tuned_model/opt.txt`.
 - Layout yang sangat padat dan overlap antar kata bisa memengaruhi proses line/word grouping.
 - Model saat ini ditujukan untuk domain label bahan makanan berbahasa Inggris; performa pada domain lain bisa menurun.
 
-## Citation
-
-Jika repository ini membantu riset Anda, silakan sitasi paper berikut (update metadata saat paper sudah final):
-
-```bibtex
-@article{alireza2026craftcrnn,
-  title   = {Pengembangan Sistem OCR untuk Pengenalan Teks Daftar Bahan pada Label Makanan Berbasis CRAFT dan CRNN},
-  author  = {Alireza, Rakeen Aria and Kurniawardhani, Arrie},
-  journal = {JPIT},
-  year    = {2026},
-  note    = {Manuscript under review}
-}
-```
-
