@@ -19,12 +19,7 @@ Why this matters:
 |---|---|
 | Input image | `<img width="438" height="327" alt="bahan_4" src="https://github.com/user-attachments/assets/8682ea93-c2e2-4bce-a021-4b023f7637bc" />|
 | CRAFT detected regions | ![bahan_4_overlay](https://github.com/user-attachments/assets/f5c6aa70-b1c4-46b5-9707-8b34d6b25095)|
-| Final OCR reconstruction | Merged [bahan_4]: BEST INGREDIENTS: Organic Whole Grain Wheat Flour (organic graham flour) Organic Wheat Flour, Organic Cane Sugar, Organic Expeller-pressed Sunflower Oil, Organic Honey, Organic Molasses, Leavening (baking soda, ammonium bicarbonate and cream of tartar), Organic Vanilla Flavor, Organic Brown Sugar Flavor, Sea Salt, Organic Rosemary Extract (to protect flavor). CONTAINS WHEAT INGREDIENTS. Made on shared equipment that also processes milk and soy.|
-
-If demo assets are not available yet, use this placeholder structure:
-- `outputs/examples/input_example.jpg`
-- `outputs/examples/detected_regions.jpg`
-- `outputs/examples/ocr_output.txt`
+| Final OCR reconstruction | BEST INGREDIENTS: Organic Whole Grain Wheat Flour (organic graham flour) Organic Wheat Flour, Organic Cane Sugar, Organic Expeller-pressed Sunflower Oil, Organic Honey, Organic Molasses, Leavening (baking soda, ammonium bicarbonate and cream of tartar), Organic Vanilla Flavor, Organic Brown Sugar Flavor, Sea Salt, Organic Rosemary Extract (to protect flavor). CONTAINS WHEAT INGREDIENTS. Made on shared equipment that also processes milk and soy.|
 
 ## Pipeline
 `Image -> CRAFT -> Word Cropping -> CRNN (TRBA) -> Text Reconstruction`
@@ -79,9 +74,9 @@ Fine-tuning on food-label domain data adapts the recognizer to ingredient vocabu
 
 ### Before vs After OCR (Sample Format)
 ```text
-Input (ground truth): INGREDIENTS: SUGAR, PALM OIL, COCOA POWDER, SALT
-Baseline OCR        : INGREDIENTS: SUGAR, PALM O1L, C0COA POWDER. SALT
-Fine-tuned OCR      : INGREDIENTS: SUGAR, PALM OIL, COCOA POWDER, SALT
+Input (ground truth): BEST INGREDIENTS: Organic Whole Grain Wheat Flour (organic graham flour) Organic Wheat Flour, Organic Cane Sugar, Organic Expeller-pressed Sunflower Oil, Organic Honey, Organic Molasses, Leavening (baking soda, ammonium bicarbonate and cream of tartar), Organic Vanilla Flavor, Organic Brown Sugar Flavor, Sea Salt, Organic Rosemary Extract (to protect flavor). CONTAINS WHEAT INGREDIENTS. Made on shared equipment that also processes milk and soy.
+Baseline OCR        : BEST INGREDIENTS: Organic Whole Grain Wheat Flour (organic graham flour)! Organic Wheat Flour, Organic Cane Sugar, Organic Expeller-pressed Sunflower Oil, Organic Honey Organic Molasses, Leavening (baking soda, ammonium bicarbonate and cream of- tartar), Organic Vanilla Flavor, Organic Brown Sugar Flavor, Seart Salt," Organic Rosemary Extract (to protect flavor). CONTAINS WHEAT INGREDIENTS. Mader on shared equipment that" alsow processes milk. and soy.
+Fine-tuned OCR      : BEST INGREDIENTS: Organic Whole Grain Wheat Flour (organic graham flour) Organic Wheat Flour, Organic Cane Sugar, Organic Expeller-pressed Sunflower Oil, Organic Honey, Organic Molasses, Leavening (baking soda, ammonium bicarbonate and cream of tartar), Organic Vanilla Flavor, Organic Brown Sugar Flavor, Sea Salt, Organic Rosemary Extract (to protect flavor). CONTAINS WHEAT INGREDIENTS. Made on shared equipment that also processes milk and soy.
 ```
 
 ### Sample Output Format
