@@ -34,18 +34,27 @@ result/
 
 # Local datasets / experiment folders (large)
 data/
+!data/
+data/*
+!data/README.md
+!data/valid/
+data/valid/*
+!data/valid/gt.txt
+
 dataset_ingredients/
 word_dataset/
-bahan/
-bahan_indo/
-bahan_inggris/
-bahan_luar/
+
+# Trained models (large)
+saved_models/
+!saved_models/
+saved_models/*
+!saved_models/README.md
+
 FT2_adam/
 FT3_adam/
 FT5_adam/
 FT6_adam/
 fine_tuned_model/
-saved_models/
 notebooklm-mcp/
 notebooklm-mcp.git/
 
@@ -53,6 +62,9 @@ notebooklm-mcp.git/
 !fine_tuned_model/
 fine_tuned_model/*
 !fine_tuned_model/opt.txt
+
+# Demo/sample folders
+demo_image/
 
 # Local logs and scratch artifacts
 paper_extracted.txt
@@ -64,8 +76,13 @@ safe_files.txt
 *.zip
 *.tar
 
-# Keep docs/config text files tracked by default
-# (do not ignore *.txt globally)
-
 # Notebooks
 *.ipynb
+
+# Local-only extra sample folders
+bahan_indo/
+bahan_inggris/
+bahan_luar/
+
+# Keep single license file
+LICENSE.md
