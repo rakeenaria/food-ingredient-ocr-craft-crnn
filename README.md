@@ -74,19 +74,19 @@ Fine-tuning on food-label domain data adapts the recognizer to ingredient vocabu
 
 ### Before vs After OCR (Sample Format)
 ```text
-Input (ground truth): BEST INGREDIENTS: Organic Whole Grain Wheat Flour (organic graham flour) Organic Wheat Flour, Organic Cane Sugar, Organic Expeller-pressed Sunflower Oil, Organic Honey, Organic Molasses, Leavening (baking soda, ammonium bicarbonate and cream of tartar), Organic Vanilla Flavor, Organic Brown Sugar Flavor, Sea Salt, Organic Rosemary Extract (to protect flavor). CONTAINS WHEAT INGREDIENTS. Made on shared equipment that also processes milk and soy.
-Baseline OCR        : BEST INGREDIENTS: Organic Whole Grain Wheat Flour (organic graham flour)! Organic Wheat Flour, Organic Cane Sugar, Organic Expeller-pressed Sunflower Oil, Organic Honey Organic Molasses, Leavening (baking soda, ammonium bicarbonate and cream of- tartar), Organic Vanilla Flavor, Organic Brown Sugar Flavor, Seart Salt," Organic Rosemary Extract (to protect flavor). CONTAINS WHEAT INGREDIENTS. Mader on shared equipment that" alsow processes milk. and soy.
-Fine-tuned OCR      : BEST INGREDIENTS: Organic Whole Grain Wheat Flour (organic graham flour) Organic Wheat Flour, Organic Cane Sugar, Organic Expeller-pressed Sunflower Oil, Organic Honey, Organic Molasses, Leavening (baking soda, ammonium bicarbonate and cream of tartar), Organic Vanilla Flavor, Organic Brown Sugar Flavor, Sea Salt, Organic Rosemary Extract (to protect flavor). CONTAINS WHEAT INGREDIENTS. Made on shared equipment that also processes milk and soy.
+Input (ground truth): INGREDIENTS: CHICKEN BROTH: WATER CHICKEN FLAVOR (CHICKEN BROTH RENDERED CHICKEN FAT, SALT, FLAVOR, DISODIUM INOSINATE & DISODIUM GUANYLATE, POLYSORBATE 60, XANTHAN GUM), WHEAT FLOUR ENRICHED WITH (NIACIN, IRON, THIAMINE MONONITRATE, RIBOFLAVIN, FOLIC ACID), COOKED WHITE MEAT CHICKEN, INTERESTERIFIED SOYBEAN OIL, HYDROGENATED SOYBEAN OIL, CARROTS, PEAS, CONTAINS 2% OR LESS OF EACH OF: CELERY, MODIFIED CORN STARCH, ONIONS, HEAVY WHIPPING CREAM, SALT, RENDERED CHICKEN FAT, SOYBEAN OIL, WHEY POWDER, NONFAT DRY MILK, SUGAR, ISOLATED SOY PROTEIN, CARRAGEENAN, METHYLCELLULOSE, AUTOLYZED YEAST EXTRACT, FLAVORS, MONO- & DIGLYCERIDES, BLACK PEPPER, TURMERIC, CARAMEL COLOR, SOY LECITHIN. CONTAINS: MILK, SOY, WHEAT.
+Baseline OCR        : INGREDIENTS: CHICKEN BROTH: WATER CHICKEN FLAVOR (CHICKEN BROTH RENDERED CHICKEN FAT, SALT," FLAVOR, DISODIUM INOSINATE but DISODIUM GUANYLATE, POLYSORBATE 6 XANTHAN GUM), WHEAT FLOUR ENRICHED WITHY (NIACIN, IRON, THIAMINE MONONITRATE, RIBOFLAVIN, FOLICH ACID)." COOKED WHITE MEATE CHICKEN, INTERESTERIFIED SOYBEAN OIL, HYDROGENATED SOYBEAN I CARROTS, PEAS, CONTAINS 2% ORRISTION LESSIN I EACHIN Of: CELERY, MODIFIED CORNIES STARCH, ONIONS, HEAVY WHIPPING CREAM, SALT, RENDERED CHICKEN FAT, SOYBEAN OIL, WHEY POWDER NONFAT DRYWE MILK, SUGAR, ISOLATED SOYER PROTEIN, CARRAGEENAN, METHYLCELLULOSE, AUTOLYZED YEAST EXTRACT, FLAVORS, MONO-T & DIGLYCERIDES, BLACK PEPPER, TURMERIC, CARAMEL COLOR, SOY-IE LECITHIN.] CONTAINS: MILK, SOY, WHEAT.
+Fine-tuned OCR      : INGREDIENTS: CHICKEN BROTH: WATER CHICKEN FLAVOR (CHICKEN BROTH RENDERED CHICKEN FAT, SALT, FLAVOR, DISODIUM INOSINATE & DISODIUM GUANYLATE, POLYSORBATE 60, XANTHAN GUM), WHEAT FLOUR ENRICHED WITHL (NIACIN, IRON, THIAMINE MONONITRATE, RIBOFLAVIN, FOLIC ACID), COOKED WHITE MEAT CHICKEN, INTERESTERIFIED SOYBEAN OIL, HYDROGENATED SOYBEAN OIL, CARROTS, PEAS, CONTAINS 2% OR LESS OF EACH OF: CELERY, MODIFIED CORN STARCH, ONIONS, HEAVY WHIPPING CREAM, SALT, RENDERED CHICKEN FAT, SOYBEAN OIL, WHEY POWDER, NONFAT DRY MILK, SUGAR, ISOLATED SOY PROTEIN, CARRAGEENAN, METHYLCELLULOSE, AUTOLYZED YEAST EXTRACT, FLAVORS, MONO- & DIGLYCERIDES, BLACK PEPPER, TURMERIC, CARAMEL COLOR, SOY LECITHIN. CONTAINS: MILK, SOY, WHEAT.
 ```
 
 ### Sample Output Format
-`outputs/craft/recognized.txt`
+`craft_results/recognized.txt`
 ```text
-outputs/crops/sample_line1_word1.png\tINGREDIENTS
-outputs/crops/sample_line1_word2.png\tSUGAR
+craft_crops/bahan_1_line1_word1.png\tINGREDIENTS
+craft_crops/bahan_1_line1_word2.png\tSUGAR
 ```
 
-`outputs/craft/merged.txt`
+`craft_results/merged.txt`
 ```text
 sample_image\tINGREDIENTS SUGAR PALM OIL COCOA POWDER SALT
 ```
