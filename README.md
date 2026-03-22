@@ -145,10 +145,6 @@ python scripts/run_demo.py --saved_model fine_tuned_model/best_accuracy.pth
 |- scripts/
 |  |- run_demo.py                    # canonical runnable entrypoint
 |- demo.py                           # compatibility wrapper (kept for existing usage)
-|- legacy_demo_variant.py            # renamed legacy runner (old demo3.py)
-|- legacy_demo_simple.py             # renamed legacy runner (old demo4.py)
-|- demo3.py                          # compatibility wrapper -> legacy_demo_variant.py
-|- demo4.py                          # compatibility wrapper -> legacy_demo_simple.py
 |- data/
 |  |- sample_inputs/                 # canonical sample-input location (documented)
 |  |- valid/gt.txt                   # lightweight annotation sample

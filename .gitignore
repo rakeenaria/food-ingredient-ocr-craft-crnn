@@ -104,3 +104,12 @@ Skripsi Prompt/
 demo3.py
 demo4.py
 transform_to_onnx.py
+
+# Removed from public GitHub profile
+paddleOCR.py
+text_recog.py
+text_recog.cpp
+notebooks/demo.ipynb
+legacy_demo_variant.py
+legacy_demo_simple.py
+figures/
