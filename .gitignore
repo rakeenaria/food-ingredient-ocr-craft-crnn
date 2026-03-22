@@ -98,3 +98,9 @@ bahan_luar/
 
 # Keep single license file
 LICENSE.md
+
+# Exclude thesis prompt workspace and legacy scripts from GitHub
+Skripsi Prompt/
+demo3.py
+demo4.py
+transform_to_onnx.py
