@@ -1,7 +1,8 @@
-﻿import os
+import os
 import time
 import string
 import argparse
+from collections import Counter
 
 import shutil
 import torch
@@ -50,15 +51,15 @@ def benchmark_all_eval(model, criterion, converter, opt, calculate_infer_time=Fa
             num_workers=int(opt.workers),
             collate_fn=AlignCollate_evaluation, pin_memory=True)
 
-        _, accuracy_by_best_model, norm_ED_by_best_model, cer_by_best_model, wer_by_best_model, avg_conf_by_best_model, coverage_thr, acc_thr, _, _, _, infer_time, length_of_data = validation(
+        _, accuracy_by_best_model, norm_ED_by_best_model, cer_by_best_model, wer_by_best_model, f1_by_best_model, avg_conf_by_best_model, coverage_thr, acc_thr, _, _, _, infer_time, length_of_data = validation(
             model, criterion, evaluation_loader, converter, opt)
         list_accuracy.append(f'{accuracy_by_best_model:0.3f}')
         total_forward_time += infer_time
         total_evaluation_data_number += len(eval_data)
         total_correct_number += accuracy_by_best_model * length_of_data
         log.write(eval_data_log)
-        print(f'Acc {accuracy_by_best_model:0.3f}\t normalized_ED {norm_ED_by_best_model:0.3f}\t CER {cer_by_best_model:0.3f}\t WER {wer_by_best_model:0.3f}\t AvgConf {avg_conf_by_best_model:0.3f}\t Coverage@0.8 {coverage_thr:0.3f}\t Acc@0.8 {acc_thr:0.3f}')
-        log.write(f'Acc {accuracy_by_best_model:0.3f}\t normalized_ED {norm_ED_by_best_model:0.3f}\t CER {cer_by_best_model:0.3f}\t WER {wer_by_best_model:0.3f}\t AvgConf {avg_conf_by_best_model:0.3f}\t Coverage@0.8 {coverage_thr:0.3f}\t Acc@0.8 {acc_thr:0.3f}\n')
+        print(f'Acc {accuracy_by_best_model:0.3f}\t normalized_ED {norm_ED_by_best_model:0.3f}\t CER {cer_by_best_model:0.3f}\t WER {wer_by_best_model:0.3f}\t F1 {f1_by_best_model:0.3f}\t AvgConf {avg_conf_by_best_model:0.3f}\t Coverage@0.8 {coverage_thr:0.3f}\t Acc@0.8 {acc_thr:0.3f}')
+        log.write(f'Acc {accuracy_by_best_model:0.3f}\t normalized_ED {norm_ED_by_best_model:0.3f}\t CER {cer_by_best_model:0.3f}\t WER {wer_by_best_model:0.3f}\t F1 {f1_by_best_model:0.3f}\t AvgConf {avg_conf_by_best_model:0.3f}\t Coverage@0.8 {coverage_thr:0.3f}\t Acc@0.8 {acc_thr:0.3f}\n')
         print(dashed_line)
         log.write(dashed_line + '\n')
 
@@ -84,6 +85,10 @@ def validation(model, criterion, evaluation_loader, converter, opt):
     norm_ED = 0
     word_edit_total = 0  # sum of word-level edit distance
     word_count_total = 0  # total gt words
+    # Exact-word F1 (corpus-level) counters.
+    tp_word_total = 0
+    pred_word_total = 0
+    gt_word_total = 0
     char_edit_total = 0  # sum of character-level edit distance
     char_count_total = 0  # total gt characters
     conf_sum = 0.0  # sum of confidence scores per sample
@@ -194,6 +199,13 @@ def validation(model, criterion, evaluation_loader, converter, opt):
                 word_edit_total += edit_distance(pred_words, gt_words)
                 word_count_total += len(gt_words)
 
+            # Exact-word matching for precision/recall/F1.
+            gt_counter = Counter(gt_words)
+            pred_counter = Counter(pred_words)
+            tp_word_total += sum((gt_counter & pred_counter).values())
+            pred_word_total += len(pred_words)
+            gt_word_total += len(gt_words)
+
             # calculate confidence score (= multiply of pred_max_prob)
             try:
                 confidence_score = pred_max_prob.cumprod(dim=0)[-1]
@@ -212,11 +224,15 @@ def validation(model, criterion, evaluation_loader, converter, opt):
     norm_ED = norm_ED / float(length_of_data)  # ICDAR2019 Normalized Edit Distance
     cer = char_edit_total / char_count_total if char_count_total > 0 else 0.0
     wer = word_edit_total / word_count_total if word_count_total > 0 else 0.0
+    precision_word = tp_word_total / pred_word_total if pred_word_total > 0 else 0.0
+    recall_word = tp_word_total / gt_word_total if gt_word_total > 0 else 0.0
+    f1_word = (2 * precision_word * recall_word / (precision_word + recall_word)
+               if (precision_word + recall_word) > 0 else 0.0)
     avg_conf = conf_sum / conf_count if conf_count > 0 else 0.0
     coverage_at_thr = conf_selected / float(length_of_data) if length_of_data > 0 else 0.0
     acc_at_thr = conf_correct / float(conf_selected) if conf_selected > 0 else 0.0
 
-    return valid_loss_avg.val(), accuracy, norm_ED, cer, wer, avg_conf, coverage_at_thr, acc_at_thr, preds_str, confidence_score_list, labels, infer_time, length_of_data
+    return valid_loss_avg.val(), accuracy, norm_ED, cer, wer, f1_word, avg_conf, coverage_at_thr, acc_at_thr, preds_str, confidence_score_list, labels, infer_time, length_of_data
 
 
 def test(opt):
@@ -295,12 +311,12 @@ def test(opt):
                 shuffle=False,
                 num_workers=int(opt.workers),
                 collate_fn=AlignCollate_evaluation, pin_memory=True)
-            valid_loss, accuracy_by_best_model, norm_ED_by_best_model, cer_by_best_model, wer_by_best_model, avg_conf_by_best_model, coverage_thr, acc_thr, _, _, _, infer_time, length_of_data = validation(
+            valid_loss, accuracy_by_best_model, norm_ED_by_best_model, cer_by_best_model, wer_by_best_model, f1_by_best_model, avg_conf_by_best_model, coverage_thr, acc_thr, _, _, _, infer_time, length_of_data = validation(
                 model, criterion, evaluation_loader, converter, opt)
             log.write(eval_data_log)
             avg_infer_ms = (infer_time / float(length_of_data) * 1000) if length_of_data > 0 else 0.0
-            print(f'Accuracy: {accuracy_by_best_model:0.3f}, norm_ED: {norm_ED_by_best_model:0.3f}, CER: {cer_by_best_model:0.3f}, WER: {wer_by_best_model:0.3f}, AvgConf: {avg_conf_by_best_model:0.3f}, Coverage@0.8: {coverage_thr:0.3f}, Acc@0.8: {acc_thr:0.3f}, avg_infer: {avg_infer_ms:0.3f} ms/img')
-            log.write(f'{accuracy_by_best_model:0.3f}\t{norm_ED_by_best_model:0.3f}\t{cer_by_best_model:0.3f}\t{wer_by_best_model:0.3f}\t{avg_conf_by_best_model:0.3f}\t{coverage_thr:0.3f}\t{acc_thr:0.3f}\t{valid_loss:0.4f}\t{avg_infer_ms:0.3f}\n')
+            print(f'Accuracy: {accuracy_by_best_model:0.3f}, norm_ED: {norm_ED_by_best_model:0.3f}, CER: {cer_by_best_model:0.3f}, WER: {wer_by_best_model:0.3f}, F1: {f1_by_best_model:0.3f}, AvgConf: {avg_conf_by_best_model:0.3f}, Coverage@0.8: {coverage_thr:0.3f}, Acc@0.8: {acc_thr:0.3f}, avg_infer: {avg_infer_ms:0.3f} ms/img')
+            log.write(f'{accuracy_by_best_model:0.3f}\t{norm_ED_by_best_model:0.3f}\t{cer_by_best_model:0.3f}\t{wer_by_best_model:0.3f}\t{f1_by_best_model:0.3f}\t{avg_conf_by_best_model:0.3f}\t{coverage_thr:0.3f}\t{acc_thr:0.3f}\t{valid_loss:0.4f}\t{avg_infer_ms:0.3f}\n')
             log.close()
 
 

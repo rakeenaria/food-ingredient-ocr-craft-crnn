@@ -1,4 +1,4 @@
-﻿import os
+import os
 import sys
 import time
 import random
@@ -230,7 +230,7 @@ def train(opt):
             with open(f'./saved_models/{opt.exp_name}/log_train.txt', 'a') as log:
                 model.eval()
                 with torch.no_grad():
-                    valid_loss, current_accuracy, current_norm_ED, _, _, _, _, _, preds, confidence_score, labels, infer_time, length_of_data = validation(
+                    valid_loss, current_accuracy, current_norm_ED, _, _, _, _, _, _, preds, confidence_score, labels, infer_time, length_of_data = validation(
                         model, criterion, valid_loader, converter, opt)
                 model.train()
 
