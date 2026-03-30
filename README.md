@@ -1,7 +1,7 @@
 ﻿# Food Ingredient OCR (CRAFT + CRNN TRBA)
 
 ## Overview
-This project builds an end-to-end OCR pipeline to read food ingredient lists from packaging images..
+This project builds an end-to-end OCR pipeline to read food ingredient lists from packaging images.
 
 Why this matters:
 - Ingredient text is often small, dense, and hard to parse manually.
