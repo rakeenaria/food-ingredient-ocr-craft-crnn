@@ -62,6 +62,15 @@ def parse_recognized_file(recognized_path: Path) -> pd.DataFrame:
     return pd.DataFrame(rows)
 
 
+def list_input_images(input_folder: Path) -> list[Path]:
+    image_exts = {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".webp"}
+    if not input_folder.exists():
+        return []
+    images = [path for path in input_folder.rglob("*") if path.is_file() and path.suffix.lower() in image_exts]
+    images.sort()
+    return images
+
+
 st.set_page_config(page_title="Food Ingredient OCR", layout="wide")
 st.title("Food Ingredient OCR Runner")
 st.caption("Run CRAFT + TRBA OCR from UI and inspect merged output quickly.")
@@ -81,9 +90,9 @@ with st.form("ocr_form"):
 
     options_col_1, options_col_2 = st.columns(2)
     with options_col_1:
-        refine = st.checkbox("Use CRAFT refiner", value=False)
-        save_overlay = st.checkbox("Save overlay images", value=False)
-        sensitive = st.checkbox("Force sensitive charset", value=False)
+        refine = st.checkbox("Use CRAFT refiner", value=True)
+        save_overlay = st.checkbox("Save overlay images", value=True)
+        sensitive = st.checkbox("Force sensitive charset", value=True)
     with options_col_2:
         pad = st.checkbox("Use PAD", value=False)
         rgb = st.checkbox("Use RGB recognizer input", value=False)
@@ -134,12 +143,28 @@ if run_clicked:
 
     merged_path = resolve_repo_path(run_options["merged_output"])
     recognized_path = resolve_repo_path(run_options["results_folder"]) / "recognized.txt"
+    input_folder_path = resolve_repo_path(run_options["input_folder"])
+    input_images = list_input_images(input_folder_path)
 
-    if merged_path.exists():
+    panel_height = 420
+    merged_col, images_col = st.columns(2)
+    with merged_col:
         st.subheader("Merged Output")
-        st.text_area("merged.txt", merged_path.read_text(encoding="utf-8"), height=360)
-    else:
-        st.warning(f"Merged output not found at: {merged_path}")
+        if merged_path.exists():
+            st.text_area("merged.txt", merged_path.read_text(encoding="utf-8"), height=panel_height)
+        else:
+            st.warning(f"Merged output not found at: {merged_path}")
+
+    with images_col:
+        st.subheader("Input Images")
+        with st.container(height=panel_height, border=True):
+            if not input_images:
+                st.warning(f"No images found in: {input_folder_path}")
+            else:
+                grid_cols = st.columns(2)
+                for index, image_path in enumerate(input_images):
+                    with grid_cols[index % 2]:
+                        st.image(str(image_path), caption=image_path.name, use_container_width=True)
 
     if recognized_path.exists():
         st.subheader("Recognized Table")

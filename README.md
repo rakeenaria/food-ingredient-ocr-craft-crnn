@@ -133,9 +133,18 @@ python demo.py \
 python scripts/run_demo.py --saved_model fine_tuned_model/best_accuracy.pth
 ```
 
-5. Outputs are written to:
+5. Optional local Streamlit interface:
+```bash
+streamlit run app_streamlit.py
+```
+UI notes:
+- Left panel: merged OCR text (`outputs/merged.txt`)
+- Right panel: scrollable gallery of input images from `--input_folder`
+
+6. Outputs are written to:
 - `outputs/crops/`
 - `outputs/craft/`
+- `outputs/merged.txt`
 
 ## Project Structure
 ```text
@@ -144,6 +153,7 @@ python scripts/run_demo.py --saved_model fine_tuned_model/best_accuracy.pth
 |  |- ocr_pipeline.py                # canonical OCR pipeline implementation
 |- scripts/
 |  |- run_demo.py                    # canonical runnable entrypoint
+|- app_streamlit.py                  # local Streamlit UI runner
 |- demo.py                           # compatibility wrapper (kept for existing usage)
 |- data/
 |  |- sample_inputs/                 # canonical sample-input location (documented)
@@ -154,7 +164,8 @@ python scripts/run_demo.py --saved_model fine_tuned_model/best_accuracy.pth
 |  |- demo.ipynb                     # exploratory notebook
 |- outputs/
 |  |- crops/                         # cropped regions from detection
-|  |- craft/                         # OCR text + heatmaps + merged output
+|  |- craft/                         # OCR text + heatmaps
+|  |- merged.txt                     # merged OCR paragraphs
 |  |- examples/                      # recruiter-facing demo placeholders
 |- THIRD_PARTY_NOTICES.md
 |- LICENSE
