@@ -139,14 +139,14 @@ if run_clicked:
         st.text_area("stdout", completed.stdout, height=280)
     if completed.stderr:
         st.subheader("Stderr")
-        st.text_area("stderr", completed.stderr, height=180)
+        st.text_area("stderr", completed.stderr, height=180) 
 
     merged_path = resolve_repo_path(run_options["merged_output"])
     recognized_path = resolve_repo_path(run_options["results_folder"]) / "recognized.txt"
     input_folder_path = resolve_repo_path(run_options["input_folder"])
     input_images = list_input_images(input_folder_path)
 
-    panel_height = 420
+    panel_height = 450
     merged_col, images_col = st.columns(2)
     with merged_col:
         st.subheader("Merged Output")
@@ -161,10 +161,8 @@ if run_clicked:
             if not input_images:
                 st.warning(f"No images found in: {input_folder_path}")
             else:
-                grid_cols = st.columns(2)
-                for index, image_path in enumerate(input_images):
-                    with grid_cols[index % 2]:
-                        st.image(str(image_path), caption=image_path.name, use_container_width=True)
+                for image_path in input_images:
+                    st.image(str(image_path), caption=image_path.name, use_container_width=True)
 
     if recognized_path.exists():
         st.subheader("Recognized Table")
