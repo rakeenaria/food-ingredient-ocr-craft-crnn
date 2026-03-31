@@ -80,19 +80,19 @@ Fine-tuned OCR      : INGREDIENTS: CHICKEN BROTH: WATER CHICKEN FLAVOR (CHICKEN 
 ```
 
 ### Sample Output Format
-`craft_results/recognized.txt`
+`outputs/craft/recognized.txt`
 ```text
-craft_crops/bahan_1_line1_word1.png\tINGREDIENTS
-craft_crops/bahan_1_line1_word2.png\tSUGAR
+outputs/crops/bahan_1_line1_word1.png\tINGREDIENTS
+outputs/crops/bahan_1_line1_word2.png\tSUGAR
 ```
 
-`craft_results/merged.txt`
+`outputs/merged.txt`
 ```text
-bahan_1 INGREDIENTS: Chicken...
+bahan_1 INGREDIENTS: Chicken, butter...
 
-bahan_2 BEST INGREDIENTS: Whey Powder...
+bahan_2 BEST INGREDIENTS: Whey Powder, Niacin...
 
-bahan_3 Ingredients: Milk...
+bahan_3 Ingredients: Milk, Sugar...
 ```
 
 ## Tech Stack
