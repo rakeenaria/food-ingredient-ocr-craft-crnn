@@ -1,4 +1,7 @@
 ﻿import argparse
+import string
+import os
+import stat
 import shutil
 from collections import defaultdict
 from pathlib import Path
@@ -18,6 +21,9 @@ import imgproc
 from dataset import RawDataset, AlignCollate
 from model import Model
 from utils import CTCLabelConverter, AttnLabelConverter
+
+DEFAULT_BASIC_CHARACTER_SET = "0123456789abcdefghijklmnopqrstuvwxyz"
+SENSITIVE_CHARACTER_SET = string.printable[:-6]
 
 
 def order_quad_points(points: np.ndarray) -> np.ndarray:
@@ -88,8 +94,8 @@ def compute_axis_aligned_iou(quad_a, quad_b) -> float:
     return intersection / union if union > 0 else 0.0
 
 
-def sort_boxes_reading_order(boxes, min_tol: float = 10.0):
-    """Sort boxes top-to-bottom then left-to-right using baseline-based line grouping."""
+def group_boxes_by_lines(boxes, min_tol: float = 10.0):
+    """Group detected boxes into reading lines, each line sorted left-to-right."""
     if len(boxes) == 0:
         return []
 
@@ -128,10 +134,18 @@ def sort_boxes_reading_order(boxes, min_tol: float = 10.0):
     if current_line:
         grouped_lines.append(current_line)
 
-    order = []
     for line in grouped_lines:
         line.sort(key=lambda item: item[1])
-        order.extend([item[0] for item in line])
+
+    return [[item[0] for item in line] for line in grouped_lines]
+
+
+def sort_boxes_reading_order(boxes, min_tol: float = 10.0):
+    """Sort boxes top-to-bottom then left-to-right using baseline-based line grouping."""
+    grouped_lines = group_boxes_by_lines(boxes, min_tol=min_tol)
+    order = []
+    for line in grouped_lines:
+        order.extend(line)
     return order
 
 
@@ -255,6 +269,62 @@ def build_recognizer_model(opt):
     return recognizer, converter, device
 
 
+def expected_num_classes(prediction_name: str, character_count: int) -> int:
+    token_count = 2 if "Attn" in prediction_name else 1
+    return character_count + token_count
+
+
+def checkpoint_num_classes(saved_model_path: str):
+    """Return output class count encoded in checkpoint head weights, if available."""
+    state = torch.load(saved_model_path, map_location="cpu")
+    if isinstance(state, dict) and "state_dict" in state:
+        state = state["state_dict"]
+    if not isinstance(state, dict):
+        return None
+
+    keys = (
+        "Prediction.generator.weight",
+        "module.Prediction.generator.weight",
+        "Prediction.weight",
+        "module.Prediction.weight",
+    )
+    for key in keys:
+        if key in state:
+            return int(state[key].shape[0])
+    return None
+
+
+def normalize_character_configuration(args):
+    """
+    Resolve recognizer character set from CLI flags and checkpoint head shape.
+    Automatically enables sensitive mode for known 96-class checkpoints.
+    """
+    if args.sensitive:
+        args.character = SENSITIVE_CHARACTER_SET
+        return
+
+    current_num_classes = expected_num_classes(args.Prediction, len(args.character))
+    checkpoint_classes = checkpoint_num_classes(args.saved_model)
+    if checkpoint_classes is None or checkpoint_classes == current_num_classes:
+        return
+
+    sensitive_num_classes = expected_num_classes(args.Prediction, len(SENSITIVE_CHARACTER_SET))
+    if args.character == DEFAULT_BASIC_CHARACTER_SET and checkpoint_classes == sensitive_num_classes:
+        args.sensitive = True
+        args.character = SENSITIVE_CHARACTER_SET
+        print(
+            f"Info: checkpoint expects {checkpoint_classes} classes. "
+            "Enabling sensitive character set automatically."
+        )
+        return
+
+    raise ValueError(
+        f"Checkpoint/output class mismatch: checkpoint has {checkpoint_classes} classes, "
+        f"but current configuration expects {current_num_classes}. "
+        "Pass --sensitive or set --character to match the training charset."
+    )
+
+
 def recognize_crop_folder(model, converter, device, crops_dir: Path, opt):
     """Run batched recognition on cropped word images."""
     align_collate = AlignCollate(imgH=opt.imgH, imgW=opt.imgW, keep_ratio_with_pad=opt.PAD)
@@ -321,7 +391,7 @@ def parse_word_order_index(stem_name: str):
     return stem_name, 0
 
 
-def write_merged_outputs(recognition_results, results_dir: Path):
+def write_merged_outputs(recognition_results, results_dir: Path, merged_output_path: Path):
     """Reconstruct paragraph-level text in reading order and write output files."""
     grouped_predictions = defaultdict(list)
 
@@ -334,7 +404,6 @@ def write_merged_outputs(recognition_results, results_dir: Path):
         base_name, order_index = parse_word_order_index(stem_name)
         grouped_predictions[base_name].append((order_index, predicted_text))
 
-    merged_output_path = results_dir / "merged.txt"
     with open(merged_output_path, "w", encoding="utf-8") as merged_file:
         for base_name, items in grouped_predictions.items():
             items.sort(key=lambda item: item[0])
@@ -391,6 +460,7 @@ def build_argument_parser():
     )
     parser.add_argument("--crops_folder", default="./outputs/crops", help="folder to save cropped text regions")
     parser.add_argument("--results_folder", default="./outputs/craft", help="folder to save output text and maps")
+    parser.add_argument("--merged_output", default="./outputs/merged.txt", help="path to merged paragraph output")
     parser.add_argument("--save_overlay", action="store_true", help="save visualized detection overlay")
 
     # Recognition arguments
@@ -415,26 +485,49 @@ def build_argument_parser():
     return parser
 
 
+def prepare_crops_directory(crops_dir: Path) -> Path:
+    """
+    Ensure crops output directory is empty.
+    If cleanup fails because the directory is locked, stop with a clear error.
+    """
+    if not crops_dir.exists():
+        return crops_dir
+
+    def remove_readonly(action, path, exc_info):
+        _ = exc_info
+        try:
+            os.chmod(path, stat.S_IWRITE)
+        except Exception:
+            pass
+        action(path)
+
+    try:
+        os.chmod(crops_dir, stat.S_IWRITE)
+        shutil.rmtree(crops_dir, onerror=remove_readonly)
+        return crops_dir
+    except PermissionError as error:
+        raise RuntimeError(
+            f"Failed to remove {crops_dir}. Close files/apps that lock this folder, then run again."
+        ) from error
+
+
 def main():
     parser = build_argument_parser()
     args = parser.parse_args()
-
-    if args.sensitive:
-        import string
-
-        args.character = string.printable[:-6]
+    normalize_character_configuration(args)
 
     input_dir = Path(args.input_folder)
     crops_dir = Path(args.crops_folder)
     results_dir = Path(args.results_folder)
+    merged_output_path = Path(args.merged_output)
 
-    # Always rebuild crop output so each run has deterministic contents.
-    if crops_dir.exists():
-        shutil.rmtree(crops_dir)
+    # Rebuild crop output from scratch for each run.
+    crops_dir = prepare_crops_directory(crops_dir)
     crops_dir.mkdir(parents=True, exist_ok=True)
     line_crops_dir = crops_dir / "lines"
     line_crops_dir.mkdir(parents=True, exist_ok=True)
     results_dir.mkdir(parents=True, exist_ok=True)
+    merged_output_path.parent.mkdir(parents=True, exist_ok=True)
 
     recognizer, label_converter, device = build_recognizer_model(args)
     craft_detector = load_craft_detector(args.trained_model, args.cuda)
@@ -486,65 +579,60 @@ def main():
             print(f"{image_path} -> 0 boxes")
             continue
 
-        # Plain CRAFT pass is used to stabilize reading-order sorting.
+        # Plain CRAFT pass drives reading-order line grouping so layout stays
+        # stable even when refiner polygons are not line-level.
         boxes_plain, _, _, _ = detect_text_regions(craft_detector, image_bgr, args, refine_net=None)
         if boxes_plain is None or len(boxes_plain) == 0:
             boxes_plain = boxes_refined
+        if boxes_plain is None or len(boxes_plain) == 0:
+            print(f"{image_path} -> 0 boxes")
+            continue
 
         if args.save_overlay:
             overlay = image_bgr.copy()
-            polygons_for_draw = polygons_refined if len(polygons_refined) == len(boxes_refined) else boxes_refined
+            polygons_for_draw = (
+                polygons_refined
+                if polygons_refined is not None and len(polygons_refined) == len(boxes_refined)
+                else boxes_plain
+            )
             for polygon in polygons_for_draw:
                 points = np.array(polygon, dtype=np.int32).reshape(-1, 1, 2)
                 cv.polylines(overlay, [points], True, (0, 255, 0), 2)
             cv.imwrite(str(results_dir / f"{image_stem}_overlay.jpg"), overlay)
 
-        sorted_plain_indices = sort_boxes_reading_order(boxes_plain)
+        grouped_line_indices = group_boxes_by_lines(boxes_plain)
+        if len(grouped_line_indices) == 0:
+            print(f"{image_path} -> 0 boxes")
+            continue
 
-        # Match sorted plain boxes to refined boxes once, based on IoU.
-        used_refined_indices = set()
-        ordered_refined_indices = []
-        for plain_index in sorted_plain_indices:
-            plain_box = boxes_plain[plain_index]
-            best_refined_idx = None
-            best_iou = 0.0
-            for refined_idx, refined_box in enumerate(boxes_refined):
-                if refined_idx in used_refined_indices:
-                    continue
-                iou = compute_axis_aligned_iou(plain_box, refined_box)
-                if iou > best_iou:
-                    best_iou = iou
-                    best_refined_idx = refined_idx
-
-            if best_refined_idx is not None:
-                used_refined_indices.add(best_refined_idx)
-                ordered_refined_indices.append(best_refined_idx)
-
-        if not ordered_refined_indices:
-            ordered_refined_indices = list(range(len(boxes_refined)))
-
+        image_height, image_width = image_bgr.shape[:2]
         written_paths = []
 
-        # 1) crop line regions, 2) detect words in each line, 3) crop words.
-        for line_rank, refined_idx in enumerate(ordered_refined_indices, start=1):
-            line_crop = perspective_crop_from_quad(image_bgr, boxes_refined[refined_idx])
-            if line_crop is None:
-                continue
+        for line_rank, line_indices in enumerate(grouped_line_indices, start=1):
+            line_quads = [np.array(boxes_plain[idx]) for idx in line_indices]
+            line_min_x = max(0, int(np.floor(min(quad[:, 0].min() for quad in line_quads))))
+            line_min_y = max(0, int(np.floor(min(quad[:, 1].min() for quad in line_quads))))
+            line_max_x = min(image_width - 1, int(np.ceil(max(quad[:, 0].max() for quad in line_quads))))
+            line_max_y = min(image_height - 1, int(np.ceil(max(quad[:, 1].max() for quad in line_quads))))
 
-            cv.imwrite(str(line_crops_dir / f"{image_stem}_line{line_rank}.png"), line_crop)
+            if line_max_x > line_min_x and line_max_y > line_min_y:
+                line_crop = image_bgr[line_min_y : line_max_y + 1, line_min_x : line_max_x + 1]
+                if line_crop.size > 0:
+                    cv.imwrite(str(line_crops_dir / f"{image_stem}_line{line_rank}.png"), line_crop)
 
-            word_boxes, _, _, _ = detect_text_regions(craft_detector, line_crop, args, refine_net=None)
-            if word_boxes is None or len(word_boxes) == 0:
-                fallback_path = crops_dir / f"{image_stem}_line{line_rank}_word1.png"
-                cv.imwrite(str(fallback_path), line_crop)
-                written_paths.append(fallback_path)
-                continue
-
-            sorted_word_indices = sort_boxes_reading_order(word_boxes)
-            for word_rank, word_index in enumerate(sorted_word_indices, start=1):
-                word_crop = perspective_crop_from_quad(line_crop, word_boxes[word_index])
-                if word_crop is None:
-                    continue
+            for word_rank, word_index in enumerate(line_indices, start=1):
+                word_crop = perspective_crop_from_quad(image_bgr, boxes_plain[word_index])
+                if word_crop is None or word_crop.size == 0:
+                    word_quad = np.array(boxes_plain[word_index])
+                    word_min_x = max(0, int(np.floor(word_quad[:, 0].min())))
+                    word_min_y = max(0, int(np.floor(word_quad[:, 1].min())))
+                    word_max_x = min(image_width - 1, int(np.ceil(word_quad[:, 0].max())))
+                    word_max_y = min(image_height - 1, int(np.ceil(word_quad[:, 1].max())))
+                    if word_max_x <= word_min_x or word_max_y <= word_min_y:
+                        continue
+                    word_crop = image_bgr[word_min_y : word_max_y + 1, word_min_x : word_max_x + 1]
+                    if word_crop.size == 0:
+                        continue
 
                 output_path = crops_dir / f"{image_stem}_line{line_rank}_word{word_rank}.png"
                 cv.imwrite(str(output_path), word_crop)
@@ -563,7 +651,11 @@ def main():
             result_file.write(f"{crop_path}\t{recognized_text}\n")
     print(f"Recognition results saved to {recognized_output_path}")
 
-    write_merged_outputs(recognition_results, results_dir)
+    legacy_merged_path = results_dir / "merged.txt"
+    if legacy_merged_path.resolve() != merged_output_path.resolve() and legacy_merged_path.exists():
+        legacy_merged_path.unlink()
+
+    write_merged_outputs(recognition_results, results_dir, merged_output_path)
 
 
 if __name__ == "__main__":

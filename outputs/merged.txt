@@ -1,0 +1,116 @@
+bahan_1	INGREDIENTS: ENRICHED MACARONI PRODUCT (WHEAT
+FLOUR, NIACIN, FERROUS SULFATE [IRON], THIAMIN
+MONONITRATE [VITAMIN B1], RIBOFLAVIN [VITAMIN B2],
+FOLIC ACID); CHEESE SAUCE (MILK, WHEY, WATER, WHEY
+PROTEIN CONCENTRATE, CANOLA OIL, MILK PROTEIN
+CONCENTRATE, SODIUM PHOSPHATE, SALT, CONTAINS LESS
+THAN 2% OF LACTIC ACID, SODIUM ALL GINATE, SORBIC ACID
+ASA PRESERVATIVE, OLEORESIN PAPRIKA [COLOR], ANNATTO
+[COLOR], NATURAL FLAVOR, CHEESE CULTURE, ENZYMES).
+CONTAINS: WHEAT, MILK.
+
+bahan_2	INGREDIENTS: CHICKEN BROTH: WATER CHICKEN FLAVOR (CHICKEN BROTH,
+RENDERED CHICKEN FAT, SALT, FLAVOR, DISODIUM INOSINATE & DISODIUM
+GUANYLATE, POLYSORBATE 60, XANTHAN GUM), WHEAT FLOUR ENRICHED WITH
+(NIACIN, IRON, THIAMINE MONONITRATE, RIBOFLAVIN, FOLIC ACID), COOKED
+WHITE MEAT CHICKEN, INTERESTERIFIED SOYBEAN OIL, HYDROGENATED
+SOYBEAN OIL, CARROTS, PEAS, CONTAINS 2% OR LESS OF EACH OF: CELERY,
+MODIFIED CORN STARCH, ONIONS, HEAVY WHIPPING CREAM, SALT, RENDERED
+CHICKEN FAT, SOYBEAN OIL, WHEY POWDER, NONFAT DRY MILK, SUGAR,
+ISOLATED SOY PROTEIN, CARRAGEENAN, METHYLCELLULOSE, AUTOLYZED
+YEAST EXTRACT, FLAVORS, MONO- & DIGLYCERIDES, BLACK PEPPER,
+TURMERIC, CARAMEL COLOR, SOY LECITHIN.
+CONTAINS: MILK, SOY, WHEAT.
+
+bahan_3	INGREDIENTS: Whole- grainsprouted
+brown rice protein concentrate, natural
+flavor, stevia.
+ALLERGEN INFORMATION: This
+product is manufactured in a facility
+that processes other products which
+may contain soy, dairy, wheat, tree
+nuts, shellfish, fish, peanuts, and
+eggs and may contain traces of all
+of the above.
+
+bahan_4	BEST INGREDIENTS:
+Organic Whole Grain Wheat Flour (organic
+graham flour) Organic Wheat Flour, Organic
+Cane Sugar, Organic Expeller-pressed
+Sunflower Oil, Organic Honey, Organic
+Molasses, Leavening (baking soda,
+ammonium bicarbonate and cream of tartar),
+Organic Vanilla Flavor, Organic Brown Sugar
+Flavor, Sea Salt, Organic Rosemary Extract
+(to protect flavor).
+CONTAINS WHEAT INGREDIENTS.
+Made on shared equipment that also
+processes milk and soy.
+
+bahan_5	Ingredients: Rolled Oats (25.1%), Candied Fruit and Nut (24%)
+{Candied Cranberry (14%), Almonds (10%),, Sugar, Oat Flour (10.7%),
+Edible Vegetable Oil (Palmolein), Rice (4. .%)), Whole Wheat (3.9%),
+Rice Flour (2.7%), Liquid Glucose, Corn Flour (1.8%), Honey, Malt Extract,
+Wheat Bran (0.6%), Wheat Flour (0. 5%), iodized Salt, Dextrose,
+Barley Flour (0.1%), Vitamins, Raising Agent (INS 500ii),
+Minerals, Antioxidant (INS 320)
+CONTAINS ADDED FLAVOURS (NATURE IDENTICAL AND
+ARTIFICIAL CREAM FLAVOURING SUBSTANCES)
+CONTAINS GLUTEN, ALMONDS.
+MAY CONTAIN TRACES OF SOY AND MILK.
+
+bahan_6	Ingredients:
+Cereals 46% (oat, rice, corn), sugar, glucose syrup, soya
+kernels, invert sugar, fructose, vegetable fat, dextrose,
+dehydrated strawberries 23%, salt, rice flour, acid (citric
+acid), natural flavour, barley malt extract, vitamins (A, C,
+DD, thiamine, riboflavin, niacin, B6, folic acid, B12).
+
+bahan_7	Ingredients: Cane Sugar, Wheat Flour,
+Glucose Syrup, Treacle, Thickener (E1442),
+Vegetable Oil, Flavouring, Citric Acid,
+Colour (E129), Emulsifiers (E471), Salt,
+Liquorice Extract, Sodium Bicarbonate.
+Contains: Wheat.
+May contain traces of peanuts and other nuts.
+
+bahan_8	LOW FAT VANILLA FLAVOURED YOGHURT
+INGREDIENTS: Skim Milk, Concentrated
+Skim Milk, Water, Sugar, Cream (From
+Milk), Thickeners (1422 (From Maize),
+1442 (From Maize)), Milk Solids,
+Gelatine, Flavours, Acidity Regulators
+(331, 332, 270, 330), Enzyme
+(Lactase), Live Cultures.
+Contains Milk and Milk Products.
+
+bahan_9	INGREDIENTS
+Cooked Marinated Chicken (35%) [Chicken Breast, Water, Tomato
+Puree, Ginger Puree, Palm Olein, Garlic Puree, Yogurt Powder
+(Milk), Cornflour, Salt, Green Chillies, Spices, Colour (Paprika
+Extract), Basill,, Onions, Single Cream (Milk) (20%), Chopped
+Tomatoes, Tomato Paste, Water, Rapeseed Oil, Spices, Ginger
+Puree, Garlic Puree, Cashew Nuts, Coriander, Honey, Cornflour,
+Unsalted Butter (Milk), Green Chilli Puree, Salt, Colour (Paprika
+Extract), Lemon Oil.
+Allergy Advicel for allergens, see ingredients in bold
+May also contain traces of other nuts, peanuts and sesame seeds.
+NO ARTIFICIAL COLOURS, FLAVOURS OR HYDROGENATED FAT.
+
+bahan_10	INGREDIENTS:
+REFINED WHEAT FLOUR (38%), SUGAR,
+EDIBLE VEGETABLE OIL (PALM), ROLLED
+OATS (14%), ALMOND (5%), WHEAT BRAN
+(2. .7%), LIQUID GLUCOSE, RAISING AGENTS
+[500(ii) 503(ii), 450(i)] MALTODEXTRIN, OAT
+FIBRE (1. 6%), INVERT SYRUP, MILK SOLIDS
+(0. 9%), EMULSIFIERS (322, .771, .772e) AND
+IODISED SALT.
+CONTAINS PERMITTED NATURAL FOOD
+COLOUR (150d) AND ADDED FLAVOURS
+[NATURE IDENTICAL & ARTIFICIAL
+FLAVOURING SUBSTANCES (BUTTER, &
+MILK)]
+(Numbers in brackets as per International
+Numbering System)
+
