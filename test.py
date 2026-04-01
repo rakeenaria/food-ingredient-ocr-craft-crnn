@@ -2,7 +2,9 @@ import os
 import time
 import string
 import argparse
+import re
 from collections import Counter
+from pathlib import Path
 
 import shutil
 import torch
@@ -16,6 +18,33 @@ from utils import CTCLabelConverter, AttnLabelConverter, Averager
 from dataset import hierarchical_dataset, AlignCollate
 from model import Model
 device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
+
+
+def _build_eval_exp_name(saved_model_path):
+    """Create a stable result folder name from checkpoint path."""
+    model_path = Path(saved_model_path)
+    parent = model_path.parent.name or 'model'
+    stem = model_path.stem or model_path.name
+    return f'{parent}_{stem}'
+
+
+def _resolve_eval_exp_name(saved_model_path):
+    """
+    Pick a safe result folder name.
+    If result/<name> is already a file, append a numeric suffix.
+    """
+    base_name = _build_eval_exp_name(saved_model_path)
+    result_root = Path('./result')
+    result_root.mkdir(parents=True, exist_ok=True)
+
+    candidate = base_name
+    suffix = 1
+    while True:
+        target = result_root / candidate
+        if not target.exists() or target.is_dir():
+            return candidate
+        candidate = f'{base_name}_{suffix}'
+        suffix += 1
 
 
 def benchmark_all_eval(model, criterion, converter, opt, calculate_infer_time=False):
@@ -277,7 +306,7 @@ def test(opt):
                 print('Warning: partially loaded checkpoint with strict=False:', e)
     else:
         model.load_state_dict(state)
-    opt.exp_name = '_'.join(opt.saved_model.split('/')[1:])
+    opt.exp_name = _resolve_eval_exp_name(opt.saved_model)
 
     # multi GPU
     model = torch.nn.DataParallel(model).to(device)
