@@ -67,153 +67,6 @@ def perspective_crop_from_quad(image_bgr: np.ndarray, box: np.ndarray):
     return cv.warpPerspective(image_bgr, transform_matrix, (target_width, target_height), flags=cv.INTER_CUBIC)
 
 
-def perspective_crop_line_from_quads(
-    image_bgr: np.ndarray,
-    line_quads,
-    pad_along_ratio: float = 0.08,
-    pad_cross_ratio: float = 0.04,
-):
-    """
-    Crop a whole text line with orientation-aware perspective transform.
-    This avoids axis-aligned line crops that mix neighboring slanted lines.
-    """
-    if not line_quads:
-        return None
-
-    all_points = []
-    ordered_quads = []
-    for quad in line_quads:
-        quad_points = np.array(quad, dtype=np.float32).reshape(-1, 2)
-        if quad_points.shape[0] >= 4:
-            ordered_quad = order_quad_points(quad_points[:4])
-            ordered_quads.append(ordered_quad)
-            all_points.append(ordered_quad)
-    if not all_points:
-        return None
-
-    all_points = np.concatenate(all_points, axis=0).astype(np.float32)
-    line_angle = estimate_global_text_angle(line_quads)
-    cos_a = float(np.cos(line_angle))
-    sin_a = float(np.sin(line_angle))
-    along_unit = np.array([cos_a, sin_a], dtype=np.float32)
-    cross_unit = np.array([-sin_a, cos_a], dtype=np.float32)
-
-    along_proj = all_points @ along_unit
-    if along_proj.size >= 8:
-        min_along, max_along = np.percentile(along_proj, [1, 99]).astype(float)
-    else:
-        min_along, max_along = float(along_proj.min()), float(along_proj.max())
-
-    # Keep line thickness tight around estimated baseline/height to avoid bleeding
-    # neighboring lines when detections are slightly tall.
-    word_bottoms = []
-    word_heights = []
-    for quad in ordered_quads:
-        cross_vals = quad @ cross_unit
-        word_bottoms.append(float(np.max(cross_vals)))
-        word_heights.append(max(2.0, float(np.max(cross_vals) - np.min(cross_vals))))
-
-    baseline_cross = float(np.median(word_bottoms)) if word_bottoms else float(np.max(all_points @ cross_unit))
-    median_height = float(np.median(word_heights)) if word_heights else 0.0
-    raw_width = max_along - min_along
-    raw_height = median_height
-    if raw_width < 2.0 or raw_height < 2.0:
-        return None
-
-    pad_along = max(2.0, raw_width * pad_along_ratio)
-    min_cross = baseline_cross - max(2.0, 1.05 * median_height)
-    max_cross = baseline_cross + max(1.0, 0.12 * median_height)
-    pad_cross = max(1.0, median_height * pad_cross_ratio)
-    min_along -= pad_along
-    max_along += pad_along
-    min_cross -= pad_cross
-    max_cross += pad_cross
-
-    line_corners = np.array(
-        [
-            along_unit * min_along + cross_unit * min_cross,
-            along_unit * max_along + cross_unit * min_cross,
-            along_unit * max_along + cross_unit * max_cross,
-            along_unit * min_along + cross_unit * max_cross,
-        ],
-        dtype=np.float32,
-    )
-
-    target_width = int(round(max_along - min_along))
-    target_height = int(round(max_cross - min_cross))
-    if target_width < 2 or target_height < 2:
-        return None
-
-    destination = np.array(
-        [[0, 0], [target_width - 1, 0], [target_width - 1, target_height - 1], [0, target_height - 1]],
-        dtype=np.float32,
-    )
-    transform_matrix = cv.getPerspectiveTransform(line_corners, destination)
-    cropped_line = cv.warpPerspective(
-        image_bgr,
-        transform_matrix,
-        (target_width, target_height),
-        flags=cv.INTER_CUBIC,
-        borderMode=cv.BORDER_REPLICATE,
-    )
-    return cropped_line, transform_matrix.astype(np.float32)
-
-
-def trim_line_crop_by_ink(line_crop: np.ndarray):
-    """
-    Trim top/bottom noise by keeping the dominant text band near image center.
-    Helps remove slight bleed from adjacent lines in dense layouts.
-    """
-    if line_crop is None or line_crop.size == 0:
-        return line_crop, 0
-
-    gray = cv.cvtColor(line_crop, cv.COLOR_BGR2GRAY)
-    _, binary_inv = cv.threshold(gray, 0, 255, cv.THRESH_BINARY_INV + cv.THRESH_OTSU)
-
-    row_ink = binary_inv.sum(axis=1).astype(np.float32)
-    if row_ink.size == 0 or float(row_ink.max()) <= 0:
-        return line_crop, 0
-
-    active_rows = np.where(row_ink > row_ink.max() * 0.1)[0]
-    if active_rows.size == 0:
-        return line_crop, 0
-
-    groups = []
-    start_row = int(active_rows[0])
-    prev_row = int(active_rows[0])
-    for row_idx in active_rows[1:]:
-        row_idx = int(row_idx)
-        if row_idx != prev_row + 1:
-            groups.append((start_row, prev_row))
-            start_row = row_idx
-        prev_row = row_idx
-    groups.append((start_row, prev_row))
-
-    crop_center = (line_crop.shape[0] - 1) / 2.0
-    best_group = None
-    best_score = None
-    for y0, y1 in groups:
-        group_center = (y0 + y1) / 2.0
-        group_height = (y1 - y0 + 1)
-        # Prefer larger group and group close to crop center.
-        score = group_height - 0.2 * abs(group_center - crop_center)
-        if best_score is None or score > best_score:
-            best_score = score
-            best_group = (y0, y1)
-
-    if best_group is None:
-        return line_crop, 0
-
-    y0, y1 = best_group
-    margin = max(1, int(round(0.05 * line_crop.shape[0])))
-    y0 = max(0, y0 - margin)
-    y1 = min(line_crop.shape[0] - 1, y1 + margin)
-    trimmed = line_crop[y0 : y1 + 1, :]
-    if trimmed.size > 0:
-        return trimmed, y0
-    return line_crop, 0
-
-
 def compute_axis_aligned_iou(quad_a, quad_b) -> float:
     """Compute IoU using axis-aligned bounds from two quadrilateral boxes."""
     box_a = np.array(quad_a)
@@ -241,178 +94,21 @@ def compute_axis_aligned_iou(quad_a, quad_b) -> float:
     return intersection / union if union > 0 else 0.0
 
 
-def select_word_indices_for_line(
-    line_quads,
-    word_boxes,
-    used_indices=None,
-    expand_y_ratio: float = 0.18,
-    expand_x_ratio: float = 0.02,
-    min_iou: float = 0.03,
-):
-    """
-    Select plain word boxes that belong to one line region.
-    This keeps per-word recognition even when refiner merges neighboring words.
-    """
-    if line_quads is None or word_boxes is None:
-        return []
-    if len(line_quads) == 0 or len(word_boxes) == 0:
-        return []
-
-    if used_indices is None:
-        used_indices = set()
-
-    line_points = np.concatenate([np.array(quad, dtype=np.float32).reshape(-1, 2) for quad in line_quads], axis=0)
-    min_x = float(line_points[:, 0].min())
-    max_x = float(line_points[:, 0].max())
-    min_y = float(line_points[:, 1].min())
-    max_y = float(line_points[:, 1].max())
-    line_h = max(1.0, max_y - min_y)
-    line_w = max(1.0, max_x - min_x)
-
-    expand_y = expand_y_ratio * line_h
-    expand_x = expand_x_ratio * line_w
-    line_quad = np.array([[min_x, min_y], [max_x, min_y], [max_x, max_y], [min_x, max_y]], dtype=np.float32)
-
-    candidates = []
-    for idx, word_box in enumerate(word_boxes):
-        if idx in used_indices:
-            continue
-        word_quad = np.array(word_box, dtype=np.float32).reshape(-1, 2)
-        if word_quad.shape[0] < 4:
-            continue
-
-        word_min_x = float(word_quad[:, 0].min())
-        word_max_x = float(word_quad[:, 0].max())
-        word_min_y = float(word_quad[:, 1].min())
-        word_max_y = float(word_quad[:, 1].max())
-        center_x = (word_min_x + word_max_x) * 0.5
-        center_y = (word_min_y + word_max_y) * 0.5
-
-        center_in_line = (
-            (min_x - expand_x) <= center_x <= (max_x + expand_x)
-            and (min_y - expand_y) <= center_y <= (max_y + expand_y)
-        )
-        iou = compute_axis_aligned_iou(line_quad, word_quad)
-        # Keep only words that are actually inside the current line region.
-        if center_in_line and iou >= min_iou:
-            candidates.append((center_x, idx))
-
-    candidates.sort(key=lambda item: item[0])
-    return [idx for _, idx in candidates]
-
-
-def quad_overlap_ratio_in_image(quad: np.ndarray, width: int, height: int) -> float:
-    """Return overlap ratio between quad AABB and image bounds."""
-    if width <= 1 or height <= 1:
-        return 0.0
-    min_x = float(np.min(quad[:, 0]))
-    max_x = float(np.max(quad[:, 0]))
-    min_y = float(np.min(quad[:, 1]))
-    max_y = float(np.max(quad[:, 1]))
-    box_w = max(0.0, max_x - min_x)
-    box_h = max(0.0, max_y - min_y)
-    box_area = box_w * box_h
-    if box_area <= 0.0:
-        return 0.0
-
-    inter_x0 = max(0.0, min_x)
-    inter_y0 = max(0.0, min_y)
-    inter_x1 = min(float(width - 1), max_x)
-    inter_y1 = min(float(height - 1), max_y)
-    inter_w = max(0.0, inter_x1 - inter_x0)
-    inter_h = max(0.0, inter_y1 - inter_y0)
-    return (inter_w * inter_h) / box_area
-
-
-def is_low_information_crop(crop: np.ndarray) -> bool:
-    """Reject almost-empty/black crops that often decode to repeated junk tokens."""
-    if crop is None or crop.size == 0:
-        return True
-    gray = cv.cvtColor(crop, cv.COLOR_BGR2GRAY)
-    if float(gray.std()) < 4.0:
-        return True
-    dark_ratio = float((gray < 15).sum()) / float(gray.size)
-    if dark_ratio > 0.97:
-        return True
-    return False
-
-
-def estimate_global_text_angle(boxes) -> float:
-    """
-    Estimate dominant text-line angle in radians from box top/bottom edges.
-    Returned angle is normalized to [-pi/2, pi/2].
-    """
-    if len(boxes) == 0:
-        return 0.0
-
-    angles = []
-    weights = []
-    for box in boxes:
-        quad = np.array(box, dtype=np.float32).reshape(-1, 2)
-        if quad.shape[0] < 4:
-            continue
-        ordered = order_quad_points(quad[:4])
-        edge_vectors = (ordered[1] - ordered[0], ordered[2] - ordered[3])
-        for edge_vec in edge_vectors:
-            edge_length = float(np.linalg.norm(edge_vec))
-            if edge_length < 2.0:
-                continue
-            angle = float(np.arctan2(edge_vec[1], edge_vec[0]))
-            if angle > np.pi / 2:
-                angle -= np.pi
-            elif angle < -np.pi / 2:
-                angle += np.pi
-            angles.append(angle)
-            weights.append(edge_length)
-
-    if not angles:
-        return 0.0
-
-    # Weighted median is more robust than mean for mixed/noisy box orientations.
-    order = np.argsort(angles)
-    sorted_angles = np.array(angles)[order]
-    sorted_weights = np.array(weights)[order]
-    half_weight = sorted_weights.sum() * 0.5
-    cumulative = np.cumsum(sorted_weights)
-    median_idx = int(np.searchsorted(cumulative, half_weight))
-    dominant_angle = float(sorted_angles[min(median_idx, len(sorted_angles) - 1)])
-
-    # Guard against pathological estimates; this line-grouper is for near-horizontal text.
-    if abs(dominant_angle) > np.deg2rad(45):
-        return 0.0
-    return dominant_angle
-
-
 def group_boxes_by_lines(boxes, min_tol: float = 10.0):
-    """
-    Group detected boxes into reading lines, each line sorted left-to-right.
-    Uses a global deskew angle so slightly rotated text keeps correct line order.
-    """
+    """Group detected boxes into reading lines, each line sorted left-to-right."""
     if len(boxes) == 0:
         return []
-
-    dominant_angle = estimate_global_text_angle(boxes)
-    cos_a = float(np.cos(dominant_angle))
-    sin_a = float(np.sin(dominant_angle))
-
-    def rotate_point(point_xy):
-        x_val = float(point_xy[0])
-        y_val = float(point_xy[1])
-        # Rotate by -dominant_angle to make text lines closer to horizontal.
-        x_rot = x_val * cos_a + y_val * sin_a
-        y_rot = -x_val * sin_a + y_val * cos_a
-        return x_rot, y_rot
 
     stats = []  # (index, min_x, baseline_y, height)
     for index, box in enumerate(boxes):
-        quad = np.array(box, dtype=np.float32).reshape(-1, 2)
-        rotated_points = np.array([rotate_point(point) for point in quad], dtype=np.float32)
-        xs = rotated_points[:, 0]
-        ys = rotated_points[:, 1]
+        quad = np.array(box)
+        ys = quad[:, 1]
+        xs = quad[:, 0]
         min_x = float(xs.min())
-        height = float(ys.max() - ys.min())
+        min_y, max_y = float(ys.min()), float(ys.max())
+        height = max_y - min_y
         ys_sorted = np.sort(ys)
-        baseline_y = float(np.mean(ys_sorted[-2:])) if ys_sorted.shape[0] >= 2 else float(ys.max())
+        baseline_y = float(np.mean(ys_sorted[-2:])) if ys_sorted.shape[0] >= 2 else float(max_y)
         stats.append((index, min_x, baseline_y, height))
 
     median_height = float(np.median([item[3] for item in stats])) if stats else 0.0
@@ -451,166 +147,6 @@ def sort_boxes_reading_order(boxes, min_tol: float = 10.0):
     for line in grouped_lines:
         order.extend(line)
     return order
-
-
-def _sample_link_strength_between_boxes(
-    left_box: np.ndarray,
-    right_box: np.ndarray,
-    score_link: np.ndarray,
-    scale_x: float,
-    scale_y: float,
-):
-    """Estimate link strength between two boxes by sampling a thick line in linkmap."""
-    left_center = np.mean(left_box, axis=0)
-    right_center = np.mean(right_box, axis=0)
-
-    x0 = int(np.clip(round(left_center[0] * scale_x), 0, score_link.shape[1] - 1))
-    y0 = int(np.clip(round(left_center[1] * scale_y), 0, score_link.shape[0] - 1))
-    x1 = int(np.clip(round(right_center[0] * scale_x), 0, score_link.shape[1] - 1))
-    y1 = int(np.clip(round(right_center[1] * scale_y), 0, score_link.shape[0] - 1))
-
-    h_left = max(1.0, float(left_box[:, 1].max() - left_box[:, 1].min()))
-    h_right = max(1.0, float(right_box[:, 1].max() - right_box[:, 1].min()))
-    thickness = max(1, int(round(0.2 * min(h_left, h_right) * scale_y)))
-
-    mask = np.zeros_like(score_link, dtype=np.uint8)
-    cv.line(mask, (x0, y0), (x1, y1), 255, thickness=thickness)
-    region = score_link[mask > 0]
-    if region.size == 0:
-        return 0.0
-    return float(region.mean())
-
-
-def group_boxes_by_refiner_linkmap(boxes, score_link: np.ndarray, image_shape, min_tol: float = 10.0):
-    """
-    Group word boxes into lines using refiner-enhanced linkmap connectivity.
-    Boxes stay word-level; linkmap is only used for ordering/grouping.
-    """
-    if boxes is None or len(boxes) == 0:
-        return []
-    if score_link is None or score_link.size == 0:
-        return group_boxes_by_lines(boxes, min_tol=min_tol)
-
-    image_h, image_w = image_shape[:2]
-    if image_h <= 0 or image_w <= 0:
-        return group_boxes_by_lines(boxes, min_tol=min_tol)
-
-    scale_x = float(score_link.shape[1]) / float(image_w)
-    scale_y = float(score_link.shape[0]) / float(image_h)
-
-    dominant_angle = estimate_global_text_angle(boxes)
-    cos_a = float(np.cos(dominant_angle))
-    sin_a = float(np.sin(dominant_angle))
-
-    def rotate_xy(x_val: float, y_val: float):
-        x_rot = x_val * cos_a + y_val * sin_a
-        y_rot = -x_val * sin_a + y_val * cos_a
-        return x_rot, y_rot
-
-    centers = []
-    heights = []
-    widths = []
-    for box in boxes:
-        quad = np.array(box, dtype=np.float32).reshape(-1, 2)
-        center = quad.mean(axis=0)
-        cx, cy = float(center[0]), float(center[1])
-        rx, ry = rotate_xy(cx, cy)
-        centers.append((cx, cy, rx, ry))
-        heights.append(max(1.0, float(quad[:, 1].max() - quad[:, 1].min())))
-        widths.append(max(1.0, float(quad[:, 0].max() - quad[:, 0].min())))
-
-    median_h = float(np.median(heights)) if heights else min_tol
-    median_w = float(np.median(widths)) if widths else 20.0
-    line_tol = max(min_tol, 0.7 * median_h)
-
-    parent = list(range(len(boxes)))
-
-    def find(x_idx):
-        while parent[x_idx] != x_idx:
-            parent[x_idx] = parent[parent[x_idx]]
-            x_idx = parent[x_idx]
-        return x_idx
-
-    def union(a_idx, b_idx):
-        ra = find(a_idx)
-        rb = find(b_idx)
-        if ra != rb:
-            parent[rb] = ra
-
-    link_thr = 0.20
-    for i in range(len(boxes)):
-        _, _, rx_i, ry_i = centers[i]
-        quad_i = np.array(boxes[i], dtype=np.float32).reshape(-1, 2)
-        for j in range(i + 1, len(boxes)):
-            _, _, rx_j, ry_j = centers[j]
-            if abs(ry_i - ry_j) > line_tol:
-                continue
-            if abs(rx_i - rx_j) > max(8.0 * median_w, 120.0):
-                continue
-
-            quad_j = np.array(boxes[j], dtype=np.float32).reshape(-1, 2)
-            if rx_i <= rx_j:
-                left_box, right_box = quad_i, quad_j
-            else:
-                left_box, right_box = quad_j, quad_i
-
-            link_score = _sample_link_strength_between_boxes(
-                left_box,
-                right_box,
-                score_link=score_link,
-                scale_x=scale_x,
-                scale_y=scale_y,
-            )
-            if link_score >= link_thr:
-                union(i, j)
-
-    groups = defaultdict(list)
-    for idx in range(len(boxes)):
-        groups[find(idx)].append(idx)
-
-    global_slope = float(np.tan(dominant_angle))
-    lines = []
-    for indices in groups.values():
-        indices.sort(key=lambda idx: centers[idx][2])  # sort by rotated x
-        rx_values = [centers[idx][2] for idx in indices]
-        # Base-line key that compensates global tilt so slanted lines keep order.
-        base_values = [centers[idx][1] - global_slope * centers[idx][0] for idx in indices]
-        line_base = float(np.median(base_values))
-        lines.append(
-            {
-                "base": line_base,
-                "min_rx": float(min(rx_values)),
-                "max_rx": float(max(rx_values)),
-                "indices": indices,
-            }
-        )
-
-    lines.sort(key=lambda item: (item["base"], item["min_rx"]))
-
-    # Merge fragmented components that likely belong to the same slanted text line.
-    merged_lines = []
-    base_tol = max(min_tol, 0.45 * median_h)
-    gap_tol = max(20.0, 1.8 * median_w)
-    for line in lines:
-        if not merged_lines:
-            merged_lines.append(line)
-            continue
-        prev = merged_lines[-1]
-        base_close = abs(line["base"] - prev["base"]) <= base_tol
-        x_gap = line["min_rx"] - prev["max_rx"]
-        close_in_x = x_gap <= gap_tol
-        if base_close and close_in_x:
-            combined = sorted(prev["indices"] + line["indices"], key=lambda idx: centers[idx][2])
-            prev["indices"] = combined
-            prev["max_rx"] = max(prev["max_rx"], line["max_rx"])
-            prev["base"] = float(
-                np.median([centers[idx][1] - global_slope * centers[idx][0] for idx in combined])
-            )
-        else:
-            merged_lines.append(line)
-
-    merged_lines.sort(key=lambda item: (item["base"], item["min_rx"]))
-    return [line["indices"] for line in merged_lines]
 
 
 def strip_module_prefix(state_dict):
@@ -949,13 +485,13 @@ def build_argument_parser():
     return parser
 
 
-def prepare_output_directory(output_dir: Path, label: str) -> Path:
+def prepare_crops_directory(crops_dir: Path) -> Path:
     """
-    Ensure output directory is empty.
+    Ensure crops output directory is empty.
     If cleanup fails because the directory is locked, stop with a clear error.
     """
-    if not output_dir.exists():
-        return output_dir
+    if not crops_dir.exists():
+        return crops_dir
 
     def remove_readonly(action, path, exc_info):
         _ = exc_info
@@ -966,13 +502,12 @@ def prepare_output_directory(output_dir: Path, label: str) -> Path:
         action(path)
 
     try:
-        os.chmod(output_dir, stat.S_IWRITE)
-        shutil.rmtree(output_dir, onerror=remove_readonly)
-        return output_dir
+        os.chmod(crops_dir, stat.S_IWRITE)
+        shutil.rmtree(crops_dir, onerror=remove_readonly)
+        return crops_dir
     except PermissionError as error:
         raise RuntimeError(
-            f"Failed to remove {label} folder ({output_dir}). "
-            "Close files/apps that lock this folder, then run again."
+            f"Failed to remove {crops_dir}. Close files/apps that lock this folder, then run again."
         ) from error
 
 
@@ -986,10 +521,11 @@ def main():
     results_dir = Path(args.results_folder)
     merged_output_path = Path(args.merged_output)
 
-    # Rebuild outputs from scratch for each run to avoid stale predictions.
-    crops_dir = prepare_output_directory(crops_dir, "crops")
-    results_dir = prepare_output_directory(results_dir, "results")
+    # Rebuild crop output from scratch for each run.
+    crops_dir = prepare_crops_directory(crops_dir)
     crops_dir.mkdir(parents=True, exist_ok=True)
+    line_crops_dir = crops_dir / "lines"
+    line_crops_dir.mkdir(parents=True, exist_ok=True)
     results_dir.mkdir(parents=True, exist_ok=True)
     merged_output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -1043,20 +579,12 @@ def main():
             print(f"{image_path} -> 0 boxes")
             continue
 
-        # Refiner output is used for line-level layout, plain CRAFT output for
-        # word-level crops so recognizer still sees per-word images.
-        if args.refine and refiner is not None:
-            boxes_for_layout = boxes_refined
-            boxes_for_words, _, _, _ = detect_text_regions(craft_detector, image_bgr, args, refine_net=None)
-            if boxes_for_words is None or len(boxes_for_words) == 0:
-                boxes_for_words = boxes_for_layout
-        else:
-            boxes_for_layout, _, _, _ = detect_text_regions(craft_detector, image_bgr, args, refine_net=None)
-            if boxes_for_layout is None or len(boxes_for_layout) == 0:
-                boxes_for_layout = boxes_refined
-            boxes_for_words = boxes_for_layout
-
-        if boxes_for_layout is None or len(boxes_for_layout) == 0:
+        # Plain CRAFT pass drives reading-order line grouping so layout stays
+        # stable even when refiner polygons are not line-level.
+        boxes_plain, _, _, _ = detect_text_regions(craft_detector, image_bgr, args, refine_net=None)
+        if boxes_plain is None or len(boxes_plain) == 0:
+            boxes_plain = boxes_refined
+        if boxes_plain is None or len(boxes_plain) == 0:
             print(f"{image_path} -> 0 boxes")
             continue
 
@@ -1065,42 +593,46 @@ def main():
             polygons_for_draw = (
                 polygons_refined
                 if polygons_refined is not None and len(polygons_refined) == len(boxes_refined)
-                else boxes_for_layout
+                else boxes_plain
             )
             for polygon in polygons_for_draw:
                 points = np.array(polygon, dtype=np.int32).reshape(-1, 1, 2)
                 cv.polylines(overlay, [points], True, (0, 255, 0), 2)
             cv.imwrite(str(results_dir / f"{image_stem}_overlay.jpg"), overlay)
 
-        if args.refine and refiner is not None:
-            grouped_line_indices = group_boxes_by_refiner_linkmap(
-                boxes_for_words,
-                score_link=score_link,
-                image_shape=image_bgr.shape,
-            )
-        else:
-            grouped_line_indices = group_boxes_by_lines(boxes_for_words)
+        grouped_line_indices = group_boxes_by_lines(boxes_plain)
         if len(grouped_line_indices) == 0:
             print(f"{image_path} -> 0 boxes")
             continue
 
+        image_height, image_width = image_bgr.shape[:2]
         written_paths = []
+
         for line_rank, line_indices in enumerate(grouped_line_indices, start=1):
+            line_quads = [np.array(boxes_plain[idx]) for idx in line_indices]
+            line_min_x = max(0, int(np.floor(min(quad[:, 0].min() for quad in line_quads))))
+            line_min_y = max(0, int(np.floor(min(quad[:, 1].min() for quad in line_quads))))
+            line_max_x = min(image_width - 1, int(np.ceil(max(quad[:, 0].max() for quad in line_quads))))
+            line_max_y = min(image_height - 1, int(np.ceil(max(quad[:, 1].max() for quad in line_quads))))
+
+            if line_max_x > line_min_x and line_max_y > line_min_y:
+                line_crop = image_bgr[line_min_y : line_max_y + 1, line_min_x : line_max_x + 1]
+                if line_crop.size > 0:
+                    cv.imwrite(str(line_crops_dir / f"{image_stem}_line{line_rank}.png"), line_crop)
+
             for word_rank, word_index in enumerate(line_indices, start=1):
-                word_quad_global = np.array(boxes_for_words[word_index], dtype=np.float32).reshape(-1, 2)
-                word_crop = perspective_crop_from_quad(image_bgr, word_quad_global)
+                word_crop = perspective_crop_from_quad(image_bgr, boxes_plain[word_index])
                 if word_crop is None or word_crop.size == 0:
-                    word_min_x = max(0, int(np.floor(word_quad_global[:, 0].min())))
-                    word_min_y = max(0, int(np.floor(word_quad_global[:, 1].min())))
-                    word_max_x = min(image_bgr.shape[1] - 1, int(np.ceil(word_quad_global[:, 0].max())))
-                    word_max_y = min(image_bgr.shape[0] - 1, int(np.ceil(word_quad_global[:, 1].max())))
+                    word_quad = np.array(boxes_plain[word_index])
+                    word_min_x = max(0, int(np.floor(word_quad[:, 0].min())))
+                    word_min_y = max(0, int(np.floor(word_quad[:, 1].min())))
+                    word_max_x = min(image_width - 1, int(np.ceil(word_quad[:, 0].max())))
+                    word_max_y = min(image_height - 1, int(np.ceil(word_quad[:, 1].max())))
                     if word_max_x <= word_min_x or word_max_y <= word_min_y:
                         continue
                     word_crop = image_bgr[word_min_y : word_max_y + 1, word_min_x : word_max_x + 1]
                     if word_crop.size == 0:
                         continue
-                if is_low_information_crop(word_crop):
-                    continue
 
                 output_path = crops_dir / f"{image_stem}_line{line_rank}_word{word_rank}.png"
                 cv.imwrite(str(output_path), word_crop)
