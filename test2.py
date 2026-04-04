@@ -1,6 +1,7 @@
 # eval_merged_vs_gt.py
-import argparse, pathlib, re
-from collections import defaultdict
+import argparse
+import pathlib
+import re
 
 def levenshtein(a,b):
     la,lb=len(a),len(b)
@@ -13,20 +14,30 @@ def levenshtein(a,b):
             prev=cur
     return dp[-1]
 
+
+def normalize_key(stem):
+    """Normalize trailing numeric suffix so bahan_01 and bahan_1 map to same key."""
+    match = re.fullmatch(r"(.*_)(\d+)", stem)
+    if not match:
+        return stem
+    return f"{match.group(1)}{int(match.group(2))}"
+
 def read_gt(gt_path):
     gt={}
     for line in pathlib.Path(gt_path).read_text(encoding='utf-8').splitlines():
         parts=line.strip().split(maxsplit=1)
         if len(parts)==2:
-            gt[pathlib.Path(parts[0]).stem]=parts[1]
+            gt[normalize_key(pathlib.Path(parts[0]).stem)] = parts[1]
     return gt
 
 def read_merged(folder):
     merged={}
     for p in pathlib.Path(folder).glob("res_*_merged.txt"):
+        if "_line" in p.stem:
+            continue
         stem=p.stem.replace("res_","").replace("_merged","")
         txt=p.read_text(encoding='utf-8').strip()
-        merged[stem]=txt
+        merged[normalize_key(stem)] = txt
     return merged
 
 def main():
@@ -89,14 +100,13 @@ def main():
         return 0.0 if (prec+rec)==0 else 2*prec*rec/(prec+rec)
 
     from collections import Counter
-    n=0; acc=0; norm_ed=0
+    n=0; norm_ed=0
     f1_sum=0; bleu_sum=0; rouge_sum=0
     cer_sum=0; cer_den=0
     wer_sum=0; wer_den=0
     for k in keys:
         g,p = gt[k], pred[k]
         n+=1
-        if g==p: acc+=1
         norm_ed += 1 - levenshtein(p,g)/max(len(g), len(p)) if g and p else 0
         f1_sum += f1_score(g,p)
         bleu_sum += bleu1(g,p)
@@ -108,13 +118,14 @@ def main():
         wer_sum += levenshtein(pred_words, gt_words)
         wer_den += len(gt_words) if gt_words else 0
     print(f"Samples: {n}")
-    print(f"Accuracy: {acc/n*100:.3f}")
     print(f"norm_ED: {norm_ed/n:.3f}")
     print(f"F1 (word-level): {f1_sum/n:.3f}")
     print(f"BLEU-1: {bleu_sum/n:.3f}")
     print(f"ROUGE-L: {rouge_sum/n:.3f}")
     cer = cer_sum/cer_den if cer_den>0 else 0.0
     wer = wer_sum/wer_den if wer_den>0 else 0.0
+    word_accuracy = max(0.0, 1.0 - wer) * 100.0
+    print(f"Word Accuracy: {word_accuracy:.3f}")
     print(f"CER: {cer:.3f}")
     print(f"WER: {wer:.3f}")
 
