@@ -60,17 +60,11 @@ Fine-tuning on food-label domain data adapts the recognizer to ingredient vocabu
 - Predictions are merged back by line and word order.
 
 ## Results
-### Internal Evaluation (Validation)
-| Model | Word Accuracy | CER | WER | Avg. Confidence |
+### Evaluation (603 data)
+| Model | Word Accuracy | NED | CER | WER |
 |---|---:|---:|---:|---:|
-| TRBA baseline | 64.764% | 0.155 | 0.352 | 0.70 |
-| Fine-tuned | 92.848% | 0.019 | 0.072 | 0.95 |
-
-### External Evaluation (10 Real-World Images)
-| Model | NED | CER | WER | F1-score |
-|---|---:|---:|---:|---:|
-| TRBA baseline | 0.924 | 0.082 | 0.221 | 0.793 |
-| Fine-tuned | 0.970 | 0.028 | 0.046 | 0.953 |
+| TRBA baseline | 90.381% | 0.946 | 0.066 | 0.096 |
+| Fine-tuned | 94.693% | 0.987 | 0.015 | 0.053 |
 
 ### Before vs After OCR (Sample Format)
 ```text
