@@ -105,7 +105,7 @@ pip install -r requirements-craft-crnn.txt
 2. Download required weights (not stored in repo):
 - CRAFT: https://github.com/clovaai/CRAFT-pytorch
 - TRBA baseline: https://github.com/zihaomu/deep-text-recognition-benchmark
-- Fine-tuned checkpoint: see project links in `models/README.md`
+- Fine-tuned checkpoint: https://drive.google.com/drive/u/0/folders/1MRPI5mAcX4nht2R4AO8VovIEsw2q6rGN
 
 3. Run inference (legacy-compatible command):
 ```bash
