@@ -28,10 +28,11 @@ def read_gt(gt_path):
                 gt[Path(gt_path).stem] = label
     return gt
 
-def infer_text(img_path, lang):
+def infer_text(img_path, lang, psm):
     img = Image.open(img_path).convert("RGB")
-    text = pytesseract.image_to_string(img, lang=lang).strip()
-    data = pytesseract.image_to_data(img, lang=lang, output_type=pytesseract.Output.DICT)
+    config = f"--psm {psm}"
+    text = pytesseract.image_to_string(img, lang=lang, config=config).strip()
+    data = pytesseract.image_to_data(img, lang=lang, config=config, output_type=pytesseract.Output.DICT)
     confs = [float(c) for c in data["conf"] if c != '-1']
     avg_conf = sum(confs)/len(confs) if confs else 0.0
     return text, avg_conf
@@ -42,6 +43,7 @@ def main():
     ap.add_argument("--gt", help="gt.txt berisi 'path label'. Jika tidak diisi, hanya prediksi.")
     ap.add_argument("--out", default="tesseract_results/recognized.txt", help="file output prediksi bila tanpa GT")
     ap.add_argument("--lang", default="eng")
+    ap.add_argument("--psm", type=int, default=8, help="Tesseract page segmentation mode. 8=single word, 7=single line")
     ap.add_argument("--conf_thr", type=float, default=0.8)
     args = ap.parse_args()
 
@@ -58,7 +60,7 @@ def main():
             total_time = 0.0
             for img_path in imgs:
                 t0 = time.time()
-                pred, avg_conf = infer_text(img_path, args.lang)
+                pred, avg_conf = infer_text(img_path, args.lang, args.psm)
                 total_time += time.time() - t0
                 f.write(f"{img_path}\t{pred}\t{avg_conf:.3f}\n")
                 print(f"{img_path}: {pred} (conf {avg_conf:.3f})")
@@ -81,10 +83,15 @@ def main():
     cov_sel = 0; cov_correct = 0
     total_time = 0.0
 
+    Path(args.out).parent.mkdir(parents=True, exist_ok=True)
+    out_file = open(args.out, "w", encoding="utf-8")
+    out_file.write("image_path\tground_truth\tprediction\tavg_conf\tcorrect\n")
+
     for img_path, gt_txt in pairs:
         t0 = time.time()
-        pred, avg_conf = infer_text(img_path, args.lang)
+        pred, avg_conf = infer_text(img_path, args.lang, args.psm)
         total_time += time.time() - t0
+        out_file.write(f"{img_path}\t{gt_txt}\t{pred}\t{avg_conf:.3f}\t{pred == gt_txt}\n")
 
         conf_sum += avg_conf; conf_count += 1
         if avg_conf >= args.conf_thr:
@@ -113,6 +120,8 @@ def main():
         wer_sum += levenshtein(pred_words, gt_words)
         wer_den += len(gt_words) if gt_words else 0
 
+    out_file.close()
+
     length_of_data = n
     accuracy = n_correct / length_of_data * 100
     norm_ED /= length_of_data
@@ -132,6 +141,7 @@ def main():
     print(f"Coverage@{args.conf_thr}: {coverage:.3f}")
     print(f"Acc@{args.conf_thr}: {acc_at_thr:.3f}")
     print(f"Avg infer: {avg_ms:.3f} ms/img")
+    print(f"Predictions saved to: {args.out}")
 
 if __name__ == "__main__":
     main()

@@ -38,7 +38,6 @@ class TPS_SpatialTransformerNetwork(nn.Module):
 
         return batch_I_r
 
-
 class LocalizationNetwork(nn.Module):
     """ Localization Network of RARE, which predicts C' (K x 2) from I (I_width x I_height) """
 

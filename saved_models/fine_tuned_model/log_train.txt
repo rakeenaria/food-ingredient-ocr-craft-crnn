@@ -1,0 +1,132 @@
+[1/2000] Train loss: 0.26427, Valid loss: 0.41595, Elapsed_time: 2.49373
+Current_accuracy : 67.126, Current_norm_ED  : 0.87
+Best_accuracy    : 67.126, Best_norm_ED     : 0.87
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+Flavour                   | Flavour                   | 0.9990	True
+(170i),                   | (170i),                   | 0.5120	True
+flakes                    | flakes                    | 0.9995	True
+Edible                    | Edible                    | 0.9999	True
+Wheatgluten,              | Wheatgluten,              | 0.6447	True
+--------------------------------------------------------------------------------
+[200/2000] Train loss: 0.06739, Valid loss: 0.10973, Elapsed_time: 96.93430
+Current_accuracy : 91.732, Current_norm_ED  : 0.97
+Best_accuracy    : 91.732, Best_norm_ED     : 0.97
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+Garlic,                   | Gariic,                   | 0.4890	False
+hygienic                  | hygienic                  | 0.9995	True
+System)                   | System)                   | 0.9907	True
+Ingredients               | Ingredients               | 0.9976	True
+NATURAL                   | NATURAL                   | 0.9985	True
+--------------------------------------------------------------------------------
+[400/2000] Train loss: 0.02044, Valid loss: 0.11714, Elapsed_time: 198.44981
+Current_accuracy : 92.323, Current_norm_ED  : 0.98
+Best_accuracy    : 92.323, Best_norm_ED     : 0.98
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+IDENTICAL                 | IDENTICAL                 | 0.9718	True
+Wheat.                    | Wheat.                    | 0.9985	True
+RICE                      | RICE                      | 0.9634	True
+Wax),                     | Wax),                     | 0.8241	True
+Dried                     | Dried                     | 0.9999	True
+--------------------------------------------------------------------------------
+[600/2000] Train loss: 0.01048, Valid loss: 0.13830, Elapsed_time: 298.85927
+Current_accuracy : 92.060, Current_norm_ED  : 0.98
+Best_accuracy    : 92.323, Best_norm_ED     : 0.98
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+INS                       | INS                       | 0.9994	True
+Pulp                      | Pulp                      | 0.9995	True
+powder,                   | powder,                   | 0.9988	True
+(Carrot                   | (Carrot                   | 0.9985	True
+Seeds                     | Seeds                     | 1.0000	True
+--------------------------------------------------------------------------------
+[800/2000] Train loss: 0.01070, Valid loss: 0.11435, Elapsed_time: 403.67022
+Current_accuracy : 92.192, Current_norm_ED  : 0.98
+Best_accuracy    : 92.323, Best_norm_ED     : 0.98
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+in                        | in                        | 0.9840	True
+extract                   | extract                   | 0.9996	True
+(Maida),                  | (Maida),                  | 0.5835	True
+Oil),                     | Oil),                     | 0.9887	True
+Meal                      | Meal                      | 0.9992	True
+--------------------------------------------------------------------------------
+[1000/2000] Train loss: 0.00515, Valid loss: 0.10914, Elapsed_time: 497.41936
+Current_accuracy : 92.520, Current_norm_ED  : 0.98
+Best_accuracy    : 92.520, Best_norm_ED     : 0.98
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+iodized                   | iodized                   | 0.8490	True
+RAGI                      | RAGI                      | 0.9044	True
+(9%)                      | (9%)                      | 0.9883	True
+CONDIMENTS,               | CONDIMENTS,               | 0.9885	True
+Edible                    | Edible                    | 1.0000	True
+--------------------------------------------------------------------------------
+[1200/2000] Train loss: 0.00439, Valid loss: 0.10264, Elapsed_time: 590.83554
+Current_accuracy : 92.257, Current_norm_ED  : 0.98
+Best_accuracy    : 92.520, Best_norm_ED     : 0.98
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+407),                     | 407),                     | 0.9856	True
+WHEAT                     | WHEAT                     | 0.9994	True
+10%                       | 10%                       | 0.9993	True
+Regulators                | Regulators                | 0.9998	True
+solids,                   | solids,                   | 0.7648	True
+--------------------------------------------------------------------------------
+[1400/2000] Train loss: 0.00339, Valid loss: 0.12141, Elapsed_time: 689.71798
+Current_accuracy : 92.454, Current_norm_ED  : 0.98
+Best_accuracy    : 92.520, Best_norm_ED     : 0.98
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+(INS                      | (INS                      | 0.9917	True
+Cranberries,              | Cranberries,              | 0.9996	True
+*Seasoning                | *Seasoning                | 0.9993	True
+sachet):                  | sachet):                  | 0.9523	True
+(E471)                    | (E471)                    | 0.9842	True
+--------------------------------------------------------------------------------
+[1600/2000] Train loss: 0.00293, Valid loss: 0.12381, Elapsed_time: 789.43792
+Current_accuracy : 91.667, Current_norm_ED  : 0.97
+Best_accuracy    : 92.520, Best_norm_ED     : 0.98
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+(330),                    | (330),                    | 0.9996	True
+Onion                     | Onion                     | 0.9990	True
+RAISING                   | RAISING                   | 1.0000	True
+Sugar,                    | Sugar,                    | 1.0000	True
+Flour                     | Flour                     | 0.9798	True
+--------------------------------------------------------------------------------
+[1800/2000] Train loss: 0.00828, Valid loss: 0.10896, Elapsed_time: 897.08088
+Current_accuracy : 92.848, Current_norm_ED  : 0.98
+Best_accuracy    : 92.848, Best_norm_ED     : 0.98
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+Acidity                   | Acidity                   | 0.9921	True
+CONTAINS:                 | CONTAINS:                 | 0.9987	True
+322(i)},                  | 322(i)),                  | 0.4569	False
+extract,                  | extract,                  | 0.9984	True
+Roasted                   | Roasted                   | 0.9997	True
+--------------------------------------------------------------------------------
+[2000/2000] Train loss: 0.00690, Valid loss: 0.10420, Elapsed_time: 999.89382
+Current_accuracy : 92.782, Current_norm_ED  : 0.98
+Best_accuracy    : 92.848, Best_norm_ED     : 0.98
+--------------------------------------------------------------------------------
+Ground Truth              | Prediction                | Confidence Score & T/F
+--------------------------------------------------------------------------------
+&                         | &                         | 0.9993	True
+emulsifier                | emulsitier                | 0.3848	False
+RAISING                   | RAISING                   | 0.9999	True
+[(E1                      | IEET                      | 0.1904	False
+Wheat                     | Wheat                     | 0.9997	True
+--------------------------------------------------------------------------------

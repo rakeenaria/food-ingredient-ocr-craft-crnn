@@ -1,80 +1,1237 @@
-bahan_1	INGREDIENTS: ENRICHED MACARONI PRODUCT (WHEAT
-FLOUR, NIACIN, FERROUS SULFATE [IRON], THIAMIN
-MONONITRATE [VITAMIN B1], RIBOFLAVIN [VITAMIN B2],
-FOLIC ACID); CHEESE SAUCE (MILK, WHEY, WATER, WHEY
-PROTEIN CONCENTRATE, CANOLA OIL, MILK PROTEIN
-CONCENTRATE, SODIUM PHOSPHATE, SALT, CONTAINS LESS
-THAN 2% OF LACTIC ACID, SODIUM ALL GINATE, SORBIC ACID
-ASA PRESERVATIVE, OLEORESIN PAPRIKA [COLOR], ANNATTO
-[COLOR], NATURAL FLAVOR, CHEESE CULTURE, ENZYMES).
-CONTAINS: WHEAT, MILK.
+in1	and good
+INGREDIENTS:
+Potato, Refined Palmolein Oil, Bengal Gram
+Flour (Besan), Potato Flakes, Potato Starch,
+Tapioca Starch, Tapary Beans (Moth Dal)
+Flour, lodised Salt, Red Chilli Powder,
+Black Salt, Acidity Regulator (INS 330),
+Black Pepper, Clove, Cardamom, Dried
+Ginger Powder, Dried Garlic Powder, Refined
+Sugar, Cumin Powder, Bay Leaves,
+Nutmeg, Cinnamon and Mint Leaves
+CONTAINS ADDED NATURAL, NATURE IDENTICAL &
+ARTIFICIAL FLAVOURING SUBSTANCES (MINT)
+Allergy Advice:
+May Contain Peanut, Tree Nuts, Sesame
+Seed, Milk, Soya, Mustard Seed & Gluten
 
-bahan_2	INGREDIENTS: CHICKEN BROTH: WATER CHICKEN FLAVOR (CHICKEN BROTH,
-RENDERED CHICKEN FAT, SALT, FLAVOR, DISODIUM INOSINATE & DISODIUM
-GUANYLATE, POLYSORBATE 60, XANTHAN GUM), WHEAT FLOUR ENRICHED WITH
-(NIACIN, IRON, THIAMINE MONONITRATE, RIBOFLAVIN, FOLIC ACID), COOKED
-WHITE MEAT CHICKEN, INTERESTERIFIED SOYBEAN OIL, HYDROGENATED
-SOYBEAN OIL, CARROTS, PEAS, CONTAINS 2% OR LESS OF EACH OF: CELERY,
-MODIFIED CORN STARCH, ONIONS, HEAVY WHIPPING CREAM, SALT, RENDERED
-CHICKEN FAT, SOYBEAN OIL, WHEY POWDER, NONFAT DRY MILK, SUGAR,
-ISOLATED SOY PROTEIN, CARRAGEENAN, METHYLCELLULOSE, AUTOLYZED
-YEAST EXTRACT, FLAVORS, MONO- & DIGLYCERIDES, BLACK PEPPER,
-TURMERIC, CARAMEL COLOR, SOY LECITHIN.
-CONTAINS: MILK, SOY, WHEAT.
+in2	Ingredients: Milk Solids, Common Salt,
+Spices & Condiments (1%), Permitted
+Stabilizer (E 460(i)).
+For identification of Manufacturing Unit,
 
-bahan_3	INGREDIENTS: Whole- grainsprouted
-brown rice protein concentrate, natural
-flavor, stevia.
-ALLERGEN INFORMATION: This
-product is manufactured in a facility
-that processes other products which
-may contain soy, dairy, wheat, tree
-nuts, shellfish, fish, peanuts, and
-eggs and may contain traces of all
-of the above.
+in3	CARBONATED WATER
+INGREDIENTS: CARBONATED WATER SUGAR ACIDITY
+ADDED REGULATORS (330, 331) PRESERVATIVE (211) CONTAINS
+FLAVOURS (NATURAL FLAVOURING SUBSTANCESI
 
-bahan_4	BEST INGREDIENTS:
-Organic Whole Grain Wheat Flour (organic
-graham flour) Organic Wheat Flour, Organic
-Cane Sugar, Organic Expeller-pressed
-Sunflower Oil, Organic Honey, Organic
-Molasses, Leavening (baking soda,
-ammonium bicarbonate and cream of tartar),
-Organic Vanilla Flavor, Organic Brown Sugar
-Flavor, Sea Salt, Organic Rosemary Extract
-(to protect flavor).
-CONTAINS WHEAT INGREDIENTS.
-Made on shared equipment that also
-processes milk and soy.
+in4	INGREDIENTS
+WATER, MANGOI PULP (19. 5 %), SUGAR,
+acidity REGULATORS (INS330, INS331(M)),
+PRESERVATIVES (INS211, INS224, INS202) AND
+antioxidants (INS300).
+CONTAINS PERMITTED SYNTHETIC FOOD COLOUR
+(INS110) and ADDED FLAVOUR [NATURE. IIDENTICAL
+FLAVOURINGE SUBSTANCES (MANGO)]
+(INS-I INTERNATIONAL NUMBERING SYSTEM).
 
-bahan_5	Ingredients: Rolled Oats (25.1%), Candied Fruit and Nut (24%)
-{Candied Cranberry (14%), Almonds (10%),, Sugar, Oat Flour (10.7%),
-Edible Vegetable Oil (Palmolein), Rice (4. .%)), Whole Wheat (3.9%),
-Rice Flour (2.7%), Liquid Glucose, Corn Flour (1.8%), Honey, Malt Extract,
-Wheat Bran (0.6%), Wheat Flour (0. 5%), iodized Salt, Dextrose,
-Barley Flour (0.1%), Vitamins, Raising Agent (INS 500ii),
-Minerals, Antioxidant (INS 320)
-CONTAINS ADDED FLAVOURS (NATURE IDENTICAL AND
-ARTIFICIAL CREAM FLAVOURING SUBSTANCES)
-CONTAINS GLUTEN, ALMONDS.
-MAY CONTAIN TRACES OF SOY AND MILK.
+in6	way TLU,
+HIDE a seek* biscuits
+EMULSIFIER INGREDIENTS: of vegetable REFINED WHEAT ORIGIN FLOUR (SOYA (MADD), lectry CHOCOLATE and ARTIFICIAL (23%) FLAVOURING [SUGAR, COCOA SOLIDS, COCOA BUTTER, DEXTROSE,
+EMULSIFIER SUGAR, REFINED of PALM INVERT SUGAR SYRUP RAISING AGENTS SUBSTANCES
+CONTAINS ADDED very FLAVOUR ORIGIN ARTIFICIAL diacety.tartaric FLAVOURING SUBSTANCES andfatty.acid for of and COCOA solids, IODISED SALT ANO
+REST reende cruma ran VANILLA).
 
-bahan_6	Ingredients:
-Cereals 46% (oat, rice, corn), sugar, glucose syrup, soya
-kernels, invert sugar, fructose, vegetable fat, dextrose,
-dehydrated strawberries 23%, salt, rice flour, acid (citric
-acid), natural flavour, barley malt extract, vitamins (A, C,
-DD, thiamine, riboflavin, niacin, B6, folic acid, B12).
+in7	INGREDIENTS: REFINED WHEAT FLOUR, EDIBLE VEGETABLE OIL (PALM), SUGAR (18%)
+RAISING AGENTS [503(ii), 500(ii)) INVERT SYRUP, IODISED SALT (0.8%), YE, AST, ACIDITY
+REGULATORS [270, 330), EMULSIFIER (472e), DOUGH CONDITIONER (223) AND
+IMPROVERS nothon 3410, (ii), T100(1)]
 
-bahan_7	Ingredients: Cane Sugar, Wheat Flour,
-Glucose Syrup, Treacle, Thickener (E1442),
-Vegetable Oil, Flavouring, Citric Acid,
-Colour (E129), Emulsifiers (E471), Salt,
-Liquorice Extract, Sodium Bicarbonate.
-Contains: Wheat.
-May contain traces of peanuts and other nuts.
+in8	Ingrecients. Whey protein isolate (22%), Fructo- Oligosaccharides (Prebiotic fibre) (13%), Dark Chocolate (12%) (Sugar, Cocoa solids, Emusifier
+(NS, 322 >X.Cashew butter, protein concentrate, Butter, Honey, Hazelnuts (4%) and Jowar millet crisp. CONTAINS ADDED FLAVOURS (NATURE
+IDENTCAL FLAYOURING SUBSTANCE (COFFEE EXTRACT). Allergen declaration: Product Proprietary. Food: 01.7 Dairy-based desserts
+comains milk.solids, sulphites & hazelnut. Processed ina facility that also processes peanuts, tree nuts, Nutritional Valuac can
 
-bahan_8	LOW FAT VANILLA FLAVOURED YOGHURT
+in9	INGREDIENTS Mango Pieces (65%), Edible
+Common Salt, Water, Cottonseed Oil, Chilli Powder,
+Spices and Condiments, Acidity Regulator (INS 260)
+and Asafoetida
+
+in10	INGREDIENTS: Tomato puree (38%). Satt, Tamarind concentrate,
+Edible vegetable oil, Red chilli powder (9%), Mustard, Acetic
+acid, Blackgram dal, Garlic, Fenugreek powder, Curry leaves
+Corlander powder, Cumin powder, Bengalgram dai, Asafoelida,
+Turmeric powder.
+CONTAINS PERMITTED class II PRESERVATIVE INS 211
+
+in11	Ingredients: Greek yogurt (pasteurized double
+toned milk, milk solids, permitted starter cultures),
+processed blueberry pulp (sugar, blueberry puree, water,
+pectin INS 440), lemon juice concentrate)
+Total Fruit Content: 3%
+
+in12	INGREDIENTS: Edible Vegetable Refined Fat, Palmolein, Wheat Flour invert (Malda), Sugar, Sugar,
+Cocos Solids (2. 3%%, Leavening Agents (500(IN). 503AN),
+lodised Salt, Emulsifier (322).
+CONTAINS ADDED flavourgnature identical TWI
+FLAVOURING Substances). ICI
+
+in13	INGREDIENTS: PHYSICALLY REFINED RICE BRAN OIL, REFINED SUNFLOWER OIL,
+antioxidants (INS 319, 330, 304), ANTI foaming agents (INS 900a). VITAMINS
+
+in14	ingredients
+Scsame Seeds & Jaggery
+
+in15	Allergens: and Milk Products
+ingredients: Cow's Vinegar
+
+in16	INGREDIENTS
+RO: Urad purified Dal, Fenugreek Water (50%), and lodized Rice (34W), Salt:
+
+in17	INGREDIENTS:
+"MACARONI (PASTA): Semolina (100%) [from
+CHEESYTOMATO *TASTEMAKERH: Milk and: sugar Wheard mix (Milk solids & Sugar), Sugar
+Dehydrated tomato paste solids {Tomato paste (13.7%), Anticaking agent (551) & lodised
+salt,, lodised salt, Mixed: spices (Dehydrated onion, Dried garlic, Roasted garlic, Cumin powder
+Red chilli, Capsicum extract, Black pepper Coriander extract & Cumin extract), Dehydrated
+Green bell pepper (7.1 %, Maltodextrin, Edible: starch, Cheese powder {Cheese (3%)
+Maltodextrin), Potato fakes (Potato, Margarine, lodised.salt, Emulsifier (471) & Turmerid, Palm
+oil, Thickener (508), Flavour enhancer (635), Oregano bits. and Acidity regulator (296).
+CONTANS-ADDEDALOURA (NATURALI flwor.non.urundedical RAYCURNGSUUSTANCES)
+MAY CONTAIN SOYA AND MUSTARD.
+
+in18	Ingredients: omato Paste (41 35%), Liquid Glucose, Onions, Sunflower Oil, Water, Sugar,
+lodized Salt, Red Chilli Flakes, Acidity Regulators (INS260 & INS330). Mixed Herbs, Garlic,
+Milk Solids, Mixed Spices & Condiments and Thickonors (INS1422 & INS415).
+contains PERMITTED class II PRESERVATIVE (INS211).
+
+in19	ingredients: (20.5%), Onlon, Garlic Relined: (28%), Rod_Chilli Purce, Tomalo Pase
+powder(1%) Mustard Sunflower seeds Oil, lodized Salt, Cumin sood
+(NN 330), Stabilizer uns.115.and/Pussoware (0.5%) Acidity (INS Regulator 21)
+
+in20	(ingredients:
+Water, (Cumin Sugar, Powder, Tamarind1Pulp(18.sma Chilli Powder a Dried Spices Ginger Powder),
+lodized: (INS 260), Salt, Stabilizer Thickener (NS (NS 415)and 1442), Preservative Acidity Regulator (INS 211)
+
+in21	Ingredients: Water, Coriander 66%, Garlic 65% Ginger
+us% Green Chilli, lodized Salt, Sugar, Thickener (NS 1442).
+Addity Regulator ans 3301, Cumin/Pharder Stabilizer ans415)
+and/Presenvathve ans211).
+
+in22	Ingredients: Tomato Paste (32%)
+Sugar, Water, Onions, Refined
+Soyabean Oil, lodised Salt, Mixed
+Spices, Garlic, Herbs, Acidity
+Regulators (ins 260, INS 330),
+Emulsifiers and Stabilizers (ins32,
+INS 415), Preservative (N3211)
+Antioxidant (N3319)
+
+in23	Ingredients: Water, Potatoes, Green chilli (25%),
+Sugar, Salt, Fresh Coriander, Acidity Regulator
+(INS 260), Garlic, Cornflour, Stabilizer (INS 415),
+Preservative (INS 211), Spices & Condiments.
+
+in24	Ingredient Colifornian Almonds, 100% Natural
+
+in25	Ingredients: Green Raisin, Almonds, Pistochios Block Raisins, Coshownuts, Cranbornies,
+Walnuts
+
+in26	Ingredients: Roasted Salted Pumpkin seeds without
+shell, Salt.
+
+in27	Ingredients Natural Walnut Kernels, (No shell)
+
+in28	INGREDIENTS:
+Sugar, Cocoa Powder (30% J.
+CONTAINS ADDED FLAVOUR (ARTIFICIAL (VANILLA]
+FLAVOURING SUBSTANCESI.
+Allergen Information: Contains Sulphites
+
+in29	Ingredients
+Water, Sugar, Mango Pulp (6.8%), Banana Puree (4.5%),
+Guava Pulp (4.4%), Pineapple Pulp (3. 2%), Watermelon
+Pulp (0.6%), Polydextrose (Dietary Fiber) (0.54%],
+Acidity Regulator (INS 330), Bael Pulp (0.17%), Jamun
+Pulp (0.17%], Litchi Pulp (0.17%), Stabilizer (INS 440),
+Antioxidant (INS 300) and Pomegranate Juice (0.05%).
+CONTAINS PERMITTED NATURAL COLOUR(S)
+(INS 160aliii)) AND ADDED FLAVOUR(S)
+(NATURAL FLAVOURS and NATURAL
+FLAVOURING SUBSTANCES and NATURE
+IDENTICAL FLAVOURING SUBSTANCESI
+SOURCE OF DIETARY FIBRE
+
+in30	run
+INGREDIENTS:
+Skimmed cocoa powder milk malt Extract, soy protein isolate,
+ferric pyrophosphate, clowder. minerals (Di calcium phosphate,
+maltodextrin, stabilizer zinc sulphate, potassium "iodide)
+bitartrate, ascorbic (guar gum), vitamins (choline
+tocopheryl acetate, acid, nicotinamide, dl-alpha
+hydrochloride, thiamine
+pyridoxine argorational agetate.rib
+sweetener CON hydrochloride, 955) folic acid, Concentication
+
+in31	INGREDIENTS
+Chicken Meat (52%), Water, Breadcrumbs {Wheat Flour, Yeast, Salt, Permitted
+Bread Improvers, Preservative (INS 282) And Acidity Regulator (INS260)), Edible
+Vegetable Oil (RBD Palmolein), Batter {Wheat Flour, Corn Flour, Corn Starch, Salt
+And Emulsifier (INS 466)), Soy, Isolated Soy Protein, lodized Salt, Spices &
+Condiments And Texturizer (INS 451(1).
+
+in32	INGREDIENTS
+Chicken Meat (53%), Breadcrumbs (Wheat
+Flour, Yeast, Salt, Permitted Bread Improvers,
+Preservative (INS 282) And Acidity Regulator
+(INS 260)), Water, Edible Vegetable Oil (Refined
+Palmolein Oil), Batter [Wheat Flour, Corn Flour,
+Corn Starch, Salt and Emulsifier (INS 466)], Soy
+Protein, Spices & Condiments, lodized Salt And
+Texturizer (INS 451 (i)).
+CONTAINS PREMITTED CLASS II PRESERVATIVE.
+Allergy Advice: Contains Soy and Wheat Products.
+
+in33	INGREDIENTS
+Carbonated Water, sugar, acidity
+regulator (338), caffeine. Contains
+permitted natural colour (150d) and
+added flavours (natural, nature-identical
+and artificial flavouring
+substances (cola flavour)
+
+in34	ingredients
+Sugar, Skimmed Mik Powder, Glucose,
+Probacc.U.ccoodeac.UUs casei stran Shirota (LeS)
+contas.ousintsow.und.edu desincilfulicurs
+
+in35	INGREDIENTS: COCONUT WATER(100%),
+BIO-PRESERVATIVE (INS 234)
+CONTAINS NATURALLY OCCURING SUGARS
+
+in36	INGREDIENTS: CARBONATED WATER, ACIDITY REGULATORS (338, 331(iii),
+SWEETENERS (951, 950), PRESERVATIVE (211), CAFFEINE (10 mg/100 g),
+
+in37	Ingredients: Water, Mixed Fruit Concentrate (12.0396)
+[Apple Juice Conc. (4. .72%), Orange Juice Conc. (2.7%
+Guava Puree (0. .7%) Apricot Puree Conc. (0.65%)
+Mango Pulp Conc. (0.5%b), Banana Puree (0.46%),
+Lime Juice Conc. (0.28%), Passion Fruit Juice Conc.
+(0.23%) Guava Puree Conc. (0.18%), Pineapple Juice
+Conc. (0.05%)), Sugar Acidity Regulator (INS 330),
+Antioxidant (INS 300) and Stabilizer (INS 440).
+
+in38	INGREDIENTS
+Oats (73.99), Maltodextrin. Salt, Spices and Condiments
+(3.47) (Onion, Tumeric, Pepper Cumin, Garlic, Fenugreel,
+Clove, Nutmeg, Red Chilli), Dried Vegetables (Carrots(1.159.
+Onion Flakes (1.152), Green Peas(0.699), Sugar Starch,
+Hydrolysed Vegetables Protien, Wheat Powder, Edible
+Vegetable Oil, Flavour Enhancer (627, 631), Antioxident(320)
+
+in39	wyg
+INGREDIENTS
+Wheat Solids (54. 2%) {Wheat Flour (Atta) (29. 6%), Refined Wheat
+Flour (Maida) (24. 6%)), Sugar, Corn Flour, Cocoa Solids (5. 6%),
+Minerals, Cereal Extract, Edible Vegetable Oil (Palmolein), lodized
+Salt, Colour (INS 150d), Vitamins, Antioxidant (INS 320).
+CONTAINS PERMITTED NATURAL COLOUR & added FLAVOURS
+(NATURE IDENTICAL & ARTIFICIAL CREAM FLAVOURING
+SUBSTANCES)
+CONTAINS GLUTEN. may CONTAIN TRACES of TREENUT.
+
+in40	jelloggs
+Ingredients
+Corn Grits (61.7%), Sugar, Sliced Almonds (9. 0%),
+Cereal Extract, Dextrose, Honey (1.6%), lodized Salt, Vitamins, Minerals,
+Colour (INS 150d) & Antioxidant (INS 320).
+CONTAINS PERMITTED NATURAL COLOUR & ADDED FLAVOUR
+(NATURE-IDENTICAL FLAVOURING SUBSTANCES)
+CONTAINS GLUTEN & ALMOND.
+MAY CONTAIN TRACES OF OTHER TREENUTS.
+
+in41	Cheese, Milk Solids, Permitted Emulsifying Salts (E452, E339, E341, E331),
+Ingredients: Salt & Permitted Class 10 Preservatives (E200 & E234)
+Common
+
+in42	ings EDIENTS Refined Palmolein Oil, Rice Flakes (20%), Sugar (Sucrose), Chickpea Flour (14.8%),
+Peanuts (7.3%6), Dried Green Peas, Lentils, Sago, Split Bengal Gram, Mixed Spices, Rice Flour, lodized Salt,
+Turmeric Carom seeds, Black salt, Citric Acid (E 330) as Acidity Regulator, Sodium Bicarbonate [E 500 (11))
+aslear ening Agent.
+
+in43	REFINED WHEAT FLOUR (MAIDA), SUGAR (26. 4%6), REFINED PALM OIL, EDIBLE DESICCATED
+Ingredients: SYRUP, milk solids, STARCH, RAISING agents [INS so3(i)), INS 500(M), INS 450M), (INS COCONUT
+coconut, INVERT IODIZED SALI, EMULSIFIERS [INS 3220), INS 471) and flour TREATMENT agent 223).
+powder, Sontherk FOCOCALOURSYANS 102 INS 129.100.000DRABOURCY (ATROURBOODEMSTECONCES <cocoustwarla.mius)
+containswheat, CONTANSPERMITED solids, soya, NUTS AND: SULPHITES.
+
+in44	INGREDIENTS: 58% Whole Grain (Rolled Oats, Brown Rice
+Flakes. Quinoa Flakes). 14% Seeds & Nuts (Pumpkin.
+Almonds, Chia, Flax), 11% Dried Fruits (Cranberry,
+Raisins), Dark Chocolate (Cocoa, Cocoa-Butter, Sugar,
+Soy Lecithin), Date Syrup. Jaggery. Rice Bran Oil, Cocoa
+Powder, Apple Fiber, Himalayan Pink Salt.
+CONTAINS ADDED NATURAL FLAVOURS:
+CHOCOLATE ROSEMARY EXTRACT.
+
+in45	Ingredients: Pumpkin Kernels, lodised Salt, Packaging gas (Nitrogen (E941))
+Allergy information: Processed in a facility that also process sulphites,
+peanuts, gluten(wheat), dairy, soybeans, sesame seeds and other tree
+nuts. May contains traces and shell pieces of nuts, sulphites, peanuts,
+gluten(ww.eat). dairy, soybeans, sesame seeds and other tree nuts.
+you are not completely satisfied with our products, we gladly
+replace your purchase. Please send this package and product to:
+
+in46	(NGREDIENTS: Popping Corn, Refined Edible
+plein oil lodised Salt, Table Butter and Beta
+Carotene.
+
+in47	ingredients Whole Wheat. No preservatives or additives used.
+
+in48	Ingredients: Milk solids, water, sugar, stabilizer (440),
+nature identical and artificial flavouring substances (rose),
+active culture.
+Allergen Information: Contains milk.
+
+in49	ingredients: Dark Chocolate (31%), Refined Wheat
+Flour (Malda), Sugar, Butter, Apple Cider Vinegar,
+Raising Agent (INSSOO(M). Vanilla Essence.
+contains: wheat and MILK
+contains added artificial flavouring
+substances (VANILLA).
+
+in50	Ingredients: Maida, Butter (25%)
+Mailitol, Fructo Ollgosccharlde, Water,
+Milk Solids. Citrus liber, Raising Agents
+(E500 (ID. E503(1)), Emulsitier (322)
+CONTAINS ADDED FLAVOUR
+FLAVOURING
+Substances VANILLA).
+
+in51	INGREDIENTS:
+Wheat flour, coconut oil, glucose syrup, whey
+powder (milk), sugar, fat-reduced cocoa, soy
+flour chocolate (sugar, cocoa mass) 5% in the
+cream filling, skimmed milk powder, raising
+agents (sodium hydrogen carbonate, disodium
+diphosphate), hazelnuts, emulsifier soy lecithins,
+salt, barley malt extract, concentrated apple
+juice, spices, Bourbon vanilla pods. May contain
+peanuts and almonds.
+
+in52	Ingredients: Choco Cream (36%) (Sugar, Vegetable Fat, Cocoa Solids, Emulsifiers (E322 from Soya)). Refined Wheat
+Flour (Maida), Sugar, Edible Vegetable Oil (Palm), Milk Solids, Golden Syrup, Cocoa Powder, Emulsifier (E322 from Soya),
+Leavening Agents (E503 E500 i), Salt
+
+in53	Ingredients: Retined Wheat Hour (Maida), Sugar, Edible" Vegetable Oil (Paim), Ury Fruits (8%) |Blackcurrant, Papaya
+{Papaya Cubes, Sugar, Acidity Regulator (E330)). Cranberry), Nuts (4%) (Cashew, Almond), Butter, Liquid Glucose, Date:
+Syrup, Milk Solids, Leavening, Agent (E503 it, E500 ii), Emulsifier (E322 from Soya), Salt, Spices (Clove and Nutmeg).
+Allergen Advice: Contains Wheat Gluten, Milk, Soya and Nuts.
+
+in54	Ingredients
+Refined Wheat flour, Hydrogenated Vegetable Fat, Cashew, Sugar, Milk Solids, Salt, Raising agent (E500)
+Flavour vanilia and butterscotch
+
+in55	INGREDIENTS
+Almond, Skimmed Milk Powder, Besan
+(Gram Flour), Fructo oligosaccharide,
+Sorbitol, Sucralose, Hydrogenated
+Vegetable oil, Baking Soda, Baking Powder,
+PermittedFlavours.
+
+in56	INGREDIENTS: REFINED WHEAT FLOUR (MAIDA), EDIBLE
+VEGETABLE oil (PALM), SUGAR, LIQUID GLUCOSE,
+RAISING agents [503(ii), 500(ii) 450(i)). BUTTER (1.2%)
+black SALT, MILK solids, edible VEGETABLE PRODUCT
+(1%) IODISED SALT, ACIDITY REGULATOR [341(11),
+DOUGH CONDITIONER (223) AND IMPROVER/11010)
+CONTAINS ADDED FLAVOUR [ARTIFICIAL
+FLAVOURING SUBSTANCE (BUTTER)).
+
+in57	ingredients:
+Organic Wheat Bran, Organic Ragi Flour,
+Organic Oats Flour, Organic Wheat Flour
+Organic Flax Seeds, Raw Kokum Butter,
+Raw Jaggery, Natural Vanilla Extract,
+Himalayan Rock Salt
+
+in58	Nogredients Brown Rice, Oats, Butter, Shatavari, Yashtimadhu, Butter
+Flax Seeds, Rock Sugar, Olive Oil, Honey, Chocochip
+Cinnamon Powder, Water, Ghee, Vanilla Essence.
+
+in59	UryNuts (1%) (Almond & Cashew), Golden Syrup, Leavening Agents (E500 17, E50311),
+Emulsifier (E322 from Soya, 472 e), Salt.
+CONTAINS ADDED ARTIFICIAL FLAVOURS (SAFFRON, ALMOND & MILK).
+Allergen Advice: Contains Wheat Gluten, Milk, Soya and Nuts,
+Store in a cool, dry place and away from direct sunlight. Once opened,
+store in an airtight container. Please dispose of this package thoughtfully.
+
+in60	INGREDIENTS WHEATFLOUR, CHOCOLATE (23%)I SUGAR, COCOA SOLIDS, COCOA BUTTER,
+DEXTROSE, EMULSIFIER (LECITHIN, of SOYA ORIGIN) and ADDED FLAVOUR ARTIFICIAL
+FLAVOURING SUBSTANCES SUGAR, EDIBLE VEGETABLE oil PALM OIL), INVERT
+SUGAR SYRUP, RAISING AGENTS! VANTALS 600 COCOA SOLIDS, IODISED SALT
+AND EMULSIFIER [DI-ACETYL TARTARIC acid ESTERS of MONO AND DI-GLYCERIDES OF EDIBLE
+vegetable OILS].
+CONTAINS ADDED FLAVOURS ARTIFICIAL FLAVOURING SUBSTANCES VANILLA
+
+in61	Ingredients: Sandwich Biscuit! 56% (Refined WheatFFour (Maida), Sugar, Edible
+Vegetable Fat, Palmolein, invertSugar, Cocoa. Solids(1.28" Leavening Agents
+(500M)503M lodised. Satt, Emulsifier) [322) Choco-Coating 44%+ (Sugar, Hydrogenated
+Vegetable Fat, MilkSolids (6.787), Cocoa: Solids" (3.6%7 Emulsifiers/442, .776)
+CONTAINS ADDEDFLAVOURS (NATURAL, NATURE IDENTICAL MOATTOOLOGMALOARCOMMALY
+FLAVOURING: SUBSTANCES)
+Allergen Information: Contains Wheat and Milk.
+
+in62	Ingredients: Choco Filling (38% (Sugar, Edible Vegetable Oil (Palm), Cocoa Solids, Milk Solids, Cocoa Butter,
+Emulsifier (322), Artificial Flavours (Vanilla and Chocolate)), Refined Wheat Flour (Maida), Sugar, Edible
+Vegetable Fat, Cocoa Solids, Invert Sugar, Raising Agents (500(ii), 503(ii), 4500), Edible Salt, Emulsifier (322)
+CONTAINS ADDED FLAVOURS (NATURAL AND ARTIFICIAL (VANILLA AND CHOCOLATE) FLAVOURING SUBSTANCES)
+Allergen Information: Contains Milk, Wheat. May Contain: Treenuts
+
+in63	INGREDIENTS:
+Finger Millet flour, Jaggery,
+Whole Wheat flour, Vegetable Oil & Salt
+
+in64	INGREDIENTS
+Isolated Soya Protein, Peanut, Skimmed Milk
+Powder, Isolated Wheat Protein, Almond, Coconut,
+whey Protein, Fructooligosacchande Sorbitol,
+Sucralose, Hydro-genated Vegetable oil, Baking
+Soda, Jeera, Salt, Baking Powder, Permitted
+Flavours.
+
+in65	INGREDIENTS: REFINED WHEAT FLOUR (MAIDA) (73%), SUGAR, REFINED PALM
+OIL, INVERT SUGAR SYRUP MILK SOLIDS, RAISING AGENTS [503(11) & 500 (111
+IODIZED SALT, EMULSIFIERAT201, CALCIUM SALT, DOUGH CONDITIONER.228),
+VITAMINS* FERROUS SALT AND POTASSIUM IODATE.
+
+in66	BISCUIT INGREDIENTS:
+Refined Wheat Flour (57%*), Sugar,
+Palmolein Oil, Cereal Based
+Beverage Mix 5%* (Cereal Extract
+51%* (Barley, Wheat), Sugar, Cocoa Solids, Colour
+(150c), Liquid Glucose, Protein Isolate,
+Maltodextrin, Milk Solids, Vitamins, Emulsifiers
+(322, 471), Raising Agent (500(ii)), Minerals, Edible
+Salt, Artificial (Ethyl Vanillin) Flavour), Invert Sugar,
+Cocoa Solids (1.4% Milk Solids (1% "), Edible Salt,
+Leavening Agents (500(ii), 503(ii) Emulsifier
+(322), Color (150c), Vitamins And Minerals.
+CONTAINS PERMITTED NATURAL COLOUR AND ADDED
+FLAVOURS (NATURAL, NATURE IDENTICAL AND ARTIFICIAL
+(ETHYL VANILLIN) FLAVOURING substances).
+Allergen information: Contains Wheat, Milk,
+Barley
+
+in67	INGREDIENTS: OATS FLOUR, WHOLE
+WHEAT FLOUR, RICE FLOUR, CORNFLOUR,
+ROLLED OATS, RICE BRAN OIL, WHEAT
+BRAN, SOYA PROTEIN isolate, DRIED
+CRANBERRY, JAGGERY POWDER, BAKING
+SODA, VANILLA, CINNAMON POWDERT
+
+in68	Ingredients: REFINED wheat FLOUR, (MAIDA), SUGAR(2496)
+edible VEGETABLE OILSI (PALM), raising agents [soo(i)). so3())),
+MILKSOLIDS, IODISED SALT, yeast, EXULSIFIER(322) and
+IMPROVERS (1100, 11016).
+
+in69	Ingredients: Protein Blend (25%) (High
+Protein Peanut Flour, Whey Protein
+Concentrate, Wheat Protein, Soy Protein
+Concentrate) Compound Chips (16%), (Sugar
+Edible Fat (Hydrogenated),
+Cocoa reguate Dextrose & Emulsifier
+(INS3221)-Lecithin of Soya
+Edible Vegetable Oil (Bakery some
+Invert Sugar, Millets & Pulses Blend
+(Wheat Flour, Oats Flour Quinoa Flour, Bengal
+Gram Flour, Ragi Flour, Corn Flour Amaranth
+Puff), Dietary Fiber (Fructolijosacharde).
+Condensed Milk, Sugar Powder, Humectant
+(Glycerine), Tribasic Calcium Phosphate, Cocoa
+Powder, Leavening agent (Baking
+Binding agent (Gum Acacia, Xanthan Soda))
+Emulsifier (INS471 INS472e), Salt.
+
+in70	INGREDIENTS: RAGI FLOUR, CHICKPEA
+FLOUR, OATS FLOUR, RICE BRAN OIL,
+JAGGERY POWDER, COCOA POWDER,
+OATS FLAKES, WHEAT BRAN, SOYA PROTEIN
+isolate, CHOCO CHIPS, SALT, BAKING
+POWDER, VANILLA
+
+in71	INGREDIENTS: REFINED WHEAT flour (maida), SUGAR, EDIBLE vegetable OIL (palm), CHOCOLATE CHIPS (11%) [SUGAR, cocoa solids, COCOA
+BUTTER, dextrose, EMULSIFIER (322) and ADDED natural FLAVOURING SUBSTANCE (VANILLAIL CHOCOCHIPS (10%) (SUGAR, EDIBLE
+HYDROGENATED vegetable OIL, (OCOA solids, dextrose, emulsifier (322) AND added NATURAL FLAYOURING SUBSTANCE (VANILLAIL INVERT
+syrup, RAISING AGENTS [503(i)), 500(ii)), 450(i)) COCOA solids, IODISED salt and EMULSIFIERS (322, 472e).
+
+in72	INGREDIENTS
+Coconut, Skimmed Milk Powder, Besan,
+Fructo oligosaccharide, Sorbitol, Sucralose,
+Hydrogenated Vegetable oil, Baking Soda,
+Baking Powder, PermittedFlavours.
+
+in73	ingredients: Almonds (26%),
+Dark Compound (25%)
+[Sugar Edible Vegetable Fat
+(Hydrogenated), Cocoa Solids,
+Emulsifiers (INS 491, 322)),
+Peanuts (22%), Rice Crispy (5%)
+(Rice Flour, Wheat Flour, Sugar
+Malt, Salt, Milk Powder), Honey,
+Oligofructose, Sugar Sunflower
+Oil, Liquid Glucose, Cocoa Powder,
+Antioxidant (INS 322), Edible
+Common Salt, Cocoa Butter
+contains permitted natural
+colour (ins 150c) AND added
+flavour (natural flavouring
+SUBSTANCES)
+
+in74	Ingredients: Wheat Flour,
+Chocolate Chips 25%lsugar,
+cocoa solids, cocoa butter,
+permitted emulsifiers
+[322,4761), Sugar, Demerara
+Sugar, Edible Hydrogenated
+Vegetable Shortening, Eggs,
+Cocoa Powder 2%11 Raising
+Agent [500(11)) Salt.
+
+in75	INGREDIENTS: REFINED WHEAT FLOUR/MAIDA) SUGAR,
+INTERESTERIFIED VEGETABLE FAT(PALM) BUTTER(4%), LIQUID
+GLUCOSE, SPRINKLED SUGAR(1.496) MILK SOLIDS, RAISING
+AGENTS [503(ii), 500(ii)), IODIZED SALT AND EMULSIFIER(322))
+CONTAINS ADDED FLAVOURS (ARTIFICIAL FLAVOURING
+SUBSTANCES-BUTTER, VANILLA).
+(Numbers in brackets as per International Numbering System.)
+ALLERGEN: Contains Wheat, Milk & Soybeans.
+
+in76	INGREDIENTS
+organic amaranth(259), organic dry
+fruits/cashew, raisin(15%)), organic sunflower
+seeds(15%), organic honey( 15%), almond( 10%),
+olive oil, dates, figs, organic brown sugar
+vanilla & raising agent!INS 500(ii)}
+
+in77	Ingredients: Choco Creme (34%) (Sugar, Refined Palmolein,
+Refined Palm Oil, Cocoa Solids, Emulsifier (Lecithin (From
+Soyabean)), Nature Identical Flavouring Substances And Artificial
+Flavouring Substances-Vanila), Refined Wheat Flour (Maida),
+Sugar Hydrogenated Vegetable Oil, Dark Chocolate Chips (10. 1%)
+(Sugar Cocoa Solids, Cocoa Butter, Dextrose, Emulsifier Lecithin
+(From Soyabean)] And Artificial Flavouring Substances Vanilla),
+Eggs (2. 5%), Invert Syrup, Liquid Glucose, Raising Agents (ins
+500), Ins 4500, Ins 503), lodized Salt, Milk Solids, Nature Identical
+Flavouring Substances, Emulsifier (Lecithin (From Soyabean)),
+Artificial Flavouring Substances (Milk, Vanilla, Coffee And
+Colours (ins 1500 Ins 150D)
+Contains Wheat, Milk, Soy, Eggs. May Contains Nuts, Sulphites
+
+in78	Ingredients: Rolled Oats, Brown
+Sugar, Coconut Oil, Sunflower
+Seeds, Pumpkin Seeds, Wheat
+Flour (Atta), Flax Seeds, Turmeric
+Powder, Ginger Powder, Baking
+Powder, Baking Soda, Cinnamon,
+Salt.
+Allergen Advice Contains Oats,
+Nuts and Wheat.
+
+in79	Ingredients: Protein Blend 25%
+(High Protein Peanut Frour, Wheat
+Protein, Soy Protein isolate, Whey
+Protein Concentrate), Edible
+Vegetable Fat (Hydrogenated), Dark
+Chocolate Compound Paste, Dark
+Chocolate Compound Chunks (8%)
+Invert Syrup. Multigrain And Puise
+Mix (Wheat. Corn, Oats, Ragi,
+Quinoa, Amaranth, Roasted Chick:
+pea). Oietary Fiber (Fructo-
+oligosaccharide, Gum Acacia),
+Sugar, Cocoa Powder, Humectant
+(Glycerine). Chilly Flakes(1 5%)
+Leavening Agent (Baking Powder),
+Tricalcium Phosphate, Emulsifiers
+(INS471, INS4720, INS322(i)
+Soy Lecithin), Salt, Antioxidant
+(Rosemary Extract), Flavors, Chilly
+Oleoresin
+
+in80	INGREDIENTS
+buckwheat(20%), organic sunflower
+seeds(17.5%), organic raisin( 12%), coconut
+powder(10%), organic honey(10%),
+almond(8%), dehydrated apple(5%), rice
+bran oil(5%) organic brown sugar(4%),
+raising agent!INS 500(ii)) cinnamon, vanilla.
+
+in81	Ingredients: Rolled Oats, Brown
+Sugar, Coconut Oil, Sunflower
+Seeds, Pumpkin Seeds, Wheat
+Flour (Atta), Flax Seeds, Coffee,
+Baking Powder, Baking Soda,
+Cinnamon, Salt.
+Allergen Advice Contains Oats,
+Nuts and Wheat.
+
+in82	INGREDIENTS: REFINED WHEAT FLOUR, CHOCO CHIPS (22%) (SUGAR COCOA SOLIDS, COCOA BUTTER, MALTO DEXTRIN, DEXTROSE
+ANTIOXIDANT (322)). SUGAR, INTERESTERIFIED VEGETABLE FAT, MILK solids, BUTTER, oats, LIQUID GLUCOSE, SUGAR SOLUTION,
+RAISING AGENT [503 ()). EDIBLE COMMON SALT, EMULSIFIER (322) AND RAISING AGENT [500 (I)
+contains ADDED FLAVOURS (ARTIFICIAL FLAVOURING SUBSTANCE vanilla, CHOCOLATE
+
+in83	Ingredients
+(Rice, Sorghum, Millet, Corn, Channa
+Dal, Amaranth), Cocoa Powder,
+Dark Chocolate Chips, Salt, Sugar
+Hydrogenated' Veg, Fat, Milk Powder,
+Leavening Agents (E50011, E503IN)
+
+in84	INGREDIENTS: REFINED WHEAT FLOUR (MAIDA), SUGAR, DARK CHOCOLATE CHIPS
+(17%) {SUGAR, COCOA SOLIDS, COCOA BUTTER, DEXTROSE, EMULSIFIER [INS 322(i)]
+AND ARTIFICIAL FLAVOURING SUBSTANCES VANILLA), REFINED PALM OIL, MILK
+CHOCO CHIPS (8%) (SUGAR, HYDROGENATED VEGETABLE FAT, MILK SOLIDS, COCOA
+SOLIDS, EMULSIFIER (INS 322()) and NATURAL FLAVOURS & NATURAL
+FLAVOURING SUBSTANCESI, INVERT SYRUP, MILK SOLIDS, EDIBLE DESICCATED
+COCONUT, RAISING AGENTS (INS 503(ii), ins 500(ii)), COCOA SOLIDS (0.4%),
+IODIZED SALT AND EMULSIFIER [INS 322(i)
+
+in85	INGREDIENTS: REFINED WHEAT FLOUR (MAIDA), SUGAR (32.3%), REFINED PALM OIL, STARCH, COCOA SOLIDS (2. 3%), MILK
+SOLIDS, RAISING AGENTS [INS 503(ii), INS 500(ii), INS 450(i)]), PLAIN CHOCOLATE (0. 3%) {SUGAR, COCOA SOLIDS, COCOA
+BUTTER, EMULSIFIERS [LECITHIN (FROM SOYABEAN), POLYGLYCEROL ESTERS OF INTERESTERIFIED RICINOLEIC ACID (FROM
+CASTOR BEAN)] AND ARTIFICIAL FLAVOURING SUBSTANCES VANILLA) EMULSIFIERS [MONO- AND DI-GLYCERIDES OF
+FATTY ACIDS (FROM PALM OIL) LECITHIN (FROM SOYABEAN)] AND IODIZED SALT.
+
+in86	INGREDIENTS: REFINED WHEAT FLOUR/MAIDA). SUGAR, REFINED PALM OIL, CARAMEL BITS(5.1%) [SUGAR, CASHEW NUTS, HYDROGENATED VEGETABLE FAT, MILK
+SOLIDS, IODIZED SALT & CONTAINS ADDED ARTIFICIAL FLAVOURING SUBSTANCES (VANILLA, MILK)), MILK SOLIDS, RAISING AGENTS [503(N), 500(1)), IODIZED SALT,
+ACIDITY REGULATORJ3410) AND EMULSIFIERS [322, .772(e)).
+CONTAINS ADDED FLAVOURS ARTIFICIAL FLAVOURING SUBSTANCES SALTED CARAMEL).
+
+in87	INGREDIENTS: REFINED wheat FLOUR(MAIDA). BROWN CHOCO CHIPS (20%)/SUGAR, COCOA SOLIDS, COCOA BUTTER, MALTODEXTRIN, DEXTROSE, EMULSIFIER (322)
+a contains ADDED ARTIFICIAL FLAVOURING SUBSTANCE (VANILLA)]. SUGAR, INTERESTERIFIED VEGETABLE FAT, BUTTER, MILK SOLIDS, COCOA SOLIDS, LIQUID
+GLUCOSE, STARCH, INVERT SYRUP, RAISING agents [500(M), 503(N)), IODIZED Salt, ACIDITY REGULATORY3410, 4500] AND EMULSIFIER/AT241)
+CONTAINS ADDED FLAVOURS ARTIFICIAL FLAVOURING SUBSTANCES CHOCOLATE, VANILLA).
+
+in88	INGREDIENTS: REFINED WHEAT FLOUR/MADA). CENTRE FILLED CHOCO PASTE/303)JSUGAR, REFINED PALM OLEIN OIL, REFINED PALM OIL,
+COCOA SOLIDS, EMULSIFIER (322), & contains ADDED FLAVOURS (ARTIFICIAL FLAVOURING SUBSTANCES- CHOCOLATE, VANILLA] SUGAR, INTERESTERIFIED
+VEGETABLE fat, MILK SOLIDS, LIQUID GLUCOSE, COCOA SOLIDS, INVERT SYRUP IODIZED SALT, RAISING AGENTS [500(1). 503()) AND EMULSIFIERS [322, 472(e)).
+CONTAINS PERMITTED NATURAL FOOD COLOUR (150d) AND ADDED FLAVOURS (ARTIFICIAL FLAVOURING SUBSTANCES CCOOCOLATE).
+
+in89	INGREDIENTS: REFINED WHEAT FLOUR/MADD)) SUGAR, INTERESTERIFIED VEGETABLE FAT, MILK SOLIDS STARCH, INVERT SYRUP BUTTER, BROWN SUGAR,
+LIQUID GLUCOSE, RAISING AGENTS (503(N). 500()). CINNAMON POWDER(O. IODIZED SALT, acidity REGULATORJ34101 and EMULSIFFER/47201)
+CONTAINS ADDED FLAVOURS ARTIFICIAL FLAVOURING SUBSTANCESSPECULOSS
+(Numbers in brackets as per International Numbering System)
+
+in90	Ingredients: Whole Wheat Flour* Butter,
+Ragi Flour (13%), Amaranth Flour
+(13%)" Organic Jaggery (12%)* Dry
+Fruits & Seeds (Sesame Seeds/Til 5%,
+Almonds, Walnuts, Dates, Cashews,
+Pista, Watermelon Seeds), Milk, Rock
+Salt & Nothing Else.
+*The flours are processed from certified
+organic whole grains. The rest of them
+are premium natural ingredients.
+Contains No Refined White Sugar,
+No Egg, No Soda Baking Powder
+Raising Agents, No Preservatives or
+Artificial Flavours used.
+The Product is 100% Chemical Free.
+Allergy Advice: Contains Gluten,
+Nuts & Milk.
+
+in91	INGREDIENTS: RAGI FLOUR, JOWAR
+FLOUR, BAJRA FLOUR, CHICKPEA FLOUR,
+WHOLE WHEAT FLOUR, CORNFLOUR, RICE
+BRAN OIL, JAGGERY POWDER, SOY
+PROTEIN isolate, WHEAT BRAN, CHIA
+seed, SESAME seed, SUNFLOWER SEED,
+FLAX SEED, BAKING POWDER, vanilla.
+
+in92	ingredients Refined Wheat Flour (43.80%), Sugar Powder (19. 5%), Hydrogenated
+Vegetable far (Palm, Soyabean, Sunflower & Sesame (13.1%), Clarified Butter (13.1), Skim Milk
+Powder (8 5%), Custard Powder, Raising Agents (INS 500
+Foods ALLERGEN ADVICE Contains Gluten & Milk. This product is made in a facility that processes
+containing Nuts, Milk & Soy components.
+
+in93	Ingredients
+(Rice, Sorghum, Millet, Corn, Channa
+Dal, Amaranth), Salt, Ajwain, Sugar,
+Hydrogenated Veg, Fat, Milk Powder,
+Leavening Agents (E500ii, E503ii)
+
+in94	PISTA BISCUITS INGREDIENTS
+Refined Wheat Flour(49%), Sugar,
+Milk Solids, Salt
+CONTAINS NATURAL FLAVOURS
+
+in95	Ingredients
+Whole Wheat Flour, Butter, Jaggery Powder,
+Oats Flour, Dates Powder, Jowar Flour, Ragi Flour,
+Sesame Seeds, Milk Solids, Cocoa Powder
+and Baking Soda.
+
+in96	-INGREDIENTS: EGG, wheat FLOUR, sugar, VEGETABLE
+OIL,CANOLAGILY VEGETABLEFAT (HYDROGENATEDOMS),
+compouscre.ud.cro.cou.edu
+[477, .771, 3220), .775, 4911, FRUCCOSESTRUPMHOOM
+POWDER, Eggyoux.pownder, HYDROGENATTO/OUMGEN
+OIL, STABILIZER(1700), 415, 1442), HUMECTANT (1520,
+422), salt, PRESERVATIVE (202, 281), MALTODEXTRIN,
+RASINGAGENTISTS SOOM), ACDITYREGULATORYBA,
+
+in97	Ingredients: Cake Concentrate (Milk Solids,
+Starch, Baking Powder, Refined Wheat Flour,
+Emulsifiers and Stabilizers (E417, E415), Salt,
+Colour (E171) Flavouring Vanilla], Refined
+Wheat Flour, Sugar, Vegetable Oil, Water
+Coco Powder, Salt Preservative (INS202, INS200),
+Humectant (INS422, Leaving Agents (INS500 (ii)).
+
+in98	Ingredients: Sugar, Eggs, Sunflower Oil, Bananas
+(16%), Wholewheat Flour (Atta) Walnuts (14%),
+Banana Powder, RaisingAgent (INS500(11))
+
+in99	INGREDIENTS
+Stevia Reb A98%, All purpose flour, Walnuts, Dates, Green and
+Black raisins, Eggs, Butter, Vanilla extract, Zests of lemon,
+Baking soda and powder & Iodized salt
+
+in100	Ingredients: Cake Concentrate (Milk Solids, Starch,
+Baking Powder, Refined Wheat Flour, Emulsifiers and
+Stabilizers (E471, E415), Salt, Colour (E171),
+Flavouring- Vanilla], Refined Wheat Flour, Sugar, Edible
+Vegetable Oil, Butter, Raisins, Papaya Preserve,
+Cashews Bits, Almonds, Salt, Caramelised Sugar,
+preservative (INS202, INS200), Humectant (INS422),
+Leaving Agents (INS500 (ii)).
+
+in101	Ingredients Wheat Flour, Edible Vegetable Fat, Edible Vegetable Oil,
+Wine Soaked Candied { Fruits a Raisins, Papaya Dates, Cherry), Fruit &
+Vegetable Peels (Candy & Ginger). Cashew Nuts), Sugar, Mixed Fruit Jam,
+Glucose Syrup, Egg, Butter, Orange Juice, Lime Juice, Mixed Spices
+(Cardamom, Cinnamon, Clove, Fennel, Cumin, Nulmeg, Mace), Leavening
+Agent.
+contains PERMITTED NATURAL food COLOUR & ADDED flavour
+NATURE IDENTICAL FLAVOURING SUBSTANCES PLUM, vanilla,
+SWEET ORANGE, PINEAPPLE, MIXED FRUIT).
+
+in102	INGREDIENTS:
+Maida, Sugar, Eggs, Ghee, Veg Shortening, Honey, Raisins, Dates, Cashewnuts,
+Almonds, Bengal Currant, Fig, Orange Peel, Ginger Peel, Grapes, Orange,
+Milkmaid &Added Flavours. Contains Permitted Additive (E 422)
+ALLERGY ADVICE:
+Contains Dryfruits & Nuts. Processed and packaged in a
+facility with dairy, tree nuts, peanuts, gluten and soy.
+
+in103	INGREDIENTS
+Roasted Almond Kernels, Sugar,
+Cocoa Solids, Cocoa Butter,
+Mango Flayour, Emulsifiers (322,476),
+Glazing Agents (Shellac)
+Contains Added Natural Flavouring Substances
+
+in104	INGREDIENTS: VEGETABLE FATS (PALM, SHEA), DESICCATED COCONUT 23. 5%,
+SUGAR, almond (8%), SKIMMED MILK POWDER, WHEY POWDER (MILKO,
+wheat FLOUR, FLAVOURINGS, EMULSIFIER: LECITHINS (SOYA), SALT, RAISING
+agent (SODIUM BICARBONATE).
+
+in105	1993
+INGREDIENTS: Cocoa Solids, Permitted Sugar, Hydrogenated Vegetable Oil, Milk
+INS 476), Salt, Emulsifying And Stabilizing Agents (INS Solids,
+322,
+CONTAINS ADDED NATURE
+FLAVOURING FAT USED: SUBSTANCES. IDENTICAL & ARTIFICIAL
+CONTAINS TRANS FAT HYDROGENATED VEGETABLE
+AllergenInformation: Contains Milk& Soya
+
+in106	Ingredients Sugar, Edible
+Vegetable Fat, Cocoa Solids &
+Emulsifiers (492, 322)
+CONTAINS ADDED NATURAL
+(VANILLA) FLAVOURING
+SUBSTANCES
+Hydrogenated Vegetable Fat Used
+Contains Trans Fats.
+Allergen information
+Contains soy. May contain traces of milk
+solids.
+
+in107	Ingredients: Sugar, Milk solids, Refined wheat flour (Maida),
+Hydrogenated vegetable vegetable fats (contain sesame oil), Edible
+lecithin), fats, Cocoa solids (4. 4%), Emulsifier (Soya
+agents (516 Raising and agent (500(ii)), Yeast, Flour treatment
+1101()) and lodized salt.
+CONTAINS ADDED FLAVOUR (ARTIFICIAL (VANILLA) FLAVOURING SUBSTANCES)
+MAY Storace contain PEANUTS.
+
+in108	Ingredients: Sugar, Milk Solids (24%*)
+Cocoa Butter, Cocoa Solids, Almond Bits
+(11%*) and Emulsifiers (476,322 (i).
+
+in109	Milk Solids (27% 2
+Ingredients: Sugar, Solids and
+Cocoa Butter, Cocoa
+Emulsifiers (476,322 Instance IVANIL
+
+in110	INGREDIENTS:
+SUGAR, COCOA SOLIDS, COCOA BUTTER, PERMITTED
+EMULSIFIERS(ES22, E476).
+<ONTIMSTOSDATIONSTATESNOS FLAVOURING
+Substances: COCOARVANILLA).
+
+in111	Ingredients: Sugar, Milk solids, Cashewnuts (13%*), Cocoa
+butter, Cocoa solids, Emulsifiers (442, 476), Stabilizers (1400,
+414), Edible salt, Glazing agent (904), Almonds.
+CONTAINS ADDED FLAVOUR (NATURAL, NATURE IDENTICAL AND artificial
+(ETHYL VANILLIN) FLAVOURING SUBSTANCES)
+
+in112	Ingredients: Maltitol (INS 965(i)), Cocoa Butter
+(33%) Cocoa Powder (18%), Almonds (10%),
+Fructo-digosacchardes, Emulsifiers (INS 322,
+INS 476), Flavouring (Hazelnut).
+
+in113	INGREDIENTS:
+SUGAR, COCOA BUTTER, COCOA solids, PERMITTED
+EMULSIFIERS (E322, E476).
+contains added FLAVOURS (ARTIFICIAL FLAVOURING
+SUBSTANCES-COCOA & VANILLA).
+
+in114	NUTRITIONAL INFORMATION*
+Amount per 100 g
+Energy, kcal 557
+Total Fat, g 33.7
+Saturated Fat, g 20.4
+Trans Fat, g 0
+Total Carbohydrate, g 57.3
+Added Sugar, g 43.0
+Protein, g 6.0
+
+in115	Ingredients: Choco Creme (34%) (Sugar, Refined Palmolein,
+Refined Palm Oil, Cocoa Solids, Emulsifier (Lecithin (From
+Soyabean)), Nature Identical Flavouring Substances And Artificial
+Flavouring Substances-Vanila), Refined Wheat Flour (Maida),
+Sugar Hydrogenated Vegetable Oil, Dark Chocolate Chips (10, 1 %)
+(Sugar Cocoa Solids, Cocoa Butter, Dextrose, Emulsifier Lecithin
+(From Soyabean)] And Artificial Flavouring Substances Vanilla),
+Eggs (2. 5%), Invert Syrup, Liquid Glucose, Raising Agents (Ins
+500), Ins 4500, Ins 503), lodized Salt, Milk Solids, Nature Identical
+Flavouring Substances, Emulsifier (Lecithin (From Soyabean)),
+Artificial Flavouring Substances (Milk, Vanilla, Coffee And
+Colours (ins 1500 Ins 150D)
+
+in116	INGREDIENTS:
+COCOA SOLIDS, sugar, COCOA BUTTER, PERMITTEDEMULSTIERS
+(E322, E476).
+CONTAINS addedilavours: (ARTIFICIAL FLAVOURING
+Substances- COCOASVANILLA).
+
+in117	Ingredients: Cocoa Solids,
+Sugar, Cocoa Butter, Emusifier
+(INS 322).
+ALLERGEN INFORM TION
+CONTAINS SOY MAY CONTAINS
+MILK, NUT.
+
+in118	INGREDIENTS: SUGAR, SKIMMED MILK POWDER (11.5%) HAZELNUTS (10.9%),
+PALMOLEIN, REFINED WHEAT FLOUR (MAIDA), REFINED SALSEED FAT, low FAT COCOA
+POWDER (5%), palm OIL, WHEAT STARCH, SUNFLOWERSEED OIL (high OLEIC ACID),
+WHEY PROTEIN CONCENTRATE, EMULSIFIER (LECITHIN INS 322), POWDERED BARLEY
+MALT EXTRACT, RAISING AGENTS (ins 503ii, INS 500II), IODIZED SALT.
+contains ADDED FLAVOURS (NATURE-IDENTICAL FLAVOURING SUBSTANCES)
+ALLERGEN INFORMATION: Contains MILK, HAZELNUTS, GLUTEN, SOY
+
+in119	Ingredients: Sugar, Edible Vegetable Fat, Refined Wheat Flour, Milk Solids,
+Starch, Cocoa Solids (5% Palmolein Oil, Emulsifiers (442, 322, 476),
+Edible Salt, Yeast, Raising Agent (500(ii)) Improver (Enzyme).
+CONTAINS ADDED FLAVOUR (NATURAL, NATURE IDENTICAL AND ARTIFICIAL
+(CARAMEL AND ETHYL VANILLIN) FLAVOURING SUBSTANCES)
+
+in120	INGREDIENTS: Cocoa Solids, Sugar, Hydrogenated Vegetables Oil, Milk Solids, Permitted
+Emulsifying & Stabilizing Agents (E-322, E-476), Salt, Artificial Flavoring, Substance Fat Used:
+Contains Trans Fat. Allergen Information: Contains Milk & Soya.
+
+in121	INGREDIENTS: SUGAR, LIQUID GLUCOSE, COCOA
+solids 10. 8 % EDIBLE VEGETABLE oil (PALMOIL),
+MILK solids, IODISED salt and EMULSIFIER
+(LECITHIN of SOYA ORIGIN).
+contains ADDED FLAVOURS (ARTIFICIAL
+FLAVOURING SUBSTANCES VANILLA).
+
+in122	Ingredients: Milk solids (35%), Sugar, Hydrogenated vegetable fats
+(contain sesame oil) Edible vegetable fats and Emulsifier (Soya lecithin).
+CONTAINS ADDED FLAVOUR (ARTIFICIAL (vanilla) FLAVOURINGS SUBSTANCESI.
+MAY CONTAIN GLUTEN.
+
+in123	Ingredients: Centre 65%* Liquid glucose, Sugar, Invert sugar, Edible
+vegetable fat, Cocoa solids, Milk solids, Hydrolyzed vegetable protein,
+Edible salt, Emulsifiers (471); Chocolayer 35% Sugar, Milk solids, Cocoa butter;
+Cocoa solids, Edible vegetable fat, Emulsifiers (442, 476)
+CONTAINS added FLAVOUR (NATURAL, NATURE IDENTICAL and ARTIFICIAL
+(CARAMEL, MALT and ETHYL VANILLIN) FLAVOURING substances)
+
+in124	INGREDIENTS: Cashews, Expeller-Pressed Sunflower Oil and/or Expeller-Pressed Peanut Oil, and Sea Salt.
+CONTAINS CASHEW INGREDIENTS.
+Alerylibirmation: This product is made on equipment that makes products containing peanuts and other tree nuts.
+
+in125	Ingredients: Rice Meal (42.7%), Edible Vegetable Oil (Palmolein Oil), Corn Meal(19. 7%).
+Spice and condiments (onion powder, red chilli powder, amchur powder, coriander seed
+powder garlic flakes & powder, ginger powder, black pepper powder, turmeric powder, spice
+extract, fenugreek) Gram Meal (3.3%), salt, sugar, tomato powder(0.1 %), citric acid(330),
+Dextrose, edible starch. Product from India. Best Before End: march 2022
+
+in126	IN EDIENTS: Cereal Products (67%) (Corn Meal (53%), Rice Meal (14%)),
+Edible Vegetable Oil (Palmolein), *Seasoning (Sugar, lodised Salt,
+Maltodextrin, Spices and Condiments, Milk Solids, Cheese, Salt Replacer
+(Potassium Chloride), Flavour (Natural and Nature Identical Flavouring
+Substances), Flavour Enhancers (627, 631), Acidity Regulators (296, 330),
+Emulsifying & Stabilising Agent ((331 (iii), 471, 327)), Gram Meal (3.6%),
+Calcium Carbonate (170(i)), lodised Salt.
+*As flavouring agent. Contains Onion and Garlic
+ALLERGEN ADVICE: Contains Soy, Milk, Wheat
+
+in127	INGREDIENTS: Enriched unbleached
+flour (wheat flour, malted barley flour,
+ascorbic acid [dough conditioner), niacin,
+reduced iron, thiamin mononitrate
+riboflavin, folic acid), sugar, degermed
+yellow cornmeal, salt, leavening (baking
+soda, sodium acid pyrophosphate].
+soybean oil, honey powder, natural flavor
+CONTAINS: Wheat.
+May contain milk, eggs, soy and tree nuts.
+
+in128	INGREDIENTS: Popping Corn, Refned Edible
+Palmolein Oil, lodised Salt and Beta Carotene.
+CONTAINS PERMITTED NATURAL COLOUR [160a(I)) AND ADDED
+FLAVOUR (NATURAL FLAVOURING SUBSTANCES)
+image on the front panel is for representation
+purpose only
+
+in129	INGREDIENTS RAGI FLOUR
+WHEAT FLOURS ween
+
+in130	INGREDIENTS
+Gingelly Oil
+NUTRITION FACTS
+(Approximate)
+Per 100 Grams
+
+in131	Ingredients: Common Salt, Potassium lodate and
+Edibie Agent (INS 536)
+Anticaking
+(Iodine content above 15 ppm)
+
+in132	worn ingredient : Pearl Millet,
+Wheat Flour (Malda)
+Refined
+Wheat Flour
+CONTAINS GLUTEN
+
+in133	INGREDIENTS: CHILLY
+Grounded from fresh
+natural Chillies packed
+underhygienic condition.
+
+in134	Ingredients
+Red Rice Flour & Salt
+
+in135	PRODUCT: ROASTED VERMICELLI
+Ingredients: Hard Wheat Semolina Suji
+200g
+
+in136	INGREDIENTS: Milk Solids, Maltodextrin, Lactose,
+Sucrose, Edible Vegetable Oil (9%) (Coconut Oil,
+Soyabean Oil & Groundnut Oil), Whey Protein
+Concentrate, Minerals, Milk Fat, Emulsifier (322),
+Vitamins, Taurine, Inositol, L5 Carnitine and Antioxidant
+(304)
+
+in137	mayo
+INGREDIENTS: Potato, Edible Vegetable Oil (Palmolein Oil,
+Rice Bran Oil), Spices & Condiments (Onion Powder, Chilli
+Powder, Dried Mango Powder, Coriander Seed Powder,
+Powder, Garlic Powder, Black Pepper Powder,
+Ginger Extract, Turmeric Powder), lodised Salt, Black Salt,
+Spices
+Tomato Powder, Citric Acid (330).
+Sugar,
+
+in138	INGREDIENTS:
+Potato (87%), Edible Vegetable Oil
+(Palmolein), Sugar, Spices & Condiments 1%
+(Chilli, Dry Mango, Corlander, Cumin, Black
+Pepper, Ginger, Clove), lodized Salt, Black Salt.
+
+in139	INGREDIENTS
+Noodles (with seasonings): Wheatfour, Edible vegetable oil (Palm),
+lodised salt, Wheatgluten, Softeringaaeent.500), Soya sauce, Black
+pepper, Flavour enhancer (621, 627. 631), Guar gum (412), Acidity
+regulator (4511) Onion, Calcium Carbonate (170i), Chicken flavour
+and Caramel (150d)(Carryover: from soya sauce).
+Seasoning (ina separate sachet); lodised salt, Sugar, Garlic, Noodle
+powder* Maltodextin (1400), Onion, Flavour enhancer (621,62,
+631), Cumin, Chives, White pepper, Oregano. Cheese powder, Citric
+acid (330), Hydrolyzed vegetable protein, Dehydrated vegetables.
+Soy sauce powder, Paprika (160C), Anticaking agent (551), Yeast
+extract and Chilli powder.
+Flavoured Oil: Edible Vegetable oil (Palm@lein) & Onion.
+
+in140	INGREDIENTS: Corn (78%), Edible Vegetable Oil
+(Palmolein Oil), Sugar, Spices & Condiments
+(Garlic Powder, Onion Powder, Chilli, Spice
+Extract), Rice Flour, Iodised Salt, Potassium
+Chloride (508), Citric Acid (330).
+
+in141	REFINED WHEAT FLOUR (MAIDA) (73%) SUGAR, REFINED PALM OIL, INVERT SUGAR
+INGPERIENTS: SYRUP, MILK SOLIDS, RAISING AGENTS [503 (ii) & 500 (ii)] IODIZED SALT EMULSIFIER(AT2)), CALCIUM
+SALT, DOUGH CONDITIONER(223), VITAMINS* FERROUS SALT AND POTASSIUM IODATE.
+CONTAINS PERMITTED NATURAL COLOUR (I 50d) AND ADDED FLAVOURSINATURE
+IDENTICAL & ARTIFICIAL (MILK & VANILLA) FLAVOURING SUBSTANCES]
+(Nunbers in brackets as per International Numbering System)
+CONTAINS WHEAT MILK AND SULPHITE
+
+in142	Ingredients: Milk fat from cow's milk
+
+in143	reanu
+Ingredients: Roasted Peanuts Fat (11100
+Sugar, Edible Vegetable Salt,
+(Soyabean), lodised MEMONTHS
+
+in144	INGREDIENTS: Kesar Badam Magic (50%) Milk solids, sugar, kesar elaichi (water, sugar, dextrose, permitted stabilizer chocolate (E440), almond. ripple
+pieces (2%), permitted emulsifier (E471) and stabilizers (E407, E466, E415, E412, Epple Choco Almond (50%) emulsifier solids, (E471) sugar, and lizers E407,
+(water, sugar, dextrose, cocoa solids, stabilizer cocoa solids, almond pieces FLAYOURING SUBSTANCES
+E466, E415, E412). CONTAINS PERMATIONS SYNTHETIC FOOD From: (E102, E110). AND ADDED LATER (ARTIFICIAL
+CARDAMOM AND SAFFRON)
+
+in145	Ingredients: Water, Tomato Paste (37%), Acidity
+Regulator (Ins 330) and Antioxidant (INS 300).
+
+in146	INGREDIENTS
+Jalapenos (55%), Water, Acidity regulator
+(INS 260), Edible Common Salt,
+Firming Agent (INS 509).
+
+in147	Ingredients: Tomato Puree, Water, Sugar lodized Salt, Corn
+Starch, Onion, Garlic, Emulsifying and stabilizing Agents
+(1422, 415), Acidity Regulator (260), Spices & Condiments,
+Preservative (211)
+
+in148	INGREDIENTS: Sugar, Mix Fruit Pulp (Papaya Pulp,
+Guava Pulp, Banana Pulp, Mango Pulp, Pineapple
+Pulp, Apple Pulp, Orange Juice, Strawberry Pulp)
+(45%), Water, Acidity Regulator (INS-330),
+Thickener (INS-440)
+
+in149	INGREDIENTS
+Rolled Oats (69.3%), Maltodextrin, Salt, Dried Vegetables
+(Carrot (1.5%), Green Peas (1%), French Beans (0. 7%),
+Onion Powder and Sugar, Refined Rice Bran oil,
+Desiccated Coconut Powder (2. 1%), Spices &
+Condiments (1.6%) (Chilly, Turmeric, Ginger, Cardamom,
+Cinnamon, Curry Leaves, Garlic), Milk Solids, Tomato,
+Hydrolysed Vegetable Protein, Yeast Extract, Anticaking
+Agent (INS 551), Acidity Regulator (INS 330), Flavour
+Enhancers (INS 627, INS 631).
+CONTAINS ADDED PERMITTED NATURAL COLOUR (INS 100)
+and FLAVOURS NATURAL AND NATURE
+IDENTICAL FLAVOURING SUBSTANCES
+
+in150	propen
+INGREDIENTS: Refined Wheat Flour (Maida), Sugar, Edible
+Vegetable Fat, Palmolein, invert Cocoa Solids (2.3%
+Leavening Agents (500(ii), 503(ii)), sugare Salt, Emulsifier (322).
+CONTAINS ADDEDFLAVOUR (NATURE identical FLAVOURING SUBSTANCESI.
+Allergen information: Contains Wheat.
+May Contain Milk.
+
+in151	INGREDIENTS:
+Split Pulse Moong
+(Moong Dal) (77 %),
+Refined Cotton Seed Oil
+& lodised Salt.
+
+in152	Ingredients: Wheat Solids (54.2%) {Whole
+Wheat Flour (29. .6%), Wheat Flour (24. 66)),
+Sugar, Corn Flour, Cocoa Solids (5.6%), Minerals,
+Malt Extract, Edible Vegetable Oil (Palmolein),
+lodized Salt, Colour (INS 150d), Vitamins,
+Antioxidant (INS 320).
+contains PERMITTED NATURAL colourl
+ADDED FLAVOURS (NATURE IDENTICAL &
+ARTIFICIAL CREAM FLAVOURING SUBSTANCES) of
+CONTAINS GLUTEN. may CONTAIN TRACES
+almond (TREENUT).
+
+in153	INGREDIENTS: adult (2000 kcal) Pack contains serve.
+Noodles: Refined wheat flour (Maida), Palm oil, Wheat gluten, lodised Salt, Thickeners (508 & 412),
+Acidity regulators (501(i) 500(i)) and Humectant (451(1).
+TASTEMAKERS: Mixed spices (35.2%) [<Roasted spice powder (9%) (Coriander (2.7%), Turmeric
+(2.3%), Cumin (1.1%), Aniseed (0.9%), Black pepper (0.6%), Fenugreek (0.5%), Ginger (0.5%), Clove
+(0.2%), Green cardamom (0.2%), Nutmeg (0.2%)) Dehydrated onion, Red chilli powder (4.5%), Dried
+garlic (4%), Red chilli bits (3%), Black pepper powder (1.5%), Coriander powder (1.4%), Turmeric
+powder (1.2%), Dried ginger powder %), Aniseed powder (0.8%), Cumin powder (0.7), <Roasted
+cumin (0.5%), Fenugreek powder (0. 4%), -Roasted garam masala powder (0. 44) (Cinnamon (0.2%),
+Bay leal (0.1%), Green cardamom (0.1%), Black pepper (0.02%), Large cardamom), Compounded
+Asafoetida (Refined wheat flour (Maida), Carrier (414), Asafoetida), Spice extract blend Capsicum
+extract, Coriander extract (0.001 %), Cumin extract (0.001%), Star anise powder (0.3%)] Sugar,
+Basted onion (Onion, Corn oil), Corn savoury powder (Corn starch, lodised Salt, Yeast extract), Yeast
+extract powder (Yeast extract, Salt), lodised salt, Noodle powder (Refined wheat flour (Maida), Palm
+oil, lodised salt, Gluten, Thickener (508), Acidity regulators (501(1). 500 Humectant (451()).
+Thickener (412)), Salt substitute (Potassium chloride), Dehydrated kasuri methi leaves, Edible starch,
+>alm oil, Thickener (508), Acidity regulator (330) and Mineral (Ferric
+MAY CONTAIN MILK SOLIDS, MUSTARD AND SOYA pyrophosphate).
+
+in154	INGREDIENTS: polyols (SORBITOL maltitol, XYLITOL (5%), mannitoli, GUMI BASE,
+GUM arabic, SWEETENER: aspartame (INS 951), humectant.ins. 422), acidity
+regulator (INS: 334), GLAZING AGENT (INS 903), antioxidant (INS 320).
+contains permited synthetic food colours (INS 171, INS 122) andadded
+nature identical artificial (Strawberry) flavouring SUBSTANCES
+
+in155	INGREDIENTS: Sugar Syruplwater (48. 25%), Sugar (46. 7%) and Sodium Bisulphite (E222) (0.0025961,
+Cottage Cheese (Chena) (4.5%), Cardamom (0. 08%) and Saffron (0.001%).
+CONTAINS PERMITTED SYNTHETIC FOOD COLOUR [(E 102) I FD & CYELLOW NO.5] and
+KE1 10) FD & C YELLOW NO.6]
+Sodium. Risulphite is used to remove impurities from Sugar Syrup
+ALLERGEN Al. ERT CONTAINS: MILK AND SULPHITE
+
+in156	Ingredients: Multi Grain Flour Mix (Rice Flour, Whole Oats Flour,
+Whole Wheat Flour), Choco Cream (Sugar, Edible Vegetable Oil
+(Sunflower Oil, Palm Oil), Cocoa Solids (6. 3%), Milk Solids, Emulsifier
+(INS 3220). Sugar, Cocoa Powder (5.1 .6%), lodized Salt, Vitamins
+
+in157	INGREDIENTS: Standardised Milk (89%),
+Sugar, Stabilizers (INS 415, INS 412, INS
+407), Sequestering Agent (INS 452(i)),
+Edible Common Salt, Cashew Powder
+(0.05%), and Emulsifier (INS 436)
+
+in158	ingredients:Com Grits, Refned Vegetable
+Oil, Cheese Powder, Mix Spice lodized salt.
+
+in159	Ingredients: Garlic and Edible Oil
+
+in160	INGREDIENTS: RICE GRITS, SEASONING MIX [REFINED palmolein, undwardsy
+IODISED SALT, tomato POWDER (0.7%), "SPICES & condiments, REFINED SUGAR,
+POWDER, GARLIC POWDER, ACIDITY REGULATORS (INS 330, INS MALTODEXTRIN, 296), milk SOUDS, oniow
+ANTICAKING AGENT (INS 551), YEAST EXTRACT& FLAVOUR ENHANCER (INS 627)), REFINED
+palmolein, CORN GRITS, GRAM GRITS and ACIDITY REGULATOR (INS 500(ii)).
+
+in161	Cranberries, Sugar & Vegetable Edible Oil (Sunflower oir)
+Ingredients:
+
+in162	INGREDIENTS: Potato, Edible Vegetable Oil (Palmolein Oil,
+Rice Bran Oil), Sugar, Spices & Condiments (Chilli, Powder,
+Onion Powder, Garlic Powder, Ginger Powder, Spice Extract),
+Salt, Citric Acid (330). Tomato Powder.
+
+in163	Ingredients: Roasted Flax Seeds 30%, Roasted Watermelon Seeds 25%,
+Roasted Sunflower Seeds 21%, Roasted White Sesame Seeds 10%
+Roasted Pumpkin Seeds 10%, Black Salt 4%.
+
+in164	mustlut
+Non-medicinal ingredients: Aqua, Citric Acid, Colours (Beta-Carotene, Curcuma oil,
+Lycopene, Purple Carrot Juice), Corn Syrup, Fractionated Coconut Oil (contains
+Beeswax and/or Carnauba Wax), Gelatin, Lactic Acid, Naturally Sourced Flavours
+(Cherry, Lemon, Orange, Strawberry, Tropical Punch, White Grape), Sucrose.
+Contains: tree nuts (coconut)
+
+in165	INGREDIENTS: Water, Edible Vegetable Oil (Soyabean
+Oil), Sugar, Thickeners (INS 1442, INS 415), Iodized Salt,
+Milk Solids, Acidity Regulators (INS 260, INS 270, INS
+330), Preservatives (INS 211, INS 202), Spice Extract and
+Sequestrant (INS 386).
+
+in166	Ingredients
+Physically Refined Rice Bran Oil,
+Permitted Antioxidants (E-319, E-330).
+Permitted Antifoaming Agent (E- 9000),
+Vitamin a and Vitamin D
+
+in167	Ingredients: Refined Wheat four (Maida), Sugar, Edable Vegetable Oil
+(Palm Oily Cashew Pieces (3%). Invert Sugar Syrup, Raising Agents
+(INS 503(in), INS 500 (ii) INS 450 (III Butter (0.4%). Edible Common Sale
+Emulsifers (INS 322, INS471, INS 472e), Dough Conditioner (INS 223).
+
+in168	INGREDIENTS: Gereal Products (67%) (Corn Meal (53%), Rice Meal
+(14%1), Edible Vegetable Oil (Palmolein), *Seasoning (Sugar, lodised
+Salt, Maltodextrin, Spices and Condiments, Milk Solids, Cheese, Salt
+Replacer (Potassium Chloride), Flavour (Natural and Nature Identical
+Flavouring Substances), Flavour Enhancers (627, 631), Acidity
+Regulators (296, 330), Emulsifying & Stabilising Agent ((331(111), 471,
+327)) Gram Meal (3.6%), Calcium Carbonate (170(I)), lodised Salt.
+
+in169	INGREDIENTS Wheat four, Water, Sugar,
+Edible Vegetable fat, Yeast, lodized Salt, Preservative 282 and
+Emulsifier, improver 924a & 1100, Flour Treatment Agent 510.
+
+in170	INGREDIENTS: Multigrain Flour Mix (Rice
+Meal (41.5%), Wheat Flour (Attaj/0.776), Oat
+Meal (0.7%), Sugar, Edible Vegetable Oil
+(Palmolein, Palm Oil) (TBHQ), Cocoa Solids
+(12.4%), Emulsifier (Lecithin), lodized Salt,
+Raising Agent (Sodium Bicarbonate) &
+Nature Identical Flavour (Vanilla).
+
+in171	TRANTERTINALY
+INGREDIENTS: Cereal Products (51%) (Rike Meal (427)
+(19%11, Edible Vegetable oi (Palmolein, Sesame on, (or Meal
+Spices and Condiments, lodised Salt, Maltodextrin, "Seasoning
+Salt, Acidity Regulators (330, 296, 334), Tomata Powder, Sugar, Black
+Say Protein, Flavour (Natural and Nature Identical Hydrolysed
+Substances), Oextrose, Emulsifier (414) Milk Solids, Edible Flavouring
+Flayour Enhancers (627 & 6311) Gram Meal (3%) Starch,
+
+in172	INGREDIENTS: Enriched unbleached
+flour (wheat flour, malted barley flour,
+ascorbic acid [dough conditioner), niacin,
+reduced iron, thiamin mononitrate
+riboflavin, folic acid), sugar, degermed
+yellow cornmeal, salt, leavening (baking
+soda, sodium acid pyrophosphate].
+soybean oil, honey powder, natural flavor
+CONTAINS: Wheat.
+May contain milk, eggs, soy and tree nuts.
+
+in173	NUTRITIONAL FACTS
+PER 100g (Approx)
+Energy 327.17kcal Calories from Fat 144kcal
+Protein 11.02g Carbohydrates 34.689 Sugar
+Og Total Fat 16g Saturated Fatty Acid 6.39
+Sodium 188.89mg MUFA 6.99 PUFA 2.8g
+Trans Fatty Acid Og Cholesterol Omg
+
+in174	was
+INGREDIENTS: Sugar, Maize
+Starch, "Dehydrated
+Vegetables (Corn (6%), Onion
+powder, Cabbage Nakes. Leeks(0.6%))
+Refined Wheat Flour (Maida), lodised solt,
+Tomato Poste Solids (6%), Hydrolyzed Vegetable Condiments
+Paim Oil, Spices &
+Protein, Hydrogenated Thickener 415, Acidity Regulator- 330,
+(Chillies (1.2%)). 627 & 631, Red Beet Juice Powder
+Flavour Enhancer
+Anticaking acent 551).
+
+in175	INGREDIENTS
+Wheat Flour (Atta) (55%), Ro-purified
+Water (38%), Edible Vegetable Oil
+(Sunflower), Edible Hydrogenated
+Vegetable Fat, Iodized Salt
+Allergen information: Contains
+Wheat Gluten.
+
+in176	MR
+Ingredients
+Semolina (84%), Edible vegetable fat-interesterifed
+(Made from Palm Oil and Palm Kernel Oil), Bengal Gram
+Dal, Cashew Nut, Salt, Curry Leaves, Raising Agent
+Sodium Bicarbonate (INS 500 ii), Anti Caking Agent Silica
+(INS 551), Mustard, Green Chilli, Ginger.
+
+in177	LOW FAT VANILLA FLAVOURED YOGHURT
 INGREDIENTS: Skim Milk, Concentrated
 Skim Milk, Water, Sugar, Cream (From
 Milk), Thickeners (1422 (From Maize),
@@ -84,33 +1241,38 @@ Gelatine, Flavours, Acidity Regulators
 (Lactase), Live Cultures.
 Contains Milk and Milk Products.
 
-bahan_9	INGREDIENTS
-Cooked Marinated Chicken (35%) [Chicken Breast, Water, Tomato
-Puree, Ginger Puree, Palm Olein, Garlic Puree, Yogurt Powder
-(Milk), Cornflour, Salt, Green Chillies, Spices, Colour (Paprika
-Extract), Basill,, Onions, Single Cream (Milk) (20%), Chopped
-Tomatoes, Tomato Paste, Water, Rapeseed Oil, Spices, Ginger
-Puree, Garlic Puree, Cashew Nuts, Coriander, Honey, Cornflour,
-Unsalted Butter (Milk), Green Chilli Puree, Salt, Colour (Paprika
-Extract), Lemon Oil.
-Allergy Advicel for allergens, see ingredients in bold
-May also contain traces of other nuts, peanuts and sesame seeds.
-NO ARTIFICIAL COLOURS, FLAVOURS OR HYDROGENATED FAT.
+in178	INGREDIENTS: MILLED CORN, SUGAR, CORN
+SYRUP, MOLASSES SALT, PARTIALLY HYDRO-
+GENATED VEGETABLE OIL (ONE OR MORE OF:
+COCONUT, COTTONSEED, AND SOYBEAN)"-. t
+SODIUM ASCORBATE AND ASCORBIC ACID
+(VITAMIN C), NIACINAMIDE, ZINC OXIDE, REDUCED
+IRON, WHEAT STARCH, PYRIDOXINE HYDROCHLO-
+RIDE (VITAMIN B6), RIBOFLAVIN (VITAMIN B2),
+THIAMIN HYDROCHLORIDE (VITAMIN B1), VITAMIN
+a PALMITATE, BHT (PRESERVATIVE). ANNATTO
+COLOR, FOLIC ACID, VITAMIN D AND VITAMIN B12.
+ADDS a NEGLIGIBLE AMOUNT OF FAT.
+FLESS THAN 0.5g TRANS FAT PER SERVING.
 
-bahan_10	INGREDIENTS:
-REFINED WHEAT FLOUR (38%), SUGAR,
-EDIBLE VEGETABLE OIL (PALM), ROLLED
-OATS (14%), ALMOND (5%), WHEAT BRAN
-(2. .7%), LIQUID GLUCOSE, RAISING AGENTS
-[500(ii) 503(ii), 450(i)] MALTODEXTRIN, OAT
-FIBRE (1. 6%), INVERT SYRUP, MILK SOLIDS
-(0. 9%), EMULSIFIERS (322, .771, .772e) AND
-IODISED SALT.
-CONTAINS PERMITTED NATURAL FOOD
-COLOUR (150d) AND ADDED FLAVOURS
-[NATURE IDENTICAL & ARTIFICIAL
-FLAVOURING SUBSTANCES (BUTTER, &
-MILK)]
-(Numbers in brackets as per International
-Numbering System)
+in179	INGREDIENTS: Milk and Lemon
+Allergen info: Contains Milk
+
+in180	Ingredients: Durum Wheat Semolina
+
+in181	VANILLA ICE CREAM
+TIMELESS AND HEAVENLY VANILLA ICE CREAM.
+VANILLA ICE CREAM INGREDIENTS: WATER, MILK SOLIDS, SUGAR,
+STABILIZERS (461, 412, 407), EMULSIFIER (471).
+
+in182	Ingredients
+Coriander powder, Chilli powder, Cumin
+powder, Iodised salt (Anticaking Agent (INS 536,
+INS 551)) Cinnamon powder, Fennel powder,
+Dried Bay leaf, Ajowan, Stone flower, Clove
+powder, Turmeric powder, Compounded
+Asafoetida (Stabilizer (INS 412)), Nutmeg powder,
+Kalonji, Green cardamom powder, Black pepper
+powder, Mace powder, Allspice, Dried ginger
+powder
 

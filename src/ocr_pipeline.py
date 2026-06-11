@@ -67,6 +67,7 @@ def perspective_crop_from_quad(image_bgr: np.ndarray, box: np.ndarray):
     return cv.warpPerspective(image_bgr, transform_matrix, (target_width, target_height), flags=cv.INTER_CUBIC)
 
 
+'''
 def compute_axis_aligned_iou(quad_a, quad_b) -> float:
     """Compute IoU using axis-aligned bounds from two quadrilateral boxes."""
     box_a = np.array(quad_a)
@@ -92,7 +93,7 @@ def compute_axis_aligned_iou(quad_a, quad_b) -> float:
     area_b = (b_x1 - b_x0) * (b_y1 - b_y0)
     union = area_a + area_b - intersection
     return intersection / union if union > 0 else 0.0
-
+'''
 
 def group_boxes_by_lines(boxes, min_tol: float = 10.0):
     """Group detected boxes into reading lines, each line sorted left-to-right."""
@@ -139,7 +140,7 @@ def group_boxes_by_lines(boxes, min_tol: float = 10.0):
 
     return [[item[0] for item in line] for line in grouped_lines]
 
-
+'''
 def sort_boxes_reading_order(boxes, min_tol: float = 10.0):
     """Sort boxes top-to-bottom then left-to-right using baseline-based line grouping."""
     grouped_lines = group_boxes_by_lines(boxes, min_tol=min_tol)
@@ -147,7 +148,7 @@ def sort_boxes_reading_order(boxes, min_tol: float = 10.0):
     for line in grouped_lines:
         order.extend(line)
     return order
-
+'''
 
 def strip_module_prefix(state_dict):
     """Remove DataParallel prefix `module.` when present."""
@@ -441,9 +442,9 @@ def build_argument_parser():
     # Detection arguments
     parser.add_argument("--input_folder", default="./bahan", help="input image folder (recursive)")
     parser.add_argument("--trained_model", default="saved_models/craft_mlt_25k.pth", help="CRAFT weight path")
-    parser.add_argument("--text_threshold", type=float, default=0.7)
+    parser.add_argument("--text_threshold", type=float, default=0.8)
     parser.add_argument("--low_text", type=float, default=0.4)
-    parser.add_argument("--link_threshold", type=float, default=0.4)
+    parser.add_argument("--link_threshold", type=float, default=0.25)
     parser.add_argument("--canvas_size", type=int, default=1280)
     parser.add_argument("--mag_ratio", type=float, default=1.5)
     parser.add_argument("--poly", action="store_true")
@@ -485,13 +486,13 @@ def build_argument_parser():
     return parser
 
 
-def prepare_crops_directory(crops_dir: Path) -> Path:
+def prepare_output_directory(output_dir: Path, label: str) -> Path:
     """
-    Ensure crops output directory is empty.
+    Ensure output directory is empty.
     If cleanup fails because the directory is locked, stop with a clear error.
     """
-    if not crops_dir.exists():
-        return crops_dir
+    if not output_dir.exists():
+        return output_dir
 
     def remove_readonly(action, path, exc_info):
         _ = exc_info
@@ -502,13 +503,36 @@ def prepare_crops_directory(crops_dir: Path) -> Path:
         action(path)
 
     try:
-        os.chmod(crops_dir, stat.S_IWRITE)
-        shutil.rmtree(crops_dir, onerror=remove_readonly)
-        return crops_dir
+        os.chmod(output_dir, stat.S_IWRITE)
+        shutil.rmtree(output_dir, onerror=remove_readonly)
+        return output_dir
     except PermissionError as error:
         raise RuntimeError(
-            f"Failed to remove {crops_dir}. Close files/apps that lock this folder, then run again."
+            f"Failed to remove {label} folder ({output_dir}). "
+            "Close files/apps that lock this folder, then run again."
         ) from error
+
+
+def should_skip_input_image(image_path: Path, crops_dir: Path, results_dir: Path) -> bool:
+    """
+    Skip generated artifacts (textmap/linkmap/overlay and crops) so they are
+    not recursively re-processed as new inputs.
+    """
+    stem_lower = image_path.stem.lower()
+    if stem_lower.endswith(("_textmap", "_linkmap", "_overlay")):
+        return True
+    if "_textmap_" in stem_lower or "_linkmap_" in stem_lower or "_overlay_" in stem_lower:
+        return True
+
+    resolved = image_path.resolve()
+    for blocked in (crops_dir.resolve(), results_dir.resolve()):
+        try:
+            resolved.relative_to(blocked)
+            return True
+        except Exception:
+            pass
+
+    return False
 
 
 def main():
@@ -521,10 +545,13 @@ def main():
     results_dir = Path(args.results_folder)
     merged_output_path = Path(args.merged_output)
 
-    # Rebuild crop output from scratch for each run.
-    crops_dir = prepare_crops_directory(crops_dir)
+    # Rebuild outputs from scratch for each run.
+    crops_dir = prepare_output_directory(crops_dir, "crops")
+    results_dir = prepare_output_directory(results_dir, "results")
     crops_dir.mkdir(parents=True, exist_ok=True)
-    line_crops_dir = crops_dir / "lines"
+    # Keep line-level debug crops outside recognition input folder so
+    # recognized.txt only contains word crops.
+    line_crops_dir = results_dir / "lines"
     line_crops_dir.mkdir(parents=True, exist_ok=True)
     results_dir.mkdir(parents=True, exist_ok=True)
     merged_output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -552,7 +579,13 @@ def main():
             refiner = None
 
     image_extensions = {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff"}
-    input_images = [path for path in input_dir.rglob("*") if path.suffix.lower() in image_extensions]
+    input_images = []
+    for path in input_dir.rglob("*"):
+        if path.suffix.lower() not in image_extensions:
+            continue
+        if should_skip_input_image(path, crops_dir, results_dir):
+            continue
+        input_images.append(path)
     print(f"Found {len(input_images)} images in {input_dir}")
 
     total_crops_written = 0

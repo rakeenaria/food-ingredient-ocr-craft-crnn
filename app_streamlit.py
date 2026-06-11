@@ -9,14 +9,14 @@ import torch
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 
-
+# mengubah path relatif menjadi absolut
 def resolve_repo_path(raw_value: str) -> Path:
     path = Path(raw_value).expanduser()
     if path.is_absolute():
         return path
     return PROJECT_ROOT / path
 
-
+# membangun perintah untuk menjalankan demo.py
 def build_demo_command(options: dict) -> list[str]:
     command = [
         sys.executable,
@@ -51,7 +51,7 @@ def build_demo_command(options: dict) -> list[str]:
         command.extend(["--cuda", "false"])
     return command
 
-
+# membaca file recognized.txt
 def parse_recognized_file(recognized_path: Path) -> pd.DataFrame:
     rows = []
     for line in recognized_path.read_text(encoding="utf-8").splitlines():
@@ -62,7 +62,6 @@ def parse_recognized_file(recognized_path: Path) -> pd.DataFrame:
         rows.append({"crop_path": crop_path, "text": text})
     return pd.DataFrame(rows)
 
-
 def list_input_images(input_folder: Path) -> list[Path]:
     image_exts = {".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tiff", ".webp"}
     if not input_folder.exists():
@@ -70,7 +69,6 @@ def list_input_images(input_folder: Path) -> list[Path]:
     images = [path for path in input_folder.rglob("*") if path.is_file() and path.suffix.lower() in image_exts]
     images.sort()
     return images
-
 
 def rotate_image(image_bgr, angle_deg: float, keep_full_frame: bool):
     """Rotate image and optionally expand canvas to keep full content."""
@@ -107,8 +105,22 @@ def bgr_to_rgb(image_bgr):
 
 
 st.set_page_config(page_title="Food Ingredient OCR", layout="wide")
+st.markdown(
+    """
+    <style>
+    .stImage img {
+        width: 100% !important;
+        max-width: 520px !important;
+        height: auto !important;
+        margin-left: auto;
+        margin-right: auto;
+        display: block;
+    }
+    </style>
+    """,
+    unsafe_allow_html=True,
+)
 st.title("Food Ingredient OCR Runner")
-st.caption("Run CRAFT + TRBA OCR from UI and inspect merged output quickly.")
 
 with st.form("ocr_form"):
     left_col, right_col = st.columns(2)

@@ -22,12 +22,16 @@ def normalize_key(stem):
         return stem
     return f"{match.group(1)}{int(match.group(2))}"
 
+def normalize_text(text):
+    """Treat newline, tabs, and repeated spaces as one normal space."""
+    return " ".join(text.split())
+
 def read_gt(gt_path):
     gt={}
     for line in pathlib.Path(gt_path).read_text(encoding='utf-8').splitlines():
         parts=line.strip().split(maxsplit=1)
         if len(parts)==2:
-            gt[normalize_key(pathlib.Path(parts[0]).stem)] = parts[1]
+            gt[normalize_key(pathlib.Path(parts[0]).stem)] = normalize_text(parts[1])
     return gt
 
 def read_merged(folder):
@@ -37,7 +41,7 @@ def read_merged(folder):
             continue
         stem=p.stem.replace("res_","").replace("_merged","")
         txt=p.read_text(encoding='utf-8').strip()
-        merged[normalize_key(stem)] = txt
+        merged[normalize_key(stem)] = normalize_text(txt)
     return merged
 
 def main():
@@ -104,20 +108,68 @@ def main():
     f1_sum=0; bleu_sum=0; rouge_sum=0
     cer_sum=0; cer_den=0
     wer_sum=0; wer_den=0
+    per_image_rows = []
     for k in keys:
         g,p = gt[k], pred[k]
         n+=1
-        norm_ed += 1 - levenshtein(p,g)/max(len(g), len(p)) if g and p else 0
-        f1_sum += f1_score(g,p)
-        bleu_sum += bleu1(g,p)
-        rouge_sum += rouge_l(g,p)
-        cer_sum += levenshtein(p, g)
-        cer_den += len(g)
+        sample_norm_ed = 1 - levenshtein(p,g)/max(len(g), len(p)) if g and p else 0
+        sample_f1 = f1_score(g,p)
+        sample_bleu = bleu1(g,p)
+        sample_rouge = rouge_l(g,p)
+        sample_char_edit = levenshtein(p, g)
+        sample_cer = sample_char_edit / len(g) if len(g) > 0 else 0.0
         gt_words = g.split()
         pred_words = p.split()
-        wer_sum += levenshtein(pred_words, gt_words)
+        sample_word_edit = levenshtein(pred_words, gt_words)
+        sample_wer = sample_word_edit / len(gt_words) if gt_words else 0.0
+        sample_word_accuracy = max(0.0, 1.0 - sample_wer) * 100.0
+
+        norm_ed += sample_norm_ed
+        f1_sum += sample_f1
+        bleu_sum += sample_bleu
+        rouge_sum += sample_rouge
+        cer_sum += sample_char_edit
+        cer_den += len(g)
+        wer_sum += sample_word_edit
         wer_den += len(gt_words) if gt_words else 0
+        per_image_rows.append(
+            (
+                k,
+                len(gt_words),
+                len(pred_words),
+                sample_norm_ed,
+                sample_f1,
+                sample_bleu,
+                sample_rouge,
+                sample_word_accuracy,
+                sample_cer,
+                sample_wer,
+            )
+        )
+    print("Per-image metrics:")
+    print("Image\tGT Words\tPred Words\tnorm_ED\tF1\tBLEU-1\tROUGE-L\tWord Accuracy\tCER\tWER")
+    for row in per_image_rows:
+        (
+            k,
+            gt_word_count,
+            pred_word_count,
+            sample_norm_ed,
+            sample_f1,
+            sample_bleu,
+            sample_rouge,
+            sample_word_accuracy,
+            sample_cer,
+            sample_wer,
+        ) = row
+        print(
+            f"{k}\t{gt_word_count}\t{pred_word_count}\t{sample_norm_ed:.3f}\t"
+            f"{sample_f1:.3f}\t{sample_bleu:.3f}\t{sample_rouge:.3f}\t"
+            f"{sample_word_accuracy:.3f}\t{sample_cer:.3f}\t{sample_wer:.3f}"
+        )
+    print()
     print(f"Samples: {n}")
+    print(f"GT Words: {wer_den}")
+    print(f"Pred Words: {sum(row[2] for row in per_image_rows)}")
     print(f"norm_ED: {norm_ed/n:.3f}")
     print(f"F1 (word-level): {f1_sum/n:.3f}")
     print(f"BLEU-1: {bleu_sum/n:.3f}")
