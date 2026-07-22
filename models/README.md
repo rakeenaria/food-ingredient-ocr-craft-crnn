@@ -11,4 +11,4 @@ Large checkpoints are intentionally not committed.
 ## Sources
 - CRAFT: https://github.com/clovaai/CRAFT-pytorch
 - TRBA baseline: https://github.com/zihaomu/deep-text-recognition-benchmark
-- Project fine-tuned weights: see root `README.md`
+- Project fine-tuned weights: https://drive.google.com/drive/folders/1MRPI5mAcX4nht2R4AO8VovIEsw2q6rGN?usp=drive_link
