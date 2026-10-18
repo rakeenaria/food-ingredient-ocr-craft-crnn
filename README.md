@@ -1,5 +1,5 @@
 ﻿# Food Ingredient OCR (CRAFT + CRNN TRBA)
-<img width="1920" height="1080" alt="Food Label OCR" src="https://github.com/user-attachments/assets/bbb9e100-9b16-4527-8200-1844f0f866f3" />
+<img width="2020" height="1180" alt="porto apple 1 2" src="https://github.com/user-attachments/assets/a9f73380-f62b-4f9f-97f5-1efb0a15c262" />
 
 ## Overview
 This project builds an end-to-end OCR pipeline to read food ingredient lists from packaging images.
