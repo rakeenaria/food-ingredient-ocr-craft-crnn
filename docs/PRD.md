@@ -2,10 +2,10 @@
 
 | | |
 |---|---|
-| Status | v0.4, approved (M4 results incorporated) |
+| Status | v0.5, approved (M5 decisions incorporated) |
 | Date | 2026-11-21 |
 | Owner | Rakeen Aria Alireza |
-| Name | Ingredient Reader (provisional) |
+| Name | Ingredient Reader |
 
 ## 1. Background
 
@@ -143,7 +143,7 @@ Priorities use MoSCoW: Must, Should, Could.
 | N3 | Memory | Peak of 2.0 GB or less during a scan (1.75 GB in the benchmark), within the host's 2.7 GB limit. |
 | N4 | Accuracy preservation | The refactored engine produces exactly the same text as the current pipeline on `images/gambar_simulasi`. |
 | N5 | Privacy | Images are processed in memory and are never persisted or logged. |
-| N6 | Security | The public deployment contains no researcher code and accepts no file-system paths from users. Upload size is enforced server-side. |
+| N6 | Security | The deployed entry point (`app_streamlit.py`) has no route to researcher pages and accepts no file-system paths from users. Upload size is enforced server-side. |
 | N7 | Compatibility | Latest Chrome (Android and desktop), Safari (iOS), Edge and Firefox (desktop). Usable at 360 px width. The camera requires HTTPS. |
 | N8 | Maintainability | The OCR engine has no Streamlit dependency, so a future API or Next.js frontend can reuse it. The `demo.py` CLI keeps working. |
 
@@ -152,9 +152,9 @@ Priorities use MoSCoW: Must, Should, Could.
 | ID | Decision | Rationale |
 |---|---|---|
 | D1 | Use Streamlit for v1. A Next.js frontend on Vercel is deferred to a possible v2. | The core of the app is PyTorch. On Vercel it would run as a serverless Python function with cold starts of about 6–7 s (measured import plus model load) and about 2 GB of memory on the free plan, against a 1.75 GB peak. The alternative is a second backend service. Streamlit keeps one Python codebase and keeps the models in memory. A v2 frontend can wrap the engine in FastAPI. |
-| D2 | Host on Streamlit Community Cloud, with Hugging Face Spaces (Docker) as fallback. Store weights on the Hugging Face Hub and download them at startup. | Community Cloud is free, uses HTTPS and deploys from GitHub. Its limits of about 2 cores and 2.7 GB RAM fit the measured footprint. Whether the free Hugging Face CPU tier is available in 2026 is uncertain. |
+| D2 | Host on Streamlit Community Cloud, with Hugging Face Spaces (Docker) as fallback. Store weights in the public Hugging Face model repo `rakeenaria/ingredient-reader` and download them at startup (`ui/engine.py`). The steps are in `docs/DEPLOY.md`. | Community Cloud is free, uses HTTPS and deploys from GitHub. Its limits of about 2 cores and 2.7 GB RAM fit the measured footprint. Whether the free Hugging Face CPU tier is available in 2026 is uncertain. |
 | D3 | Build a custom camera component with Streamlit Components v2, and keep upload as a fallback. | `st.camera_input` requests a capture width equal to the widget's on-screen width, which is too low for dense label text on phones. |
-| D4 | Two entry points share `src/`: `app_streamlit.py` (public, deployed) and `researcher_app.py` (local). | Users cannot reach researcher features because they do not exist in the deployment. If the researcher app is ever hosted, protect it with `st.login` and an email allowlist. |
+| D4 | Two entry points share `src/`: `app_streamlit.py` (public, deployed) and `researcher_app.py` (local). | Users cannot reach researcher features: the deployed entry point only routes to the Scan and About pages. If the researcher app is ever hosted, protect it with `st.login` and an email allowlist. |
 | D5 | Model `saved_models/FT_801010_off/best_accuracy.pth`: case-sensitive charset, grayscale, no PAD, `batch_max_length` 60 (from `opt.txt`). Pretrained CRAFT with text threshold 0.8, low-text 0.4, link 0.25, canvas 1280, mag ratio 1.5, refiner off, single pass. | This matches the thesis configuration. With the refiner off, the current second CRAFT pass recomputes identical boxes and doubles detection time. |
 | D6 | No int8 quantization. | It made recognition only about 10% faster and introduced an error (`INGREDIENTS:` became `INCREDIENTS:`). |
 | D7 | English UI. | The labels are in English, and the app is a public portfolio piece. |
@@ -190,7 +190,7 @@ Risks:
 
 Open questions:
 
-- The app name "Ingredient Reader" is provisional. Decide before M5, because it becomes part of the app URL.
+- None at the moment.
 
 Resolved in M3:
 
@@ -219,3 +219,9 @@ Resolved in review (v0.2):
 - The 6 s speed target and 20 MB upload limit are kept.
 - Text is shown as a paragraph by default.
 - The thesis report is not committed.
+
+Decided for M5:
+
+- **The name "Ingredient Reader" is final.** The app URL is `ingredient-reader.streamlit.app`.
+- **The app deploys first from the `web-revamp` branch.** It is merged into `master` once it works online.
+- **Only an iPhone is available for testing now.** The Android check moves to the tester round in section 9.

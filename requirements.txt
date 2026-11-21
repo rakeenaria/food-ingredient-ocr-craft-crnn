@@ -9,3 +9,5 @@ numpy==1.26.0
 pillow==11.1.0
 lmdb==1.7.3
 natsort==8.4.0
+six==1.16.0
+huggingface_hub==0.36.2

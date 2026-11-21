@@ -155,7 +155,9 @@ streamlit run researcher_app.py    # local researcher tools: run, inspect, evalu
   - **Evaluate**: compare checkpoints with the thesis protocols. Photos are scored end to end against an image-level `gt*.txt` (`test2.py`), and word images against an LMDB split (`test.py`). It reproduces the thesis numbers: 94.693% on the test split and 92.248% on the 5 photos.
   - **Edit images**: crop and rotate an image at full resolution. A copy is saved by default.
 
-6. Outputs are written to:
+6. Deployment: the public app runs on Streamlit Community Cloud. Its weights are downloaded at startup from the Hugging Face model repo `rakeenaria/ingredient-reader`. Step-by-step guide: [docs/DEPLOY.md](docs/DEPLOY.md).
+
+7. Outputs are written to:
 - `outputs/crops/`
 - `outputs/craft/`
 - `outputs/merged.txt`
@@ -180,6 +182,8 @@ streamlit run researcher_app.py    # local researcher tools: run, inspect, evalu
 |- .streamlit/config.toml            # theme and server settings
 |- docs/
 |  |- PRD.md                         # product requirements for the web app
+|  |- DEPLOY.md                      # Hugging Face + Streamlit Community Cloud deployment guide
+|  |- huggingface_model_card.md      # model card for the weights repository
 |- demo.py                           # compatibility wrapper (kept for existing usage)
 |- data/
 |  |- sample_inputs/                 # canonical sample-input location (documented)

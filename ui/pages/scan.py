@@ -10,7 +10,7 @@ from src.ocr_engine import draw_word_boxes
 from src.postprocess import ComposedText, Span, compose_text, join_wrapped_lines, parse_ingredients
 from ui import style
 from ui.components import copy_button, ingredient_list, label_capture
-from ui.engine import get_engine
+from ui.engine import get_engine, log_scan
 from ui.imaging import (
     ImageError,
     decode_data_url,
@@ -178,6 +178,7 @@ def process_submission() -> None:
             fail("Something went wrong while reading this photo. Please try again or use another photo.")
             return
         status.update(label=f"Done in {result.timings['total']:.1f} s", state="complete", expanded=False)
+    log_scan(result.timings["total"], len(result.words), result.image_size)
 
     ss.ocr = {"result": result, "image": image}
     ss.submission = None
