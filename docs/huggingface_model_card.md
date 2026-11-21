@@ -42,7 +42,7 @@ from huggingface_hub import hf_hub_download
 
 from src.ocr_engine import OCREngine
 
-repo = "rakeenaria/ingredient-reader"
+repo = "rakeenarya/ingredient-reader"
 recognizer = hf_hub_download(repo, "best_accuracy.pth")
 hf_hub_download(repo, "opt.txt")  # settings, read next to the checkpoint
 detector = hf_hub_download(repo, "craft_mlt_25k.pth")

@@ -17,7 +17,7 @@ from src.ocr_engine import DEFAULT_DETECTOR_PATH, DEFAULT_RECOGNIZER_PATH, PROJE
 
 WARMUP_IMAGE = PROJECT_ROOT / "images" / "gambar_simulasi" / "04.jpeg"
 # Public model repo holding best_accuracy.pth, opt.txt and craft_mlt_25k.pth.
-WEIGHTS_REPO = os.environ.get("INGREDIENT_READER_WEIGHTS_REPO", "rakeenaria/ingredient-reader")
+WEIGHTS_REPO = os.environ.get("INGREDIENT_READER_WEIGHTS_REPO", "rakeenarya/ingredient-reader")
 WEIGHTS_REVISION = os.environ.get("INGREDIENT_READER_WEIGHTS_REVISION", "main")
 
 

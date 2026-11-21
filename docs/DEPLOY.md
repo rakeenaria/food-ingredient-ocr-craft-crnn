@@ -18,7 +18,7 @@ The researcher app (`researcher_app.py`) is never deployed. Only `app_streamlit.
 4. Add the model card the same way: upload `docs/huggingface_model_card.md` renamed to `README.md`. You can also paste its content into **Model card → Edit**.
 5. Compare each file's SHA-256 on the Hub with the table in the model card.
 
-The app looks for `rakeenaria/ingredient-reader`. If your Hugging Face username is different, change `WEIGHTS_REPO` in `ui/engine.py`, or set the `INGREDIENT_READER_WEIGHTS_REPO` secret in step 3.
+The app looks for `rakeenarya/ingredient-reader` (the Hugging Face username differs from the GitHub one, `rakeenaria`). If you use another repository, change `WEIGHTS_REPO` in `ui/engine.py`, or set the `INGREDIENT_READER_WEIGHTS_REPO` secret in step 3.
 
 ## 2. GitHub: push the branch
 
