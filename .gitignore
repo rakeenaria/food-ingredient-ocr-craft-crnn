@@ -34,6 +34,7 @@ tesseract_results/
 result/
 
 # Runtime outputs (canonical)
+outputs/merged.txt
 outputs/crops/*
 outputs/craft/*
 !outputs/crops/.gitkeep
@@ -99,6 +100,9 @@ bahan_luar/
 
 # Keep single license file
 LICENSE.md
+
+# Local thesis report (not published)
+LAPORAN*.docx
 
 # Exclude thesis prompt workspace and legacy scripts from GitHub
 Skripsi Prompt/

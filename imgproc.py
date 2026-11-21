@@ -5,10 +5,13 @@ MIT License
 
 # -*- coding: utf-8 -*-
 import numpy as np
-from skimage import io
 import cv2
 
 def loadImage(img_file):
+    # Imported lazily so the OCR pipeline does not require scikit-image
+    # (and SciPy) unless this loader is actually used.
+    from skimage import io
+
     img = io.imread(img_file)           # RGB order
     if img.shape[0] == 2: img = img[0]
     if len(img.shape) == 2 : img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)

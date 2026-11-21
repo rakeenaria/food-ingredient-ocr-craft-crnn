@@ -1,0 +1,11 @@
+# Public web app (Streamlit), CPU-only. This is what the hosting platform installs.
+# Research, training and evaluation dependencies live in requirements-research.txt.
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch==2.6.0
+torchvision==0.21.0
+streamlit==1.55.0
+opencv-python-headless==4.11.0.86
+numpy==1.26.0
+pillow==11.1.0
+lmdb==1.7.3
+natsort==8.4.0

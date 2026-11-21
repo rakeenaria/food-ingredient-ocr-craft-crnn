@@ -60,17 +60,20 @@ Fine-tuning on food-label domain data adapts the recognizer to ingredient vocabu
 - Predictions are merged back by line and word order.
 
 ## Results
-### Internal Evaluation (Validation)
-| Model | Word Accuracy | CER | WER | Avg. Confidence |
-|---|---:|---:|---:|---:|
-| TRBA baseline | 64.764% | 0.155 | 0.352 | 0.70 |
-| Fine-tuned | 92.848% | 0.019 | 0.072 | 0.95 |
+Final results reported in the thesis. The recognizer was fine-tuned on 6,081 curated word images (from 182 label images of the Kaggle *Ingredients Image from Food Label* dataset), split 80:10:10 into train, validation and test sets.
 
-### External Evaluation (10 Real-World Images)
-| Model | NED | CER | WER | F1-score |
+### Test Set
+| Model | Word Accuracy | NED | CER | WER |
 |---|---:|---:|---:|---:|
-| TRBA baseline | 0.924 | 0.082 | 0.221 | 0.793 |
-| Fine-tuned | 0.970 | 0.028 | 0.046 | 0.953 |
+| Tesseract | 70.813% | 0.894 | 0.089 | 0.300 |
+| TRBA pretrained | 90.381% | 0.946 | 0.066 | 0.096 |
+| TRBA fine-tuned (final) | 94.693% | 0.987 | 0.015 | 0.053 |
+
+### External Simulation (Unseen Photos)
+| Images | Word Accuracy | NED | CER | WER |
+|---|---:|---:|---:|---:|
+| 5 English food labels, photographed in a minimarket | 92.248% | 0.988 | 0.009 | 0.078 |
+| 3 Indonesian medicine labels (out of domain) | 85.382% | 0.965 | 0.034 | 0.146 |
 
 ### Before vs After OCR (Sample Format)
 ```text
@@ -95,6 +98,9 @@ bahan_2 BEST INGREDIENTS: Whey Powder, Niacin...
 bahan_3 Ingredients: Milk, Sugar...
 ```
 
+## Roadmap
+The web app is being rebuilt for public use, with camera capture, a simpler flow and hosting. Scope, requirements and decisions are documented in [docs/PRD.md](docs/PRD.md).
+
 ## Tech Stack
 - Python
 - PyTorch
@@ -104,8 +110,13 @@ bahan_3 Ingredients: Milk, Sugar...
 
 ## How to Run
 1. Install dependencies:
+- Research, training and the CLI (GPU recommended): install the PyTorch build for your CUDA version, then:
 ```bash
-pip install -r requirements-craft-crnn.txt
+pip install -r requirements-research.txt
+```
+- Web app only (CPU, as used for hosting):
+```bash
+pip install -r requirements.txt
 ```
 
 2. Download required weights (not stored in repo):
@@ -154,6 +165,8 @@ UI notes:
 |- scripts/
 |  |- run_demo.py                    # canonical runnable entrypoint
 |- app_streamlit.py                  # local Streamlit UI runner
+|- docs/
+|  |- PRD.md                         # product requirements for the web app
 |- demo.py                           # compatibility wrapper (kept for existing usage)
 |- data/
 |  |- sample_inputs/                 # canonical sample-input location (documented)
