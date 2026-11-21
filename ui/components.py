@@ -34,14 +34,18 @@ def label_capture(
     key: str = "capture",
     on_sample: Callable[[], None] | None = None,
     on_submit: Callable[[], None] | None = None,
+    options: dict | None = None,
 ):
     """Camera, upload and sample picker with an in-browser crop & rotate editor.
 
     Triggers: ``sample`` (sample id) and ``submit`` (dict with a JPEG/PNG data URL).
+    ``options`` is for the researcher app: ``editorOnly`` shows just the editor,
+    ``geometryOnly`` submits the crop and rotation instead of an image, and
+    ``submitLabel`` / ``hint`` replace the button and hint texts.
     """
     return _label_capture(
         key=key,
-        data={"samples": samples, "image": image, "notice": notice},
+        data={"samples": samples, "image": image, "notice": notice, "options": options or {}},
         on_sample_change=on_sample or _noop,
         on_submit_change=on_submit or _noop,
     )

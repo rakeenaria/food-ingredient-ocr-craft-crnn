@@ -27,8 +27,8 @@ _CSS = r"""
 .ir-section .ir-aside { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; font-variant-numeric: tabular-nums; }
 .ir-facts { width: 100%; margin: 0; border-collapse: collapse; font-size: 0.98rem; }
 .ir-facts th, .ir-facts td { padding: 0.45rem 0; border: 0; border-bottom: 1px solid #111; background: transparent; }
-.ir-facts th { text-align: left; font-weight: 800; }
-.ir-facts td { text-align: right; font-variant-numeric: tabular-nums; }
+.ir-facts th { text-align: left; font-weight: 800; white-space: nowrap; padding-right: 1rem; }
+.ir-facts td { text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
 .ir-facts tr:last-child th, .ir-facts tr:last-child td { border-bottom: 0; }
 .ir-text { padding: 1rem 1.1rem; border: 2px solid #111; background: #fff; font-size: 1.08rem; line-height: 1.75; overflow-wrap: anywhere; }
 .ir-text mark, .ir-note mark, .ir-words mark { background: #ffe14d; color: #000; padding: 0.05em 0.15em; box-shadow: inset 0 -2px 0 #000; }
@@ -50,6 +50,16 @@ button[data-testid="stBaseButton-secondary"], button[data-testid="stBaseButton-p
 button[data-testid="stBaseButton-secondary"] { border-color: #111111; }
 button[data-testid="stBaseButton-secondary"]:hover, button[data-testid="stBaseButton-secondary"]:focus-visible { border-color: #111111; background: #f3f3f1; color: #111111; }
 button[data-testid="stBaseButton-secondary"] p, button[data-testid="stBaseButton-primary"] p { font-weight: 700; }
+.ir-meters { margin: 0.25rem 0 1rem; }
+.ir-meter { display: grid; grid-template-columns: minmax(10rem, 26rem) minmax(6rem, 1fr) 6.5rem; align-items: center; gap: 0.35rem 1rem; padding: 0.45rem 0; border-bottom: 1px solid #e4e4e0; }
+.ir-meter-name { font-weight: 700; overflow-wrap: anywhere; }
+.ir-meter-track { display: block; height: 10px; background: #e4e4e0; }
+.ir-meter-fill { display: block; height: 100%; background: #111111; border-radius: 0 4px 4px 0; }
+.ir-meter-figure { text-align: right; font-weight: 700; font-variant-numeric: tabular-nums; }
+.ir-diff { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+.ir-diff .ir-text { font-size: 0.98rem; line-height: 1.65; }
+.ir-diff-label { margin: 0 0 0.3rem; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+@media (max-width: 640px) { .ir-meter { grid-template-columns: 1fr auto; } .ir-meter-name { grid-column: 1 / -1; } .ir-diff { grid-template-columns: 1fr; } }
 [data-testid="stExpander"] details { border: 2px solid #111111; }
 [data-testid="stExpander"] summary p { font-weight: 800; }
 .ir-steps .short, .ir-words .short { display: none; }
@@ -70,8 +80,9 @@ SHORT_STEP_NAMES = ("Capture", "Crop", "Read", "Results")
 Mark = tuple[int, int, str]  # (start, end, tooltip) inside a text
 
 
-def inject() -> None:
-    st.markdown(_CSS, unsafe_allow_html=True)
+def inject(*, wide: bool = False) -> None:
+    """Add the styles. ``wide`` lets pages use the full width (researcher app)."""
+    st.markdown(_CSS.replace("max-width: 46rem;", "max-width: 104rem;") if wide else _CSS, unsafe_allow_html=True)
 
 
 def masthead(title: str, lede: str) -> None:
@@ -121,6 +132,51 @@ def marked_html(text: str, marks: Iterable[Mark]) -> str:
 def marked_text(text: str, marks: Iterable[Mark] = ()) -> None:
     """The OCR text in a ruled box, with low-confidence words highlighted."""
     st.html(f'<div class="ir-text">{marked_html(text, marks)}</div>')
+
+
+def meters(rows: Iterable[tuple[str, float, str]], *, maximum: float = 100.0, unit: str = "%", decimals: int = 3) -> None:
+    """A meter list: one row per item with its name, a bar from zero and the figure.
+
+    ``rows`` are (name, value, detail); the detail shows on hover. Pass them in
+    the order to show (largest first for a ranking).
+    """
+    items = []
+    for name, value, detail in rows:
+        share = max(0.0, min(1.0, value / maximum)) * 100 if maximum else 0.0
+        figure = f"{value:.{decimals}f}{unit}"
+        items.append(
+            f'<div class="ir-meter" role="listitem" title="{escape(detail)}">'
+            f'<span class="ir-meter-name">{escape(name)}</span>'
+            f'<span class="ir-meter-track" role="img" aria-label="{escape(name)}: {figure}">'
+            f'<span class="ir-meter-fill" style="width: {share:.3f}%"></span></span>'
+            f'<span class="ir-meter-figure">{figure}</span></div>'
+        )
+    st.html(f'<div class="ir-meters" role="list">{"".join(items)}</div>')
+
+
+def text_diff(reference: str, candidate: str, *, reference_label: str, candidate_label: str) -> None:
+    """Two texts side by side with the words that differ highlighted."""
+    from difflib import SequenceMatcher
+
+    left_words, right_words = reference.split(), candidate.split()
+    left, right = [], []
+    for tag, i1, i2, j1, j2 in SequenceMatcher(None, left_words, right_words, autojunk=False).get_opcodes():
+        left_part = escape(" ".join(left_words[i1:i2]))
+        right_part = escape(" ".join(right_words[j1:j2]))
+        if tag == "equal":
+            left.append(left_part)
+            right.append(right_part)
+            continue
+        if left_part:
+            left.append(f"<mark>{left_part}</mark>")
+        if right_part:
+            right.append(f"<mark>{right_part}</mark>")
+    st.html(
+        '<div class="ir-diff">'
+        f'<div><p class="ir-diff-label">{escape(reference_label)}</p><div class="ir-text">{" ".join(left) or "&nbsp;"}</div></div>'
+        f'<div><p class="ir-diff-label">{escape(candidate_label)}</p><div class="ir-text">{" ".join(right) or "&nbsp;"}</div></div>'
+        "</div>"
+    )
 
 
 def word_table(rows: Iterable[tuple[int, str, str, float, bool]]) -> None:

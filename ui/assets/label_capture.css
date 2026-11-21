@@ -329,6 +329,13 @@
 .steps .short {
   display: none;
 }
+
+/* Researcher image editor: only the crop & rotate stage. */
+.lc.is-editor-only .steps,
+.lc.is-editor-only [data-stage="source"],
+.lc.is-editor-only [data-action="back"] {
+  display: none !important;
+}
 .message {
   margin: 0 0 0.9rem;
   padding: 0.65rem 0.85rem;

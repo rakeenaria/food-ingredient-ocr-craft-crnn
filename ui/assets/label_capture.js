@@ -5,9 +5,11 @@
 //   samples: [{ id, label, thumb }]           sample thumbnails
 //   image:   { token, src, kind } | null      an image to open in the editor
 //   notice:  { token, text } | null           a message to show (re-enables submit)
+//   options: { editorOnly, geometryOnly, submitLabel, hint }   researcher app only
 // Triggers to Python:
 //   sample: <sample id>
 //   submit: { image, width, height, source, edited }
+//           or, with geometryOnly: { geometry: { quarter, fine, crop, width, height }, source }
 
 const instances = new WeakMap();
 
@@ -94,7 +96,20 @@ function createInstance(root) {
     imageToken: null,
     noticeToken: null,
     samplesSignature: null,
+    options: {},
   };
+
+  const DEFAULT_SUBMIT = "Read ingredients";
+  const submitLabel = () => s.options.submitLabel || DEFAULT_SUBMIT;
+  const hintElement = q(".hint");
+  const defaultHint = hintElement ? hintElement.textContent : "";
+
+  function applyOptions(options) {
+    s.options = options && typeof options === "object" ? options : {};
+    q(".lc").classList.toggle("is-editor-only", Boolean(s.options.editorOnly));
+    if (hintElement) hintElement.textContent = s.options.hint || defaultHint;
+    if (!el.submitButton.disabled) el.submitButton.textContent = submitLabel();
+  }
 
   const inst = { setTriggerValue: () => {} };
 
@@ -338,7 +353,7 @@ function createInstance(root) {
     el.angle.value = "0";
     el.angleOut.textContent = "0°";
     el.submitButton.disabled = false;
-    el.submitButton.textContent = "Read ingredients";
+    el.submitButton.textContent = submitLabel();
     showMessage("");
     setStage("editor");
     requestAnimationFrame(() => {
@@ -593,6 +608,14 @@ function createInstance(root) {
 
   el.submitButton.addEventListener("click", () => {
     if (!s.image || el.submitButton.disabled) return;
+    if (s.options.geometryOnly) {
+      // Python applies the edit to the full-resolution file itself.
+      inst.setTriggerValue("submit", {
+        geometry: { quarter: s.quarter, fine: s.fine, crop: { ...s.crop }, width: s.imageW, height: s.imageH },
+        source: s.kind,
+      });
+      return;
+    }
     let output;
     try {
       output = exportImage();
@@ -621,6 +644,7 @@ function createInstance(root) {
 
   inst.stopCamera = stopCamera;
   inst.update = (data) => {
+    applyOptions(data.options);
     renderSamples(Array.isArray(data.samples) ? data.samples : []);
     const image = data.image;
     if (image && image.src && image.token !== s.imageToken) {
@@ -633,7 +657,7 @@ function createInstance(root) {
       s.noticeToken = notice.token;
       showMessage(notice.text || "");
       el.submitButton.disabled = false;
-      el.submitButton.textContent = "Read ingredients";
+      el.submitButton.textContent = submitLabel();
     }
   };
   return inst;

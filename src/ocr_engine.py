@@ -5,6 +5,10 @@ touching the file system, so web apps (and a future API) can share it. It has no
 Streamlit dependency. The CLI in ``src/ocr_pipeline.py`` uses the same building
 blocks (detection, line grouping, word cropping), so both produce the same text.
 
+``OCREngine`` combines a ``TextDetector`` (CRAFT) and a ``WordRecognizer`` (one
+CRNN checkpoint). The researcher app uses the two parts directly, for example to
+detect once and compare several checkpoints on the same words.
+
 Example:
     engine = OCREngine()                      # final thesis model, auto device
     result = engine.process(cv2.imread("label.jpg"))
@@ -128,6 +132,19 @@ class Word:
 
 
 @dataclass(eq=False)
+class Detection:
+    """The words CRAFT found in one image, cut out in reading order (no text yet)."""
+
+    placements: list[tuple[int, int, np.ndarray]]  # (line, position, quad) for every crop
+    crops: list[np.ndarray]  # BGR word images, same order as placements
+    image_size: tuple[int, int]  # (width, height)
+    score_text: np.ndarray  # CRAFT region score map
+    score_link: np.ndarray  # affinity score map (refined when the refiner is on)
+    polygons: list[np.ndarray] | None = None  # refiner polygons for drawing; None without refiner
+    timings: dict[str, float] = field(default_factory=dict)  # seconds: detect, crop
+
+
+@dataclass(eq=False)
 class OCRResult:
     words: list[Word]
     lines: list[str]  # reconstructed lines in reading order
@@ -135,6 +152,7 @@ class OCRResult:
     timings: dict[str, float] = field(default_factory=dict)  # seconds
     score_text: np.ndarray | None = None  # CRAFT region score map (optional)
     score_link: np.ndarray | None = None  # CRAFT affinity score map (optional)
+    polygons: list[np.ndarray] | None = None  # refiner polygons (only with the refiner)
 
     @property
     def text(self) -> str:
@@ -166,6 +184,206 @@ def _to_bgr(image: np.ndarray) -> np.ndarray:
     raise ValueError(f"Unsupported image shape: {image.shape}")
 
 
+def _load_state(path: Path, device: torch.device):
+    state = torch.load(path, map_location=device)
+    if isinstance(state, dict) and "state_dict" in state:
+        state = state["state_dict"]
+    return strip_module_prefix(state)
+
+
+def _require(path: Path, label: str) -> Path:
+    if not path.exists():
+        raise FileNotFoundError(f"{label} weights not found: {path}")
+    return path
+
+
+class TextDetector:
+    """CRAFT word detection plus reading-order cropping. Thread-safe.
+
+    With ``refiner_path`` the CRAFT link refiner runs too, exactly as in the CLI:
+    its polygons and refined link map are kept for inspection, while the words
+    are still cut from the plain CRAFT boxes, so the text does not change.
+    """
+
+    def __init__(
+        self,
+        detector_path: str | Path = DEFAULT_DETECTOR_PATH,
+        *,
+        config: DetectorConfig | None = None,
+        device: str | torch.device = "auto",
+        refiner_path: str | Path | None = None,
+    ):
+        self.detector_path = _require(Path(detector_path), "CRAFT detector")
+        self.refiner_path = _require(Path(refiner_path), "CRAFT refiner") if refiner_path else None
+        self.device = resolve_device(device)
+        self.config = config or DetectorConfig()
+
+        self.model = CRAFT()
+        self.model.load_state_dict(_load_state(self.detector_path, self.device))
+        if self.device.type == "cuda":
+            torch.backends.cudnn.benchmark = False
+        self.model = self.model.to(self.device).eval()
+
+        self.refiner = None
+        if self.refiner_path is not None:
+            from refinenet import RefineNet
+
+            refiner = RefineNet()
+            refiner.load_state_dict(_load_state(self.refiner_path, self.device))
+            self.refiner = refiner.to(self.device).eval()
+
+        # detect_text_regions() expects CLI-style args.
+        self._args = SimpleNamespace(**vars(self.config), cuda=self.device.type == "cuda")
+        self._lock = threading.Lock()
+
+    def detect(self, image: np.ndarray) -> Detection:
+        """Find and cut out every word of an upright BGR image."""
+        image_bgr = _to_bgr(image)
+        height, width = image_bgr.shape[:2]
+        with self._lock, torch.no_grad():
+            start = time.perf_counter()
+            # As in the thesis pipeline, CRAFT receives the BGR array; kept for result parity.
+            if self.refiner is None:
+                boxes, _, score_text, score_link = detect_text_regions(self.model, image_bgr, self._args)
+                polygons = None
+            else:
+                refined_args = SimpleNamespace(**{**vars(self._args), "poly": True})
+                boxes_refined, polygons_refined, score_text, score_link = detect_text_regions(
+                    self.model, image_bgr, refined_args, refine_net=self.refiner
+                )
+                boxes, _, _, _ = detect_text_regions(self.model, image_bgr, self._args)
+                if boxes is None or len(boxes) == 0:
+                    boxes = boxes_refined
+                usable = polygons_refined is not None and len(polygons_refined) == len(boxes_refined)
+                polygons = [np.asarray(polygon, dtype=np.float32) for polygon in (polygons_refined if usable else boxes)]
+            detected = time.perf_counter()
+
+            placements, crops = [], []
+            for line_number, line_indices in enumerate(group_boxes_by_lines(boxes), start=1):
+                for position, box_index in enumerate(line_indices, start=1):
+                    quad = np.asarray(boxes[box_index], dtype=np.float32)
+                    crop = crop_word(image_bgr, quad)
+                    if crop is None:
+                        continue
+                    placements.append((line_number, position, quad))
+                    crops.append(crop)
+            cropped = time.perf_counter()
+
+        return Detection(
+            placements=placements,
+            crops=crops,
+            image_size=(width, height),
+            score_text=score_text,
+            score_link=score_link,
+            polygons=polygons,
+            timings={"detect": detected - start, "crop": cropped - detected},
+        )
+
+
+class WordRecognizer:
+    """A CRNN checkpoint that reads word images. Thread-safe."""
+
+    def __init__(
+        self,
+        checkpoint_path: str | Path = DEFAULT_RECOGNIZER_PATH,
+        *,
+        config: RecognizerConfig | None = None,
+        device: str | torch.device = "auto",
+        batch_size: int = 32,
+    ):
+        self.checkpoint_path = _require(Path(checkpoint_path), "Recognizer")
+        self.device = resolve_device(device)
+        self.config = config or RecognizerConfig.for_checkpoint(self.checkpoint_path)
+        self.batch_size = batch_size
+
+        if "CTC" in self.config.Prediction:
+            self.converter = CTCLabelConverter(self.config.character)
+        else:
+            self.converter = AttnLabelConverter(self.config.character)
+        model_opt = SimpleNamespace(**vars(self.config), num_class=len(self.converter.character))
+        model = Model(model_opt)
+        model.load_state_dict(_load_state(self.checkpoint_path, self.device))
+        self.model = model.to(self.device).eval()
+        self._align = AlignCollate(imgH=self.config.imgH, imgW=self.config.imgW, keep_ratio_with_pad=self.config.PAD)
+        self._lock = threading.Lock()
+
+    def recognize(self, crops_bgr: list[np.ndarray]) -> tuple[list[str], list[float]]:
+        """Read BGR word crops; returns texts and confidences."""
+        mode = "RGB" if self.config.rgb else "L"
+        # Same pixels the CLI's RawDataset reads back from its PNG crops.
+        images = [Image.fromarray(cv.cvtColor(crop, cv.COLOR_BGR2RGB)).convert(mode) for crop in crops_bgr]
+        return self.recognize_images(images)
+
+    def recognize_images(self, images: list[Image.Image]) -> tuple[list[str], list[float]]:
+        """Read PIL word images that are already in the model's color mode (L or RGB)."""
+        config = self.config
+        texts: list[str] = []
+        confidences: list[float] = []
+        with self._lock, torch.no_grad():
+            for start in range(0, len(images), self.batch_size):
+                batch = images[start : start + self.batch_size]
+                image_tensors, _ = self._align([(image, index) for index, image in enumerate(batch)])
+                image_tensors = image_tensors.to(self.device)
+                count = image_tensors.size(0)
+                text_for_pred = torch.LongTensor(count, config.batch_max_length + 1).fill_(0).to(self.device)
+
+                if "CTC" in config.Prediction:
+                    predictions = self.model(image_tensors, text_for_pred)
+                    sizes = torch.IntTensor([predictions.size(1)] * count)
+                    _, indices = predictions.max(2)
+                    batch_texts = self.converter.decode(indices, sizes)
+                    max_probs, _ = F.softmax(predictions, dim=2).max(dim=2)
+                    batch_confidences = [float(row.cumprod(dim=0)[-1]) for row in max_probs]
+                else:
+                    predictions = self.model(image_tensors, text_for_pred, is_train=False)
+                    _, indices = predictions.max(2)
+                    lengths = torch.IntTensor([config.batch_max_length] * count)
+                    batch_texts = [text.split("[s]")[0] for text in self.converter.decode(indices, lengths)]
+                    max_probs, _ = F.softmax(predictions, dim=2).max(dim=2)
+                    batch_confidences = []
+                    for index_row, prob_row in zip(indices, max_probs):
+                        eos = (index_row == ATTN_EOS_INDEX).nonzero()
+                        end = int(eos[0]) if len(eos) else index_row.numel()
+                        batch_confidences.append(float(prob_row[:end].prod()) if end > 0 else 0.0)
+
+                texts.extend(batch_texts)
+                confidences.extend(batch_confidences)
+        return texts, confidences
+
+
+def build_result(
+    detection: Detection,
+    texts: list[str],
+    confidences: list[float],
+    *,
+    recognize_seconds: float = 0.0,
+    keep_score_maps: bool = False,
+) -> OCRResult:
+    """Combine a detection with the recognizer output into words and lines."""
+    words = [
+        Word(text=text, confidence=confidence, box=quad, line=line, position=position, crop=crop)
+        for (line, position, quad), crop, text, confidence in zip(
+            detection.placements, detection.crops, texts, confidences
+        )
+    ]
+    lines = []
+    for line_number in sorted({word.line for word in words}):
+        line_words = sorted((word for word in words if word.line == line_number), key=lambda w: w.position)
+        lines.append(" ".join(word.text for word in line_words))
+
+    timings = {**detection.timings, "recognize": recognize_seconds}
+    timings["total"] = timings.get("detect", 0.0) + timings.get("crop", 0.0) + recognize_seconds
+    return OCRResult(
+        words=words,
+        lines=lines,
+        image_size=detection.image_size,
+        timings=timings,
+        score_text=detection.score_text if keep_score_maps else None,
+        score_link=detection.score_link if keep_score_maps else None,
+        polygons=detection.polygons,
+    )
+
+
 class OCREngine:
     """Loads CRAFT and the CRNN recognizer once; ``process`` runs one image in memory.
 
@@ -182,50 +400,23 @@ class OCREngine:
         detector_config: DetectorConfig | None = None,
         device: str | torch.device = "auto",
         batch_size: int = 32,
+        refiner_path: str | Path | None = None,
     ):
-        self.recognizer_path = Path(recognizer_path)
-        self.detector_path = Path(detector_path)
-        for path, label in ((self.recognizer_path, "Recognizer"), (self.detector_path, "CRAFT detector")):
-            if not path.exists():
-                raise FileNotFoundError(f"{label} weights not found: {path}")
-
+        _require(Path(recognizer_path), "Recognizer")
+        _require(Path(detector_path), "CRAFT detector")
         self.device = resolve_device(device)
-        self.recognizer_config = recognizer_config or RecognizerConfig.for_checkpoint(self.recognizer_path)
-        self.detector_config = detector_config or DetectorConfig()
+        self.word_recognizer = WordRecognizer(
+            recognizer_path, config=recognizer_config, device=self.device, batch_size=batch_size
+        )
+        self.text_detector = TextDetector(
+            detector_path, config=detector_config, device=self.device, refiner_path=refiner_path
+        )
+        self.recognizer_path = self.word_recognizer.checkpoint_path
+        self.detector_path = self.text_detector.detector_path
+        self.recognizer_config = self.word_recognizer.config
+        self.detector_config = self.text_detector.config
         self.batch_size = batch_size
-
-        config = self.recognizer_config
-        if "CTC" in config.Prediction:
-            self.converter = CTCLabelConverter(config.character)
-        else:
-            self.converter = AttnLabelConverter(config.character)
-
-        self.recognizer = self._load_recognizer()
-        self.detector = self._load_detector()
-        self._align = AlignCollate(imgH=config.imgH, imgW=config.imgW, keep_ratio_with_pad=config.PAD)
-        # detect_text_regions() expects CLI-style args.
-        self._detect_args = SimpleNamespace(**vars(self.detector_config), cuda=self.device.type == "cuda")
         self._lock = threading.Lock()
-
-    def _load_state(self, path: Path):
-        state = torch.load(path, map_location=self.device)
-        if isinstance(state, dict) and "state_dict" in state:
-            state = state["state_dict"]
-        return strip_module_prefix(state)
-
-    def _load_recognizer(self) -> Model:
-        config = self.recognizer_config
-        model_opt = SimpleNamespace(**vars(config), num_class=len(self.converter.character))
-        model = Model(model_opt)
-        model.load_state_dict(self._load_state(self.recognizer_path))
-        return model.to(self.device).eval()
-
-    def _load_detector(self) -> CRAFT:
-        detector = CRAFT()
-        detector.load_state_dict(self._load_state(self.detector_path))
-        if self.device.type == "cuda":
-            torch.backends.cudnn.benchmark = False
-        return detector.to(self.device).eval()
 
     @property
     def busy(self) -> bool:
@@ -245,92 +436,21 @@ class OCREngine:
         ("recognize", number_of_words) so a UI can report progress.
         """
         image_bgr = _to_bgr(image)
-        height, width = image_bgr.shape[:2]
         notify = on_progress or (lambda stage, count: None)
-
-        with self._lock, torch.no_grad():
+        with self._lock:
             notify("detect", 0)
+            detection = self.text_detector.detect(image_bgr)
+            notify("recognize", len(detection.crops))
             start = time.perf_counter()
-            # As in the thesis pipeline, CRAFT receives the BGR array; kept for result parity.
-            boxes, _, score_text, score_link = detect_text_regions(self.detector, image_bgr, self._detect_args)
-            detected = time.perf_counter()
-
-            placements, crops = [], []
-            for line_number, line_indices in enumerate(group_boxes_by_lines(boxes), start=1):
-                for position, box_index in enumerate(line_indices, start=1):
-                    quad = np.asarray(boxes[box_index], dtype=np.float32)
-                    crop = crop_word(image_bgr, quad)
-                    if crop is None:
-                        continue
-                    placements.append((line_number, position, quad))
-                    crops.append(crop)
-            cropped = time.perf_counter()
-
-            notify("recognize", len(crops))
-            texts, confidences = self._recognize(crops)
-            recognized = time.perf_counter()
-
-        words = [
-            Word(text=text, confidence=confidence, box=quad, line=line, position=position, crop=crop)
-            for (line, position, quad), crop, text, confidence in zip(placements, crops, texts, confidences)
-        ]
-        lines = []
-        for line_number in sorted({word.line for word in words}):
-            line_words = sorted((word for word in words if word.line == line_number), key=lambda w: w.position)
-            lines.append(" ".join(word.text for word in line_words))
-
-        return OCRResult(
-            words=words,
-            lines=lines,
-            image_size=(width, height),
-            timings={
-                "detect": detected - start,
-                "crop": cropped - detected,
-                "recognize": recognized - cropped,
-                "total": recognized - start,
-            },
-            score_text=score_text if keep_score_maps else None,
-            score_link=score_link if keep_score_maps else None,
+            texts, confidences = self.word_recognizer.recognize(detection.crops)
+            recognize_seconds = time.perf_counter() - start
+        return build_result(
+            detection,
+            texts,
+            confidences,
+            recognize_seconds=recognize_seconds,
+            keep_score_maps=keep_score_maps,
         )
-
-    def _recognize(self, crops_bgr: list[np.ndarray]) -> tuple[list[str], list[float]]:
-        """Recognize word crops in batches; returns texts and confidences."""
-        config = self.recognizer_config
-        mode = "RGB" if config.rgb else "L"
-        # Same pixels the CLI's RawDataset reads back from its PNG crops.
-        images = [Image.fromarray(cv.cvtColor(crop, cv.COLOR_BGR2RGB)).convert(mode) for crop in crops_bgr]
-
-        texts: list[str] = []
-        confidences: list[float] = []
-        for start in range(0, len(images), self.batch_size):
-            batch = images[start : start + self.batch_size]
-            image_tensors, _ = self._align([(image, index) for index, image in enumerate(batch)])
-            image_tensors = image_tensors.to(self.device)
-            count = image_tensors.size(0)
-            text_for_pred = torch.LongTensor(count, config.batch_max_length + 1).fill_(0).to(self.device)
-
-            if "CTC" in config.Prediction:
-                predictions = self.recognizer(image_tensors, text_for_pred)
-                sizes = torch.IntTensor([predictions.size(1)] * count)
-                _, indices = predictions.max(2)
-                batch_texts = self.converter.decode(indices, sizes)
-                max_probs, _ = F.softmax(predictions, dim=2).max(dim=2)
-                batch_confidences = [float(row.cumprod(dim=0)[-1]) for row in max_probs]
-            else:
-                predictions = self.recognizer(image_tensors, text_for_pred, is_train=False)
-                _, indices = predictions.max(2)
-                lengths = torch.IntTensor([config.batch_max_length] * count)
-                batch_texts = [text.split("[s]")[0] for text in self.converter.decode(indices, lengths)]
-                max_probs, _ = F.softmax(predictions, dim=2).max(dim=2)
-                batch_confidences = []
-                for index_row, prob_row in zip(indices, max_probs):
-                    eos = (index_row == ATTN_EOS_INDEX).nonzero()
-                    end = int(eos[0]) if len(eos) else index_row.numel()
-                    batch_confidences.append(float(prob_row[:end].prod()) if end > 0 else 0.0)
-
-            texts.extend(batch_texts)
-            confidences.extend(batch_confidences)
-        return texts, confidences
 
 
 def draw_word_boxes(

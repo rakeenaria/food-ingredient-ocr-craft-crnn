@@ -35,6 +35,7 @@ result/
 
 # Runtime outputs (canonical)
 outputs/merged.txt
+outputs/runs/
 outputs/crops/*
 outputs/craft/*
 !outputs/crops/.gitkeep

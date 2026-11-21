@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | v0.3, approved (M3 results incorporated) |
+| Status | v0.4, approved (M4 results incorporated) |
 | Date | 2026-11-21 |
 | Owner | Rakeen Aria Alireza |
 | Name | Ingredient Reader (provisional) |
@@ -109,11 +109,30 @@ Priorities use MoSCoW: Must, Should, Could.
 
 ### Researcher app (local only)
 
-- **R1. Batch run (Must)**: process a local folder. Any checkpoint under `saved_models/` can be chosen from a dropdown. Settings are filled in from the checkpoint's `opt.txt` and can be overridden (refiner, PAD, RGB, CUDA).
-- **R2. Inspection (Must)**: detection overlay, text and link heatmaps, line crops, a word table with crop thumbnails and confidence, and the run log.
-- **R3. Evaluation (Should)**: select a `gt.txt` file and compute word accuracy, NED, CER, WER and F1 per image and on average, reusing the logic in `test2.py`.
-- **R4. Image editor (Should)**: rotate and crop. Saves a copy by default and overwrites only after explicit confirmation.
-- **R5. Isolation (Must)**: launched with `streamlit run researcher_app.py` and never deployed.
+**R1. Batch run (Must)**
+- Process a local folder. Any checkpoint under `saved_models/` can be chosen from a dropdown.
+- Settings come from the checkpoint's `opt.txt`. Pretrained benchmark files have no `opt.txt`, so their settings come from the file name.
+- Overrides:
+  - PAD and device (Auto, GPU, CPU) can be changed.
+  - The CRAFT refiner can be turned on. As in the CLI, it adds line polygons and a refined link map for inspection, and the text still comes from the plain CRAFT boxes.
+  - RGB is shown but cannot be changed, because the checkpoint's first layer fixes the number of input channels.
+- Results stay in the app. "Save run" writes them in the CLI layout to a new folder under `outputs/runs/`, so nothing is overwritten.
+
+**R2. Inspection (Must)**
+- Detection overlay, text and link heatmaps, line crops, a word table with crop thumbnails and confidence, and the run log.
+
+**R3. Evaluation (Should)**
+- Several checkpoints can be compared at once. The result is a ranked meter list plus a metrics table.
+- **Photos, end to end:** an image-level `gt*.txt` is scored per image and on average with the logic of `test2.py`. Detection runs once per photo, and every checkpoint reads the same word crops.
+- **Word images, recognizer only:** an LMDB split is scored with the logic and label filtering of `test.py`. An "ignore case and symbols" option (`--data_filtering_off`) compares checkpoints with different character sets.
+
+**R4. Image editor (Should)**
+- Rotate and crop in the browser editor. OpenCV applies the same geometry to the full-resolution file.
+- Saves a copy by default and overwrites only after explicit confirmation.
+
+**R5. Isolation (Must)**
+- Launched with `streamlit run researcher_app.py` and never deployed.
+- The pages live in `research/` and only `researcher_app.py` routes to them.
 
 ## 6. Non-functional requirements
 
@@ -181,6 +200,16 @@ Resolved in M3:
 - Raising the threshold to 0.9 catches no more errors. At 0.95 it catches one more per split but flags about twice as many words.
 - **The ingredient parser was checked on 191 OCR results** from `dataset_ingredients/` and `images/bahan/`. A heading was found in 182. Only the two nutrition-panel photos produced no items.
 - **"Start over" in the crop step became a back arrow** at the owner's request. Going back from a camera photo restarts the camera (retake).
+
+Resolved in M4:
+
+- **The owner chose the evaluation scope.** Both protocols are included, several checkpoints are compared at once, and runs are saved on request into `outputs/runs/`.
+- **The researcher app reproduces the thesis numbers exactly:**
+  - Word level, test split: 94.693% word accuracy, CER 0.015, WER 0.053.
+  - The pretrained `TPS-ResNet-BiLSTM-Attn-case-sensitive` (before fine-tuning): 90.381%.
+  - The 5 real product photos (`gt_lima.txt`): 92.248%.
+- **All 29 checkpoints load:** 22 fine-tuned and 7 pretrained.
+- **`OCREngine` is now a `TextDetector` plus a `WordRecognizer`**, with identical output: the regression test passes 5/5 and the CLI output is unchanged.
 
 Resolved in review (v0.2):
 
