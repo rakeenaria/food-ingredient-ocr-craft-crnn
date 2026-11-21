@@ -149,7 +149,7 @@ python scripts/run_demo.py --saved_model saved_models/FT_801010_off/best_accurac
 streamlit run app_streamlit.py     # Ingredient Reader: camera/upload -> crop & rotate -> read
 streamlit run researcher_app.py    # local researcher tools: model options, folders, logs
 ```
-- **Ingredient Reader** is the public app. Photos are cropped and rotated in the browser, the models load once, and results highlight words read with low confidence.
+- **Ingredient Reader** is the public app. Photos are cropped and rotated in the browser, the models load once, and results highlight words read with low confidence. The text is also split into a numbered, searchable ingredient list (statements such as "Contains: milk" are kept apart), and a word details table shows every word crop with its confidence.
 - **Researcher app** is for local experiments only and is never deployed.
 
 6. Outputs are written to:
@@ -163,8 +163,10 @@ streamlit run researcher_app.py    # local researcher tools: model options, fold
 |- src/
 |  |- ocr_pipeline.py                # canonical OCR pipeline implementation (CLI)
 |  |- ocr_engine.py                  # in-memory engine (models loaded once) for the web apps
+|  |- postprocess.py                 # reading-order text and the ingredient list parser
 |- tests/
 |  |- test_engine_regression.py      # engine output must match the thesis pipeline
+|  |- test_postprocess.py            # ingredient list parser (no weights needed)
 |- scripts/
 |  |- run_demo.py                    # canonical runnable entrypoint
 |- app_streamlit.py                  # public web app (Ingredient Reader)

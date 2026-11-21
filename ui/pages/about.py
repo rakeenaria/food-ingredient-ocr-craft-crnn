@@ -10,7 +10,8 @@ style.masthead("About", "A thesis project turned into a tool for reading ingredi
 style.section("What it does")
 st.html(
     "<p>Ingredient lists are printed small and dense, often on glossy, curved packaging. "
-    "Ingredient Reader turns a photo of that list into plain text you can copy, search or save.</p>"
+    "Ingredient Reader turns a photo of that list into plain text you can copy or save, "
+    "and into a numbered list of ingredients you can search.</p>"
 )
 
 style.section("How it works")
@@ -21,6 +22,11 @@ st.html(
     "<li><b>Read each word.</b> A CRNN (TPS-ResNet-BiLSTM-Attention), fine-tuned on 6,081 word images "
     "from food labels, recognizes the characters.</li>"
     "<li><b>Put it back together.</b> Words are reassembled in reading order, left to right and top to bottom.</li>"
+    "<li><b>Flag doubtful words.</b> Every word gets a confidence score, and words under 80% are highlighted. "
+    "On the thesis test set this flagged 6% of the words and caught 12 of the 14 words with misread "
+    "letters or digits.</li>"
+    "<li><b>Split the list.</b> Commas outside brackets separate the ingredients. Statements such as "
+    "“Contains: milk” are listed apart.</li>"
     "</ol>"
 )
 

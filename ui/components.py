@@ -47,7 +47,24 @@ def label_capture(
     )
 
 
-_COPY_HTML = '<button type="button" class="copy"><span class="label">Copy text</span></button>'
+_ingredient_list = st.components.v2.component(
+    "ingredient_list",
+    html=_asset("ingredient_list.html"),
+    css=_asset("ingredient_list.css"),
+    js=_asset("ingredient_list.js"),
+)
+
+
+def ingredient_list(*, items: list[dict], notes: list[dict], key: str = "ingredients") -> None:
+    """Numbered ingredient list with an instant, in-browser search.
+
+    ``items`` and ``notes`` are ``{"text": str, "marks": [[start, end], ...]}``;
+    marks are character ranges of low-confidence words inside ``text``.
+    """
+    _ingredient_list(key=key, data={"items": items, "notes": notes})
+
+
+_COPY_HTML ='<button type="button" class="copy"><span class="label">Copy text</span></button>'
 
 _COPY_CSS = """
 .copy {

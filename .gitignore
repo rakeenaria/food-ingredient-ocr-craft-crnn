@@ -101,8 +101,9 @@ bahan_luar/
 # Keep single license file
 LICENSE.md
 
-# Local thesis report (not published)
+# Local thesis report (not published) and Office lock files
 LAPORAN*.docx
+~$*
 
 # Exclude thesis prompt workspace and legacy scripts from GitHub
 Skripsi Prompt/

@@ -58,6 +58,19 @@ def to_display_rgb(image_bgr: np.ndarray, max_side: int = 1600) -> np.ndarray:
     return cv.cvtColor(image_bgr, cv.COLOR_BGR2RGB)
 
 
+def word_thumbnail(crop_bgr: np.ndarray, height: int = 48, max_width: int = 480) -> str:
+    """A small JPEG data URL of a word crop for the word details table."""
+    crop_height, crop_width = crop_bgr.shape[:2]
+    scale = min(height / crop_height, max_width / crop_width)
+    if scale < 1.0:
+        size = (max(1, round(crop_width * scale)), max(1, round(crop_height * scale)))
+        crop_bgr = cv.resize(crop_bgr, size, interpolation=cv.INTER_AREA)
+    ok, encoded = cv.imencode(".jpg", crop_bgr, [cv.IMWRITE_JPEG_QUALITY, 85])
+    if not ok:
+        return ""
+    return "data:image/jpeg;base64," + base64.b64encode(encoded.tobytes()).decode("ascii")
+
+
 def _sample_paths() -> list:
     return [path for path in sorted(SAMPLES_DIR.glob("*")) if path.suffix.lower() in SAMPLE_MIME]
 

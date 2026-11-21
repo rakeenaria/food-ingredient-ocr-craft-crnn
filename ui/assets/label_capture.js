@@ -164,7 +164,7 @@ function createInstance(root) {
       return;
     }
     if (request !== s.cameraRequest) {
-      // Permission arrived after the visitor switched tabs or started over: release it.
+      // Permission arrived after the visitor switched tabs or moved on: release it.
       for (const track of stream.getTracks()) track.stop();
       return;
     }
@@ -553,7 +553,12 @@ function createInstance(root) {
     el.angleOut.textContent = "0°";
     setRotation(0, 0, false);
   });
-  q('[data-action="restart"]').addEventListener("click", closeEditor);
+  q('[data-action="back"]').addEventListener("click", () => {
+    const retake = s.kind === "camera";
+    closeEditor();
+    // Back from a camera photo means "retake": permission is already granted.
+    if (retake) startCamera();
+  });
 
   new ResizeObserver(() => {
     if (el.editor.hidden || !s.image) return;

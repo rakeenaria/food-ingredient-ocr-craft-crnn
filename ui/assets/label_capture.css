@@ -289,6 +289,17 @@
   text-decoration: underline;
   text-underline-offset: 4px;
 }
+.btn-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+  width: 48px;
+  padding: 0;
+}
+.btn-icon svg {
+  display: block;
+}
 .btn:disabled {
   opacity: 0.55;
   cursor: progress;

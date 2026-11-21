@@ -6,6 +6,7 @@ Blocks are rendered with st.html so OCR text is never parsed as Markdown.
 
 from __future__ import annotations
 
+from collections.abc import Iterable
 from html import escape
 
 import streamlit as st
@@ -22,17 +23,26 @@ _CSS = r"""
 .ir-steps li::before { content: counter(step) "\00a0\00a0"; font-weight: 900; }
 .ir-steps li.is-done { color: #111; }
 .ir-steps li.is-active { color: #111; font-weight: 800; box-shadow: inset 0 -4px 0 #111; }
-.ir-section { margin: 1.75rem 0 0.5rem; padding-bottom: 0.35rem; border-bottom: 5px solid #000; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+.ir-section { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin: 1.75rem 0 0.5rem; padding-bottom: 0.35rem; border-bottom: 5px solid #000; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+.ir-section .ir-aside { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; font-variant-numeric: tabular-nums; }
 .ir-facts { width: 100%; margin: 0; border-collapse: collapse; font-size: 0.98rem; }
 .ir-facts th, .ir-facts td { padding: 0.45rem 0; border: 0; border-bottom: 1px solid #111; background: transparent; }
 .ir-facts th { text-align: left; font-weight: 800; }
 .ir-facts td { text-align: right; font-variant-numeric: tabular-nums; }
 .ir-facts tr:last-child th, .ir-facts tr:last-child td { border-bottom: 0; }
 .ir-text { padding: 1rem 1.1rem; border: 2px solid #111; background: #fff; font-size: 1.08rem; line-height: 1.75; overflow-wrap: anywhere; }
-.ir-text mark, .ir-note mark { background: #ffe14d; color: #000; padding: 0.05em 0.15em; box-shadow: inset 0 -2px 0 #000; }
+.ir-text mark, .ir-note mark, .ir-words mark { background: #ffe14d; color: #000; padding: 0.05em 0.15em; box-shadow: inset 0 -2px 0 #000; }
 .ir-note { margin: 0.5rem 0 0; font-size: 0.86rem; color: #4a4a46; }
 .ir-list { margin: 0.25rem 0 0; padding-left: 1.3rem; }
 .ir-list li { margin: 0.3rem 0; }
+.ir-words { width: 100%; margin: 0; border-collapse: collapse; font-size: 0.95rem; }
+.ir-words th { padding: 0.3rem 0.5rem 0.3rem 0; border: 0; border-bottom: 2px solid #111; background: transparent; text-align: left; font-size: 0.7rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
+.ir-words td { padding: 0.35rem 0.5rem 0.35rem 0; border: 0; border-bottom: 1px solid #cfcfca; background: transparent; vertical-align: middle; }
+.ir-words .n { width: 2.4rem; color: #5f5f5a; font-variant-numeric: tabular-nums; }
+.ir-words .crop { width: 42%; }
+.ir-words .crop img { display: block; width: auto; max-width: 100%; height: 1.9rem; object-fit: contain; object-position: left center; }
+.ir-words .read { font-weight: 600; overflow-wrap: anywhere; }
+.ir-words .conf { width: 5.6rem; padding-right: 0; text-align: right; font-variant-numeric: tabular-nums; }
 ol.ir-steps { padding: 0 !important; }
 [data-testid="stMainBlockContainer"] a { color: #111111; text-decoration: underline; text-decoration-thickness: 1px; text-underline-offset: 3px; }
 [data-testid="stMainBlockContainer"] a:hover { text-decoration-thickness: 2px; }
@@ -40,13 +50,24 @@ button[data-testid="stBaseButton-secondary"], button[data-testid="stBaseButton-p
 button[data-testid="stBaseButton-secondary"] { border-color: #111111; }
 button[data-testid="stBaseButton-secondary"]:hover, button[data-testid="stBaseButton-secondary"]:focus-visible { border-color: #111111; background: #f3f3f1; color: #111111; }
 button[data-testid="stBaseButton-secondary"] p, button[data-testid="stBaseButton-primary"] p { font-weight: 700; }
-.ir-steps .short { display: none; }
-@media (max-width: 480px) { .ir-steps { font-size: 0.66rem; } .ir-steps .long { display: none; } .ir-steps .short { display: inline; } }
+[data-testid="stExpander"] details { border: 2px solid #111111; }
+[data-testid="stExpander"] summary p { font-weight: 800; }
+.ir-steps .short, .ir-words .short { display: none; }
+@media (max-width: 480px) {
+  .ir-steps { font-size: 0.66rem; }
+  .ir-steps .long, .ir-words .long { display: none; }
+  .ir-steps .short, .ir-words .short { display: inline; }
+  .ir-words .n { width: 1.9rem; }
+  .ir-words .crop { width: 30%; }
+  .ir-words .conf { width: 3.4rem; }
+}
 </style>
 """
 
 STEP_NAMES = ("Capture", "Crop & rotate", "Read", "Results")
 SHORT_STEP_NAMES = ("Capture", "Crop", "Read", "Results")
+
+Mark = tuple[int, int, str]  # (start, end, tooltip) inside a text
 
 
 def inject() -> None:
@@ -69,8 +90,9 @@ def steps(active: int) -> None:
     st.html(f'<ol class="ir-steps" aria-label="Progress">{"".join(items)}</ol>')
 
 
-def section(title: str) -> None:
-    st.html(f'<p class="ir-section">{escape(title)}</p>')
+def section(title: str, aside: str | None = None) -> None:
+    extra = f'<span class="ir-aside">{escape(aside)}</span>' if aside else ""
+    st.html(f'<p class="ir-section"><span>{escape(title)}</span>{extra}</p>')
 
 
 def facts(rows: list[tuple[str, str]]) -> None:
@@ -83,27 +105,39 @@ def note(html_text: str) -> None:
     st.html(f'<p class="ir-note">{html_text}</p>')
 
 
-def highlighted_text(words, threshold: float, *, as_lines: bool) -> None:
-    """OCR words in reading order; words below ``threshold`` are highlighted."""
-    lines: dict[int, list] = {}
-    for word in words:
-        lines.setdefault(word.line, []).append(word)
-    rendered = []
-    for line_number in sorted(lines):
-        parts = []
-        for word in sorted(lines[line_number], key=lambda w: w.position):
-            text = " ".join(word.text.split())
-            if not text:
-                continue
-            if word.confidence < threshold:
-                parts.append(f'<mark title="Confidence {word.confidence:.0%}">{escape(text)}</mark>')
-            else:
-                parts.append(escape(text))
-        if parts:
-            rendered.append(" ".join(parts))
-    separator = "<br>" if as_lines else " "
-    st.html(f'<div class="ir-text">{separator.join(rendered)}</div>')
+def marked_html(text: str, marks: Iterable[Mark]) -> str:
+    """Escaped ``text`` with ``<mark>`` around each range; line breaks become <br>."""
+    parts, cursor = [], 0
+    for start, end, tooltip in sorted(marks):
+        if start < cursor or start >= end:
+            continue
+        parts.append(escape(text[cursor:start]))
+        parts.append(f'<mark title="{escape(tooltip)}">{escape(text[start:end])}</mark>')
+        cursor = end
+    parts.append(escape(text[cursor:]))
+    return "".join(parts).replace("\n", "<br>")
 
 
-def plain_text(text: str) -> None:
-    st.html(f'<div class="ir-text">{escape(text).replace(chr(10), "<br>")}</div>')
+def marked_text(text: str, marks: Iterable[Mark] = ()) -> None:
+    """The OCR text in a ruled box, with low-confidence words highlighted."""
+    st.html(f'<div class="ir-text">{marked_html(text, marks)}</div>')
+
+
+def word_table(rows: Iterable[tuple[int, str, str, float, bool]]) -> None:
+    """Word details: (number, thumbnail data URL, text, confidence, needs checking)."""
+    body = []
+    for number, thumbnail, text, confidence, low in rows:
+        read = escape(text) or "&nbsp;"
+        if low:
+            read = f"<mark>{read}</mark>"
+        image = f'<img src="{thumbnail}" alt="Word {number} as photographed">' if thumbnail else ""
+        body.append(
+            f'<tr><td class="n">{number}</td><td class="crop">{image}</td>'
+            f'<td class="read">{read}</td><td class="conf">{confidence:.0%}</td></tr>'
+        )
+    st.html(
+        '<table class="ir-words"><thead><tr><th class="n" scope="col">#</th><th scope="col">Photo</th>'
+        '<th scope="col">Read as</th><th class="conf" scope="col">'
+        '<span class="long">Confidence</span><span class="short">Conf.</span></th></tr></thead>'
+        f'<tbody>{"".join(body)}</tbody></table>'
+    )

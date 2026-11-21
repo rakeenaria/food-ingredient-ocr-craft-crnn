@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | v0.2, approved (review answers incorporated) |
+| Status | v0.3, approved (M3 results incorporated) |
 | Date | 2026-11-21 |
 | Owner | Rakeen Aria Alireza |
 | Name | Ingredient Reader (provisional) |
@@ -79,19 +79,21 @@ Priorities use MoSCoW: Must, Should, Could.
 
 **P4. Results (Must)**
 - Text reconstructed in reading order. By default it is shown as one paragraph, which is clean to copy. A "Show original lines" toggle shows the text line by line as on the label.
-- Words with confidence below 0.8 are highlighted. The threshold is provisional and set in config.
+- Words with confidence below 0.8 are highlighted. The threshold was validated in M3 (see section 10).
 - A toggle between the original image and the detected bounding boxes.
 - Edit, Copy, and Download as .txt.
 - A summary line with processing time, word count, and number of words to check.
 - Acceptance: Copy and Download both contain the edited text.
 
 **P5. Ingredient list (Should)**
-- Split the text into items on top-level commas (commas inside parentheses do not split). Remove the "Ingredients:" heading and join wrapped lines.
-- A search box that highlights matching items.
+- Split the text into items on top-level commas and semicolons (commas inside `()`, `[]` or `{}` do not split). Remove the "Ingredients:" heading, including common OCR misreadings such as `INCREDIENTS`, and join wrapped lines.
+- Statements after the list, such as "Contains: milk" or "May contain traces of nuts", are shown apart as label notes.
+- The list follows the user's edits. Low-confidence words stay highlighted in it.
+- A search box that highlights matching items and notes while the user types.
 - Acceptance: `milk (fresh milk (20%), milk powder), sugar` yields 2 items.
 
 **P6. Word details (Should)**
-- An expandable table showing each word crop thumbnail, the predicted text, and its confidence.
+- An expandable table showing each word crop thumbnail, the predicted text, and its confidence. It opens on the words to check and can switch to all words.
 
 **P7. About page (Must)**
 - Pipeline overview, model and dataset summary, and thesis metrics.
@@ -169,8 +171,16 @@ Risks:
 
 Open questions:
 
-- The app name "Ingredient Reader" is provisional.
-- The 0.8 confidence threshold is provisional. Validate it on the sample images in M2.
+- The app name "Ingredient Reader" is provisional. Decide before M5, because it becomes part of the app URL.
+
+Resolved in M3:
+
+- **The 0.8 threshold is kept.** Validation split: 610 words. It flags 4.8% of the words and catches 8 of the 12 words with misread letters or digits.
+- Test split: 603 words. It flags 6.3% and catches 12 of 14.
+- Most missed errors are case or punctuation differences, or ground-truth typos where the model is right.
+- Raising the threshold to 0.9 catches no more errors. At 0.95 it catches one more per split but flags about twice as many words.
+- **The ingredient parser was checked on 191 OCR results** from `dataset_ingredients/` and `images/bahan/`. A heading was found in 182. Only the two nutrition-panel photos produced no items.
+- **"Start over" in the crop step became a back arrow** at the owner's request. Going back from a camera photo restarts the camera (retake).
 
 Resolved in review (v0.2):
 
