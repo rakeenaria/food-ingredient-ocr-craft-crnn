@@ -67,6 +67,28 @@ def perspective_crop_from_quad(image_bgr: np.ndarray, box: np.ndarray):
     return cv.warpPerspective(image_bgr, transform_matrix, (target_width, target_height), flags=cv.INTER_CUBIC)
 
 
+def crop_word(image_bgr: np.ndarray, quad):
+    """Crop one detected word: perspective-rectified, else its axis-aligned bounds.
+
+    Returns None when the box is degenerate. Shared by the CLI and OCREngine so
+    both feed the recognizer identical crops.
+    """
+    crop = perspective_crop_from_quad(image_bgr, quad)
+    if crop is not None and crop.size > 0:
+        return crop
+
+    quad = np.array(quad)
+    image_height, image_width = image_bgr.shape[:2]
+    min_x = max(0, int(np.floor(quad[:, 0].min())))
+    min_y = max(0, int(np.floor(quad[:, 1].min())))
+    max_x = min(image_width - 1, int(np.ceil(quad[:, 0].max())))
+    max_y = min(image_height - 1, int(np.ceil(quad[:, 1].max())))
+    if max_x <= min_x or max_y <= min_y:
+        return None
+    crop = image_bgr[min_y : max_y + 1, min_x : max_x + 1]
+    return crop if crop.size > 0 else None
+
+
 '''
 def compute_axis_aligned_iou(quad_a, quad_b) -> float:
     """Compute IoU using axis-aligned bounds from two quadrilateral boxes."""
@@ -234,7 +256,8 @@ def build_recognizer_model(opt):
         opt.input_channel = 3
 
     recognizer = Model(opt)
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    use_cuda = getattr(opt, "cuda", True) and torch.cuda.is_available()
+    device = torch.device("cuda" if use_cuda else "cpu")
 
     print(
         "Recognizer params",
@@ -265,7 +288,9 @@ def build_recognizer_model(opt):
         stripped = OrderedDict((k[7:], v) if k.startswith("module.") else (k, v) for k, v in state.items())
         recognizer.load_state_dict(stripped, strict=False)
 
-    recognizer = torch.nn.DataParallel(recognizer).to(device)
+    # DataParallel requires the module on cuda:0 whenever CUDA exists, so it is
+    # only used for GPU runs; CPU runs (--cuda false) use the plain module.
+    recognizer = torch.nn.DataParallel(recognizer).to(device) if use_cuda else recognizer.to(device)
     recognizer.eval()
     return recognizer, converter, device
 
@@ -612,9 +637,13 @@ def main():
             print(f"{image_path} -> 0 boxes")
             continue
 
-        # Plain CRAFT pass drives reading-order line grouping so layout stays
-        # stable even when refiner polygons are not line-level.
-        boxes_plain, _, _, _ = detect_text_regions(craft_detector, image_bgr, args, refine_net=None)
+        # Plain CRAFT boxes drive reading-order line grouping so layout stays
+        # stable even when refiner polygons are not line-level. Without the
+        # refiner the first pass already is the plain pass, so reuse it.
+        if refiner is not None:
+            boxes_plain, _, _, _ = detect_text_regions(craft_detector, image_bgr, args, refine_net=None)
+        else:
+            boxes_plain = boxes_refined
         if boxes_plain is None or len(boxes_plain) == 0:
             boxes_plain = boxes_refined
         if boxes_plain is None or len(boxes_plain) == 0:
@@ -654,18 +683,9 @@ def main():
                     cv.imwrite(str(line_crops_dir / f"{image_stem}_line{line_rank}.png"), line_crop)
 
             for word_rank, word_index in enumerate(line_indices, start=1):
-                word_crop = perspective_crop_from_quad(image_bgr, boxes_plain[word_index])
-                if word_crop is None or word_crop.size == 0:
-                    word_quad = np.array(boxes_plain[word_index])
-                    word_min_x = max(0, int(np.floor(word_quad[:, 0].min())))
-                    word_min_y = max(0, int(np.floor(word_quad[:, 1].min())))
-                    word_max_x = min(image_width - 1, int(np.ceil(word_quad[:, 0].max())))
-                    word_max_y = min(image_height - 1, int(np.ceil(word_quad[:, 1].max())))
-                    if word_max_x <= word_min_x or word_max_y <= word_min_y:
-                        continue
-                    word_crop = image_bgr[word_min_y : word_max_y + 1, word_min_x : word_max_x + 1]
-                    if word_crop.size == 0:
-                        continue
+                word_crop = crop_word(image_bgr, boxes_plain[word_index])
+                if word_crop is None:
+                    continue
 
                 output_path = crops_dir / f"{image_stem}_line{line_rank}_word{word_rank}.png"
                 cv.imwrite(str(output_path), word_crop)

@@ -16,7 +16,7 @@ class Attention(nn.Module):
     def _char_to_onehot(self, input_char, onehot_dim=38):
         input_char = input_char.unsqueeze(1)
         batch_size = input_char.size(0)
-        one_hot = torch.FloatTensor(batch_size, onehot_dim).zero_().to(device)
+        one_hot = torch.FloatTensor(batch_size, onehot_dim).zero_().to(input_char.device)
         one_hot = one_hot.scatter_(1, input_char, 1)
         return one_hot
 
@@ -29,6 +29,8 @@ class Attention(nn.Module):
         """
         batch_size = batch_H.size(0)
         num_steps = batch_max_length + 1  # +1 for [s] at end of sentence.
+        # Allocate on the input's device so the model also runs on CPU when CUDA exists.
+        device = batch_H.device
 
         output_hiddens = torch.FloatTensor(batch_size, num_steps, self.hidden_size).fill_(0).to(device)
         hidden = (torch.FloatTensor(batch_size, self.hidden_size).fill_(0).to(device),

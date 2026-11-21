@@ -161,7 +161,10 @@ UI notes:
 ```text
 .
 |- src/
-|  |- ocr_pipeline.py                # canonical OCR pipeline implementation
+|  |- ocr_pipeline.py                # canonical OCR pipeline implementation (CLI)
+|  |- ocr_engine.py                  # in-memory engine (models loaded once) for the web apps
+|- tests/
+|  |- test_engine_regression.py      # engine output must match the thesis pipeline
 |- scripts/
 |  |- run_demo.py                    # canonical runnable entrypoint
 |- app_streamlit.py                  # local Streamlit UI runner
