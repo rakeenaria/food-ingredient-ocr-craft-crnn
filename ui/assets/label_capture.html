@@ -1,0 +1,67 @@
+<div class="lc">
+  <ol class="steps" aria-label="Progress">
+    <li data-step="1">Capture</li>
+    <li data-step="2"><span class="long">Crop &amp; rotate</span><span class="short">Crop</span></li>
+    <li data-step="3">Read</li>
+    <li data-step="4">Results</li>
+  </ol>
+
+  <p class="message" role="alert" hidden></p>
+
+  <section data-stage="source">
+    <div class="tabs" role="tablist">
+      <button type="button" role="tab" data-tab="camera" aria-selected="true">Take photo</button>
+      <button type="button" role="tab" data-tab="upload" aria-selected="false">Upload image</button>
+    </div>
+
+    <div data-panel="camera">
+      <div class="viewfinder">
+        <video playsinline muted autoplay></video>
+        <div class="guide" aria-hidden="true"></div>
+        <p class="viewfinder-hint">Fit the ingredient list inside the frame</p>
+        <div class="camera-idle">
+          <p>Point your camera at the ingredient list.<br />Good light, no glare, text in focus.</p>
+          <button type="button" class="btn btn-primary" data-action="start-camera">Start camera</button>
+        </div>
+      </div>
+      <div class="row camera-controls" hidden>
+        <button type="button" class="btn" data-action="switch-camera" hidden>Switch camera</button>
+        <button type="button" class="btn btn-primary" data-action="capture">Capture</button>
+      </div>
+    </div>
+
+    <div data-panel="upload" hidden>
+      <label class="drop">
+        <input type="file" accept="image/jpeg,image/png,image/webp" />
+        <span class="drop-title">Choose a photo</span>
+        <span class="drop-sub">or drop it here. JPG, PNG or WebP, up to 20&nbsp;MB.</span>
+      </label>
+    </div>
+
+    <div class="samples" hidden>
+      <p class="samples-title">No label at hand? Try a sample photo.</p>
+      <div class="sample-list"></div>
+    </div>
+  </section>
+
+  <section data-stage="editor" hidden>
+    <div class="canvas-wrap">
+      <canvas class="crop-canvas" aria-label="Your photo. Drag the frame so only the ingredient list is inside."></canvas>
+    </div>
+    <p class="hint">Drag the frame or its handles so only the ingredient list is inside.</p>
+    <div class="toolbar">
+      <button type="button" class="btn" data-action="rotate-left">Rotate left</button>
+      <button type="button" class="btn" data-action="rotate-right">Rotate right</button>
+      <label class="straighten">
+        <span>Straighten</span>
+        <input type="range" min="-30" max="30" step="0.5" value="0" />
+        <output>0°</output>
+      </label>
+      <button type="button" class="btn btn-quiet" data-action="reset">Reset</button>
+    </div>
+    <div class="row actions">
+      <button type="button" class="btn" data-action="restart">Start over</button>
+      <button type="button" class="btn btn-primary" data-action="submit">Read ingredients</button>
+    </div>
+  </section>
+</div>

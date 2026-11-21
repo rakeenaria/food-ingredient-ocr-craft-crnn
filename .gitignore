@@ -118,3 +118,6 @@ notebooks/demo.ipynb
 legacy_demo_variant.py
 legacy_demo_simple.py
 figures/
+
+# Browser test artifacts (Playwright MCP)
+.playwright-mcp/

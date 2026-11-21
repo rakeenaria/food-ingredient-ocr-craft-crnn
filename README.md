@@ -143,13 +143,13 @@ python demo.py \
 python scripts/run_demo.py --saved_model saved_models/FT_801010_off/best_accuracy.pth --sensitive
 ```
 
-5. Optional local Streamlit interface:
+5. Web apps (Streamlit):
 ```bash
-streamlit run app_streamlit.py
+streamlit run app_streamlit.py     # Ingredient Reader: camera/upload -> crop & rotate -> read
+streamlit run researcher_app.py    # local researcher tools: model options, folders, logs
 ```
-UI notes:
-- Left panel: merged OCR text (`outputs/merged.txt`)
-- Right panel: scrollable gallery of input images from `--input_folder`
+- **Ingredient Reader** is the public app. Photos are cropped and rotated in the browser, the models load once, and results highlight words read with low confidence.
+- **Researcher app** is for local experiments only and is never deployed.
 
 6. Outputs are written to:
 - `outputs/crops/`
@@ -166,7 +166,10 @@ UI notes:
 |  |- test_engine_regression.py      # engine output must match the thesis pipeline
 |- scripts/
 |  |- run_demo.py                    # canonical runnable entrypoint
-|- app_streamlit.py                  # local Streamlit UI runner
+|- app_streamlit.py                  # public web app (Ingredient Reader)
+|- researcher_app.py                 # local researcher UI (not deployed)
+|- ui/                               # web app pages, styles and the camera/crop component
+|- .streamlit/config.toml            # theme and server settings
 |- docs/
 |  |- PRD.md                         # product requirements for the web app
 |- demo.py                           # compatibility wrapper (kept for existing usage)

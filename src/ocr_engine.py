@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import threading
 import time
+from collections.abc import Callable
 from dataclasses import dataclass, field, fields
 from pathlib import Path
 from types import SimpleNamespace
@@ -226,12 +227,29 @@ class OCREngine:
             torch.backends.cudnn.benchmark = False
         return detector.to(self.device).eval()
 
-    def process(self, image: np.ndarray, *, keep_score_maps: bool = False) -> OCRResult:
-        """Detect, crop and recognize all words in an upright BGR image."""
+    @property
+    def busy(self) -> bool:
+        """True while another call to ``process`` holds the engine."""
+        return self._lock.locked()
+
+    def process(
+        self,
+        image: np.ndarray,
+        *,
+        keep_score_maps: bool = False,
+        on_progress: Callable[[str, int], None] | None = None,
+    ) -> OCRResult:
+        """Detect, crop and recognize all words in an upright BGR image.
+
+        ``on_progress(stage, count)`` is called with ("detect", 0) and then
+        ("recognize", number_of_words) so a UI can report progress.
+        """
         image_bgr = _to_bgr(image)
         height, width = image_bgr.shape[:2]
+        notify = on_progress or (lambda stage, count: None)
 
         with self._lock, torch.no_grad():
+            notify("detect", 0)
             start = time.perf_counter()
             # As in the thesis pipeline, CRAFT receives the BGR array; kept for result parity.
             boxes, _, score_text, score_link = detect_text_regions(self.detector, image_bgr, self._detect_args)
@@ -248,6 +266,7 @@ class OCREngine:
                     crops.append(crop)
             cropped = time.perf_counter()
 
+            notify("recognize", len(crops))
             texts, confidences = self._recognize(crops)
             recognized = time.perf_counter()
 
@@ -322,11 +341,18 @@ def draw_word_boxes(
     thickness: int = 2,
     low_confidence_threshold: float | None = None,
     low_confidence_color: tuple[int, int, int] = (0, 200, 255),
+    outline_color: tuple[int, int, int] | None = None,
 ) -> np.ndarray:
-    """Return a copy of the image with word boxes drawn (BGR colors)."""
+    """Return a copy of the image with word boxes drawn (BGR colors).
+
+    ``outline_color`` draws a wider halo under each box so boxes stay visible
+    on both light and dark packaging.
+    """
     canvas = _to_bgr(image_bgr).copy()
     for word in words:
         is_low = low_confidence_threshold is not None and word.confidence < low_confidence_threshold
         points = np.round(word.box).astype(np.int32).reshape(-1, 1, 2)
-        cv.polylines(canvas, [points], True, low_confidence_color if is_low else color, thickness)
+        if outline_color is not None:
+            cv.polylines(canvas, [points], True, outline_color, thickness + 2, cv.LINE_AA)
+        cv.polylines(canvas, [points], True, low_confidence_color if is_low else color, thickness, cv.LINE_AA)
     return canvas

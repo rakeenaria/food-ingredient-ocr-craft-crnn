@@ -1,0 +1,26 @@
+[server]
+maxUploadSize = 20
+
+[browser]
+gatherUsageStats = false
+
+[client]
+toolbarMode = "minimal"
+# Never show tracebacks to visitors. For local debugging run:
+#   streamlit run app_streamlit.py --client.showErrorDetails=full
+showErrorDetails = "none"
+
+[theme]
+base = "light"
+primaryColor = "#000000"
+backgroundColor = "#FFFFFF"
+secondaryBackgroundColor = "#F3F3F1"
+textColor = "#111111"
+linkColor = "#000000"
+linkUnderline = true
+borderColor = "#CFCFCA"
+showWidgetBorder = true
+baseRadius = "none"
+buttonRadius = "none"
+font = "Libre Franklin:https://fonts.googleapis.com/css2?family=Libre+Franklin:wght@400;500;600;700;800;900&display=swap, sans-serif"
+headingFontWeights = [900, 800, 800, 700, 700, 700]
