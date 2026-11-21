@@ -97,7 +97,7 @@ Priorities use MoSCoW: Must, Should, Could.
 - Pipeline overview, model and dataset summary, and thesis metrics.
 - Limitations: English printed labels and static images only. OCR can be wrong, so users should always check the physical label.
 - A privacy note.
-- Author name with links to GitHub and LinkedIn.
+- Author name with a link to GitHub.
 
 **P8. Allergen highlighting (Could, v1.1)**
 - Flag common allergens (milk, egg, peanut, tree nuts, soy, wheat/gluten, fish, shellfish, sesame) with a clear disclaimer.
@@ -138,7 +138,7 @@ Priorities use MoSCoW: Must, Should, Could.
 | D6 | No int8 quantization. | It made recognition only about 10% faster and introduced an error (`INGREDIENTS:` became `INCREDIENTS:`). |
 | D7 | English UI. | The labels are in English, and the app is a public portfolio piece. |
 | D8 | Minimal monochrome visual design: white background, black accents, typography-led layout. No gradients, emoji icons, glow effects or decorative illustrations. | The owner wants the app to look deliberate and clean, not like generic AI-generated UI. Color is reserved for meaning: highlighted low-confidence words, and later allergen flags. |
-| D9 | Model weights are published publicly on the Hugging Face Hub. | They are already shared publicly through the README. A public repo means the host needs no access token. |
+| D9 | Model weights are published publicly on the Hugging Face Hub. | They are already shared publicly through the README; the Drive copy of `best_accuracy.pth` is byte-identical (SHA-256) to `FT_801010_off/best_accuracy.pth`. A public repo means the host needs no access token. |
 
 ## 8. Milestones
 

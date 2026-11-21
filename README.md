@@ -122,26 +122,25 @@ pip install -r requirements.txt
 2. Download required weights (not stored in repo):
 - CRAFT: https://github.com/clovaai/CRAFT-pytorch
 - TRBA baseline: https://github.com/zihaomu/deep-text-recognition-benchmark
-- Fine-tuned checkpoint: https://drive.google.com/drive/folders/1MRPI5mAcX4nht2R4AO8VovIEsw2q6rGN?usp=drive_link
+- Fine-tuned checkpoint (final thesis model): [best_accuracy.pth](https://drive.google.com/file/d/1wyBZXzxK36qW_Y4ge2wH5EMlpPTIANb1/view?usp=drive_link). Save it as `saved_models/FT_801010_off/best_accuracy.pth`. The [Drive folder](https://drive.google.com/drive/folders/1MRPI5mAcX4nht2R4AO8VovIEsw2q6rGN?usp=drive_link) also has `best_norm_ED.pth`, but `best_accuracy.pth` gives better results.
 
-3. Run inference (legacy-compatible command):
+3. Run inference. The final model was trained without PAD, so do not pass `--PAD`; it lowers accuracy:
 ```bash
 python demo.py \
-  --input_folder ./bahan \
+  --input_folder images/gambar_simulasi \
   --trained_model saved_models/craft_mlt_25k.pth \
-  --saved_model fine_tuned_model/best_accuracy.pth \
+  --saved_model saved_models/FT_801010_off/best_accuracy.pth \
   --Transformation TPS \
   --FeatureExtraction ResNet \
   --SequenceModeling BiLSTM \
   --Prediction Attn \
   --batch_max_length 60 \
-  --sensitive \
-  --PAD
+  --sensitive
 ```
 
 4. Optional canonical script entrypoint:
 ```bash
-python scripts/run_demo.py --saved_model fine_tuned_model/best_accuracy.pth
+python scripts/run_demo.py --saved_model saved_models/FT_801010_off/best_accuracy.pth --sensitive
 ```
 
 5. Optional local Streamlit interface:
