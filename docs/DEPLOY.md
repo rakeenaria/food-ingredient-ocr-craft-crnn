@@ -48,9 +48,17 @@ git push -u origin web-revamp
 - On an iPhone, open the URL in Safari, choose **Take photo**, and allow the camera. If the camera is blocked, use **Settings → Safari → Camera**, or upload a photo instead.
 - Free apps sleep after several days without visitors. The next visitor sees a wake-up screen, and the app starts again in a minute or two.
 
-## 5. After the app works
+## 5. After the app works: deploy from `master`
 
-Merge `web-revamp` into `master` and push, then in the app's **Settings** switch the branch to `master`.
+Community Cloud identifies an app by its GitHub coordinates (repository, branch, entrypoint file), so the branch cannot be changed in the settings.
+
+1. Merge `web-revamp` into `master` and push.
+2. Note the app's settings (subdomain, Python version, secrets), then delete the app: the app's **⋮** menu → **Delete**.
+3. Deploy again as in step 3 with branch `master`. The deleted app's subdomain is free again immediately, so you can enter it, or a new one, under App URL.
+
+Do not delete or rename a branch while an app is deployed from it: Community Cloud would lose track of the app and you could no longer manage it.
+
+To change only the URL, use the app's **⋮** menu → **Settings → General → App URL** (6 to 63 characters). The old URL then returns 404.
 
 ## Troubleshooting
 
