@@ -48,7 +48,7 @@ Non-goals for v1:
 1. **Capture**: take a photo in the app, upload one, or pick a sample image.
 2. **Crop & rotate**: frame only the ingredient list and straighten it if needed.
 3. **Read**: OCR runs and shows progress for each stage.
-4. **Results**: the photo comes first, then the allergens and the text. Allergen words are colored by group, words to check have a red dotted underline and words corrected automatically a purple one. The user can edit, copy or download the text and search the ingredient list.
+4. **Results**: the photo comes first, then the allergens and the text. Allergen words are colored by group, words to check have a yellow dotted underline and words corrected automatically a green one. The user can edit, copy or download the text and search the ingredient list.
 
 ## 5. Functional requirements
 
@@ -80,9 +80,9 @@ Priorities use MoSCoW: Must, Should, Could.
 **P4. Results (Must)**
 - Order: the photo, the allergen box (P8), the text, the ingredient list (P5) and the word details (P6). The photo takes at most 40% of the screen height.
 - Text reconstructed in reading order. By default it is shown as one paragraph, which is clean to copy. A "Show original lines" toggle shows the text line by line as on the label.
-- Words with confidence below 0.8 get a red dotted underline. The threshold was validated in M3 (see section 10).
+- Words with confidence below 0.8 get a yellow dotted underline. The threshold was validated in M3 (see section 10).
 - Allergen words in the text get the color of their group (P8).
-- A toggle between the original image and the detected bounding boxes. Words to check get a red dashed box and corrected words a purple one.
+- A toggle between the original image and the detected bounding boxes. Words to check get a yellow dashed box and corrected words a green one.
 - Edit, Copy, and Download as .txt. Copy and Download are icons in the top-right corner of the text box. The "Show original lines" and "Edit text" toggles stay on one row on phones.
 - A summary line under the photo with the word count, the processing time, and the number of words to check and corrected.
 - Acceptance: Copy and Download both contain the edited text.
@@ -90,7 +90,7 @@ Priorities use MoSCoW: Must, Should, Could.
 **P5. Ingredient list (Should)**
 - Split the text into items on top-level commas and semicolons (commas inside `()`, `[]` or `{}` do not split). Remove the "Ingredients:" heading, including common OCR misreadings such as `INCREDIENTS`, and join wrapped lines.
 - Statements after the list, such as "Contains: milk" or "May contain traces of nuts", are shown apart as label notes.
-- The list follows the user's edits. Low-confidence words and corrected words keep their red and purple dotted underlines in it.
+- The list follows the user's edits. Low-confidence words and corrected words keep their yellow and green dotted underlines in it.
 - A search box that highlights matching items and notes while the user types.
 - Acceptance: `milk (fresh milk (20%), milk powder), sugar` yields 2 items.
 
@@ -125,8 +125,8 @@ Priorities use MoSCoW: Must, Should, Could.
   - The edit distance is cheaper for OCR slips such as I/l, O/0 and rn/m.
   - A low-confidence word may be one or two edits away from the suggestion.
   - A word the model was sure about only gets look-alike fixes.
-- Corrections are applied automatically (D11) and get a purple dotted underline in the text and the ingredient list. The allergen box counts the corrected words.
-- Hovering (desktop) or tapping (phone) a corrected word shows the word as read, in a monospace face where I/l and O/0 look different, with Undo. An undone correction gets the red dotted underline of a word to check and can be applied again.
+- Corrections are applied automatically (D11) and get a green dotted underline in the text and the ingredient list. The allergen box counts the corrected words.
+- Hovering (desktop) or tapping (phone) a corrected word shows the word as read, in a monospace face where I/l and O/0 look different, with Undo. An undone correction gets the yellow dotted underline of a word to check and can be applied again.
 
 ### Researcher app (local only)
 
@@ -179,11 +179,11 @@ Priorities use MoSCoW: Must, Should, Could.
 | D5 | Model `saved_models/FT_801010_off/best_accuracy.pth`: case-sensitive charset, grayscale, no PAD, `batch_max_length` 60 (from `opt.txt`). Pretrained CRAFT with text threshold 0.8, low-text 0.4, link 0.25, canvas 1280, mag ratio 1.5, refiner off, single pass. | This matches the thesis configuration. With the refiner off, the current second CRAFT pass recomputes identical boxes and doubles detection time. |
 | D6 | No int8 quantization. | It made recognition only about 10% faster and introduced an error (`INGREDIENTS:` became `INCREDIENTS:`). |
 | D7 | English UI. | The labels are in English, and the app is a public portfolio piece. |
-| D8 | Minimal monochrome visual design: white background, black accents, typography-led layout. No gradients, emoji icons, glow effects or decorative illustrations. | The owner wants the app to look deliberate and clean, not like generic AI-generated UI. Color is reserved for meaning: one color per allergen group (D10), and dotted underlines in red for words to check and purple for words corrected automatically (D12). |
+| D8 | Minimal monochrome visual design: white background, black accents, typography-led layout. No gradients, emoji icons, glow effects or decorative illustrations. | The owner wants the app to look deliberate and clean, not like generic AI-generated UI. Color is reserved for meaning: one color per allergen group (D10), and dotted underlines in yellow for words to check and green for words corrected automatically (D12). |
 | D9 | Model weights are published publicly on the Hugging Face Hub. | They are already shared publicly through the README; the Drive copy of `best_accuracy.pth` is byte-identical (SHA-256) to `FT_801010_off/best_accuracy.pth`. A public repo means the host needs no access token. |
 | D10 | Allergen tags have one color per group, matched to the food: milk blue, egg yolk, peanut brown, tree nuts green, soy edamame green, wheat and gluten gold, fish sea blue, shellfish coral, sesame beige. The text on every tag passes WCAG AA (4.5:1). | The owner asked for colors that match how people picture each food. The tags still name the group, so color is never the only cue. |
-| D11 | Post-OCR corrections are applied automatically, each with Undo. Until 2026-11-22 the user ticked which fixes to apply. | The owner asked for it. Applying every suggestion raised accuracy on the photos and left the test split unchanged (M6 results in section 10). The purple dotted underline and Undo keep every change visible and reversible. |
-| D12 | Words to check get a red dotted underline and corrected words a purple one, in the text, the ingredient list and the word details; their boxes on the photo are dashed in the same colors. Allergen words in the text look like the tags in the allergen box. | The owner asked for corrections as a dotted line instead of the yellow highlight, and for allergen words in the text to look like the allergen tags. Red reads as "check this", like a spelling mark. Purple is far from every allergen color, so a dotted line never looks like an allergen. The lines are drawn as borders, not underlines, so they also show under a colored allergen word. |
+| D11 | Post-OCR corrections are applied automatically, each with Undo. Until 2026-11-22 the user ticked which fixes to apply. | The owner asked for it. Applying every suggestion raised accuracy on the photos and left the test split unchanged (M6 results in section 10). The green dotted underline and Undo keep every change visible and reversible. |
+| D12 | Words to check get a yellow dotted underline and corrected words a green one, in the text, the ingredient list and the word details; their boxes on the photo are dashed in the same colors. Allergen words in the text look like the tags in the allergen box. | The owner asked for corrections as a dotted line instead of the yellow highlight, and for allergen words in the text to look like the allergen tags. After seeing red and purple, the owner chose yellow and green, like a traffic light: yellow to look again, green for fixed. The yellow is a deep gold (#E0A800), because a lighter yellow hardly shows on white; it stays below the 3:1 that WCAG asks for lines, so the legend names it and its boxes on the photo get a dark edge. The marks are dotted lines, never filled tags, so they do not read as allergens. They are drawn as borders, not underlines, so they also show under a colored allergen word. |
 
 ## 8. Milestones
 
@@ -304,8 +304,9 @@ Results page revision 2 (2026-11-22, the owner's feedback):
 
 - **Less space above the photo.** The gap between the steps and the photo heading went from 64 px to 24 px.
 - **Dotted lines in two colors (D12).**
-  - Corrected words lost the yellow highlight and got a purple dotted underline. Words to check went from a black to a red one.
-  - The boxes on the photo follow: red dashed for words to check, purple dashed for corrected words.
+  - Corrected words lost the yellow highlight and got a green dotted underline. Words to check went from a black to a yellow one.
+  - The owner first saw red and purple, then chose yellow and green.
+  - The boxes on the photo follow: yellow dashed with a dark edge for words to check, green dashed for corrected words.
 - **Allergen words are colored in the text (P8):** solid in the color of their group, outlined in a "may contain" statement, as in the allergen box.
   - They are found in the parsed paragraph and moved onto the text shown, so they also follow the label's lines and the user's edits.
   - "May contain" notes in the ingredient list got outlined tags too.

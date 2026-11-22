@@ -22,7 +22,7 @@ st.html(
     "<li><b>Read each word.</b> A CRNN (TPS-ResNet-BiLSTM-Attention), fine-tuned on 6,081 word images "
     "from food labels, recognizes the characters.</li>"
     "<li><b>Put it back together.</b> Words are reassembled in reading order, left to right and top to bottom.</li>"
-    "<li><b>Flag doubtful words.</b> Every word gets a confidence score, and words under 80% get a red dotted underline. "
+    "<li><b>Flag doubtful words.</b> Every word gets a confidence score, and words under 80% get a yellow dotted underline. "
     "On the thesis test set this flagged 6% of the words and caught 12 of the 14 words with misread "
     "letters or digits.</li>"
     "<li><b>Split the list.</b> Commas outside brackets separate the ingredients. Statements such as "
@@ -31,7 +31,7 @@ st.html(
     "peanut, tree nuts, soy, wheat and other gluten cereals, fish, shellfish and sesame. “May contain” statements "
     "are kept apart from the ingredients, and their allergens are outlined.</li>"
     "<li><b>Fix misreadings.</b> A word that is not in an ingredient vocabulary but is a letter or two away from "
-    "a word that is gets corrected, such as “Vilater” to “Water”. Corrections get a purple dotted underline, and you can "
+    "a word that is gets corrected, such as “Vilater” to “Water”. Corrections get a green dotted underline, and you can "
     "undo each one.</li>"
     "</ol>"
 )

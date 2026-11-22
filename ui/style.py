@@ -1,7 +1,7 @@
 """Visual system: a food-label look. White paper, black rules, Libre Franklin.
 
-Color is kept for meaning (PRD D8): a red dotted underline for words to
-check, a purple one for words corrected automatically, and one color per
+Color is kept for meaning (PRD D8): a yellow dotted underline for words to
+check, a green one for words corrected automatically, and one color per
 allergen group. Blocks are rendered with st.html so OCR text is never parsed
 as Markdown.
 """
@@ -124,10 +124,12 @@ def allergen_palette() -> dict[str, dict[str, str]]:
 
 
 # Marks on words, in the text, the ingredient list and the word details, and the
-# matching box colors on the photo (ui/imaging.py). Both are dotted lines, so the
-# color tells them apart; neither is used by an allergen group.
-CHECK_COLOR = "#E11D48"  # words to check: red, like a spelling mark
-FIXED_COLOR = "#7C3AED"  # words corrected automatically: purple
+# matching box colors on the photo (ui/imaging.py). The owner chose them like a
+# traffic light: yellow to look again, green for fixed. Both are dotted lines, never
+# a filled tag, so they do not read as allergens. The yellow is a deep gold: a
+# lighter one hardly shows on white.
+CHECK_COLOR = "#E0A800"  # words to check: yellow
+FIXED_COLOR = "#16A34A"  # words corrected automatically: green
 
 _ALLERGEN_CSS = " ".join(
     f".ir-tag.a-{allergen_slug(group)} {{ --tag: {fill}; --tag-ink: {ink}; --tag-line: {line}; }}"
@@ -267,8 +269,8 @@ def word_table(rows: Iterable[tuple], *, low_style: str = "mark") -> None:
 
     ``note`` is ``("fixed", word)`` for a word corrected automatically or
     ``("suggested", word)`` for a correction the user undid. ``low_style``
-    "underline" gives words to check a red dotted underline (public app) instead
-    of the yellow highlight (researcher app).
+    "underline" gives words to check a yellow dotted underline (public app)
+    instead of the yellow highlight (researcher app).
     """
     body = []
     for number, thumbnail, text, confidence, low, *extra in rows:

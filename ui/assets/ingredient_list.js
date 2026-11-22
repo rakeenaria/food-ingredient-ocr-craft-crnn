@@ -4,9 +4,9 @@
 //   items: [{ text, low, fixed, strong, allergens }]          ingredients in label order
 //   notes: [{ text, low, fixed, strong, allergens, maybe }]   statements such as "Contains: milk"
 //   palette: { group: { fill, ink, line } }            allergen tag colors
-// "low" are character ranges of words read with low confidence (red dotted
+// "low" are character ranges of words read with low confidence (yellow dotted
 // underline), "fixed" ranges of words corrected automatically ([start, end,
-// word as read], purple dotted underline), "strong" the ranges of allergen
+// word as read], green dotted underline), "strong" the ranges of allergen
 // words (bold, as on real labels) and "allergens" the group names shown as
 // colored tags (outlined for a "may contain" statement, "maybe").
 // Searching matches the text and the group names.

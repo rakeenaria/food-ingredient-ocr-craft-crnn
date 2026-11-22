@@ -122,13 +122,13 @@ li.is-dim .tag {
   opacity: 0.4;
 }
 
-/* Words read with low confidence (red) and words corrected automatically
-   (purple): a dotted line, as in the label text. */
+/* Words read with low confidence (yellow) and words corrected automatically
+   (green): a dotted line, as in the label text. */
 .low {
-  border-bottom: 2px dotted #e11d48; /* style.CHECK_COLOR */
+  border-bottom: 2px dotted #e0a800; /* style.CHECK_COLOR */
 }
 .fixed {
-  border-bottom: 2px dotted #7c3aed; /* style.FIXED_COLOR */
+  border-bottom: 2px dotted #16a34a; /* style.FIXED_COLOR */
 }
 li.is-dim .low,
 li.is-dim .fixed {

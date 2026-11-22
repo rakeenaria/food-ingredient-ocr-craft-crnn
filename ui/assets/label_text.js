@@ -1,6 +1,6 @@
 // The label text box: the text as read, with allergen words in the colors of
 // their group (outlined when the label only says "may contain"), words to check
-// (red dotted underline) and words corrected automatically (purple dotted
+// (yellow dotted underline) and words corrected automatically (green dotted
 // underline). Hovering or tapping a corrected word shows what was read, with
 // Undo. Copy, download and editing all happen in the browser.
 //

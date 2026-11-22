@@ -39,7 +39,7 @@ from ui.imaging import (
     word_thumbnail,
 )
 
-# Words read with less confidence than this get a red dotted underline (PRD P4). Checked
+# Words read with less confidence than this get a yellow dotted underline (PRD P4). Checked
 # on the thesis splits: on the test set it flags 6% of words and catches 12 of the 14
 # words with misread letters or digits; 0.9 catches no more, 0.7 misses two more.
 LOW_CONFIDENCE = 0.80
@@ -163,8 +163,8 @@ class Reading:
     words: list  # words as read, in reading order
     corrected: list  # the same words with the corrections that were kept
     fixes: dict[int, Suggestion]  # word index -> suggested correction
-    fixed: set[int]  # corrected words (purple dotted underline)
-    check: set[int]  # words to check (red dotted underline): low confidence or a correction undone
+    fixed: set[int]  # corrected words (green dotted underline)
+    check: set[int]  # words to check (yellow dotted underline): low confidence or a correction undone
     seconds: float
 
 
@@ -445,10 +445,10 @@ def render_text(reading: Reading, edited: str | None, analysis: Analysis) -> Non
         return
     legend = []
     if reading.check:
-        legend.append('<span class="ir-low">Red dotted</span> words were read with low confidence. Check them on the label.')
+        legend.append('<span class="ir-low">Yellow dotted</span> words were read with low confidence. Check them on the label.')
     if reading.fixed:
         legend.append(
-            '<span class="ir-fix">Purple dotted</span> words were corrected automatically. '
+            '<span class="ir-fix">Green dotted</span> words were corrected automatically. '
             "Hover or tap one to see what was read, or to undo it."
         )
     if legend:
@@ -479,7 +479,7 @@ def render_word_details(reading: Reading) -> None:
     with st.expander("Word details"):
         style.note(
             "How each word looked to the reader, what it read and how sure it was. Flagged words were "
-            f'read with less than {LOW_CONFIDENCE:.0%} confidence (<span class="ir-low">red dotted underline</span>) '
+            f'read with less than {LOW_CONFIDENCE:.0%} confidence (<span class="ir-low">yellow dotted underline</span>) '
             'or <span class="ir-fix">corrected automatically</span>.'
         )
         numbered = [(index, word) for index, word in enumerate(reading.words) if word.text.strip()]

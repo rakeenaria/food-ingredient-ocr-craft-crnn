@@ -4,10 +4,10 @@
   --muted: #4a4a46;
   --soft: #f3f3f1;
   --rule: #e4e4e0;
-  --check: #e11d48; /* style.CHECK_COLOR */
-  --check-soft: #ffe4e6;
-  --fixed: #7c3aed; /* style.FIXED_COLOR */
-  --fixed-soft: #ede9fe;
+  --check: #e0a800; /* style.CHECK_COLOR */
+  --check-soft: #fef6cc;
+  --fixed: #16a34a; /* style.FIXED_COLOR */
+  --fixed-soft: #dcfce7;
   font-family: var(--st-font, "Libre Franklin", system-ui, sans-serif);
   color: var(--ink);
 }
@@ -78,8 +78,8 @@
   overflow-wrap: anywhere;
 }
 
-/* Words to check (red) and words corrected automatically (purple; tap for what
-   was read): a dotted line. It is a border, not an underline, so it also runs
+/* Words to check (yellow) and words corrected automatically (green; tap for
+   what was read): a dotted line. It is a border, not an underline, so it also runs
    just below the allergen colors of a word inside it. */
 .low,
 .fix {
