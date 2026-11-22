@@ -268,9 +268,9 @@ def list_entries(
 ) -> list[dict]:
     """Ingredient list rows with their words to check, corrected words and allergens.
 
-    Allergen words get the colors of their group, as in the label text, and each row
-    tags its groups. For ``notes``, a "may contain" statement gets outlined words and
-    tags, as in the allergen box.
+    Allergen words get the colors of their group, as in the label text; for ``notes``,
+    they are outlined in a "may contain" statement. The groups of a row are sent too,
+    so searching "milk" also finds "whey".
     """
     entries = []
     for span in spans:

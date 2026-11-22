@@ -8,10 +8,9 @@
 // underline), "fixed" ranges of words corrected automatically ([start, end,
 // word as read], green dotted underline) and "chips" ranges of allergen words
 // ([start, end, group]), shown in the colors of their group as in the label
-// text. "allergens" are the group names, shown as tags after the text, so a
-// word such as "whey" says which group it belongs to. A "may contain"
-// statement ("maybe") has outlined words and tags.
-// Searching matches the text and the group names.
+// text, outlined in a "may contain" statement ("maybe"). "allergens" are the
+// group names: searching matches them as well as the text, so "milk" also
+// finds "whey".
 
 const instances = new WeakMap();
 
@@ -53,13 +52,6 @@ function ranges(lists, length) {
   return kept;
 }
 
-function paint(el, colors) {
-  if (!colors) return;
-  el.style.setProperty("--tag", colors.fill);
-  el.style.setProperty("--tag-ink", colors.ink);
-  el.style.setProperty("--tag-line", colors.line);
-}
-
 // A word to check or a corrected word; it holds the pieces of that word.
 function markElement(mark) {
   const span = document.createElement("span");
@@ -78,14 +70,19 @@ function markElement(mark) {
 function chipElement(piece, group, maybe, isStart, isEnd, palette, titled) {
   const span = document.createElement("span");
   span.className = `chip${maybe ? " is-maybe" : ""}${isStart ? " is-start" : ""}${isEnd ? " is-end" : ""}`;
-  paint(span, palette[group]);
+  const colors = palette[group];
+  if (colors) {
+    span.style.setProperty("--tag", colors.fill);
+    span.style.setProperty("--tag-ink", colors.ink);
+    span.style.setProperty("--tag-line", colors.line);
+  }
   if (titled) span.title = maybe ? `May contain: ${group}` : `Allergen: ${group}`;
   span.textContent = piece;
   return span;
 }
 
-// The text with its dotted words and colored allergen words, then the group
-// tags, built without innerHTML.
+// The text with its dotted words and colored allergen words, built without
+// innerHTML.
 function fill(target, entry, palette) {
   const text = String(entry.text || "");
   const maybe = Boolean(entry.maybe);
@@ -131,19 +128,6 @@ function fill(target, entry, palette) {
       target.append(markEl);
     }
     markEl.append(node);
-  }
-  const groups = Array.isArray(entry.allergens) ? entry.allergens : [];
-  if (groups.length) {
-    const box = document.createElement("span");
-    box.className = "tags";
-    for (const group of groups) {
-      const tag = document.createElement("span");
-      tag.className = maybe ? "tag is-maybe" : "tag";
-      tag.textContent = group;
-      paint(tag, palette[group]);
-      box.append(tag);
-    }
-    target.append(box);
   }
 }
 

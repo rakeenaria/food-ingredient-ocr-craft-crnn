@@ -115,7 +115,7 @@ Priorities use MoSCoW: Must, Should, Could.
   - An allergen box right below the photo shows what the product contains and what it may contain.
   - Each group has its own color (D10). "May contain" tags are outlined in that color.
   - In the text, each allergen word gets the color of its group, outlined when it sits in a "may contain" statement. The words come from the same ingredients and statements as the box, so the two always agree, also in the label's lines and after an edit.
-  - In the ingredient list, allergen words get the same colors as in the text. Each item also carries tags that name its groups, so "whey" shows that it is milk. A "may contain" statement has outlined words and tags. Searching an allergen name (for example "milk") also finds "whey" and "caseinate".
+  - In the ingredient list, allergen words get the same colors as in the text, outlined in a "may contain" statement. Searching an allergen name (for example "milk") also finds "whey" and "caseinate".
   - When an undone correction (P9) would reveal an allergen, the box shows it under "Check".
 
 **P9. Post-OCR correction (Could, v1.1)**
@@ -319,7 +319,8 @@ Results page revision 2 (2026-11-22, the owner's feedback):
 Results page revision 3 (2026-11-22, the owner's answer to an open question):
 
 - **Allergen words in the ingredient list are colored as in the text (P8)** instead of bold: solid in the color of their group, outlined in a "may contain" statement.
-  - The tags after each item stay. They name the group of a word such as "whey" or "almond", which a phone cannot show on hover, so color is never the only cue (D10).
+  - The group tags after each item were removed. The owner saw them kept first, then chose the colors alone, as in the text.
+  - The allergen box still names every group, and hovering a word on a desktop names its group. A search for "milk" still finds "whey".
   - An allergen word that is also corrected or uncertain keeps its color, with the dotted line below it, as in the text.
 - **Checked locally** on samples 2, 3 and 5 at 320 and 390 px and on a desktop:
   - the list colors the same words as the text, in the same colors;
