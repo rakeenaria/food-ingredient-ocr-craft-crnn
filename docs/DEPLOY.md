@@ -67,3 +67,4 @@ To change only the URL, use the app's **⋮** menu → **Settings → General �
 | "Error installing requirements" | Read the log. `requirements.txt` takes CPU builds of PyTorch from `download.pytorch.org/whl/cpu`; keep that line first. |
 | "The reader is unavailable right now" | The weights could not be downloaded. Check that the Hugging Face repository is public and holds all three files with their original names. |
 | The app restarts or runs out of memory | Reboot it from **Manage app**. The app needs about 1.8 GB at peak, and the free limit is about 2.7 GB. |
+| After a push, results show an error or new styles are missing | Community Cloud updated the page scripts but kept old copies of other changed modules. Reboot the app: **Manage app → ⋮ → Reboot app**. It is safest to reboot after every code push. |
