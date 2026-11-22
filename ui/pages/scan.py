@@ -268,7 +268,9 @@ def list_entries(
 ) -> list[dict]:
     """Ingredient list rows with their words to check, corrected words and allergens.
 
-    For ``notes``, a "may contain" statement gets outlined allergen tags, as in the allergen box.
+    Allergen words get the colors of their group, as in the label text, and each row
+    tags its groups. For ``notes``, a "may contain" statement gets outlined words and
+    tags, as in the allergen box.
     """
     entries = []
     for span in spans:
@@ -287,7 +289,7 @@ def list_entries(
                     for start, end, original in fixed
                     if start < span.end and end > span.start
                 ],
-                "strong": [[hit.start, hit.end] for hit in hits],
+                "chips": [[hit.start, hit.end, hit.group] for hit in hits],
                 "allergens": [group for group in GROUPS if group in found],
                 "maybe": notes and is_precautionary(span.text),
             }

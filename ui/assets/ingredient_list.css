@@ -93,10 +93,43 @@
   color: var(--faint);
 }
 
-.items strong,
-.note-list strong {
-  font-weight: 800;
+/* Allergen words: the colors of their group, as in the label text; outlined in
+   a "may contain" statement. No vertical padding, so a dotted line under the
+   word stays visible. */
+.chip {
+  padding: 0 0.22em;
+  background: var(--tag, var(--ink));
+  color: var(--tag-ink, var(--paper));
+  font-weight: 700;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
 }
+.chip.is-maybe {
+  --left: 0px;
+  --right: 0px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow:
+    inset 0 2px 0 var(--tag-line, var(--ink)),
+    inset 0 -2px 0 var(--tag-line, var(--ink)),
+    inset var(--left) 0 0 var(--tag-line, var(--ink)),
+    inset calc(-1 * var(--right)) 0 0 var(--tag-line, var(--ink));
+}
+.chip.is-maybe.is-start {
+  --left: 2px;
+}
+.chip.is-maybe.is-end {
+  --right: 2px;
+}
+/* An allergen word cut in two by a dotted word keeps only its outer edges. */
+.chip:not(.is-start) {
+  padding-left: 0;
+}
+.chip:not(.is-end) {
+  padding-right: 0;
+}
+
+/* Tags after the text name the groups, so a word such as "whey" says it is milk. */
 .tags {
   margin-left: 0.4rem;
 }
@@ -118,6 +151,7 @@
   color: var(--ink);
   box-shadow: inset 0 0 0 2px var(--tag-line, var(--ink));
 }
+li.is-dim .chip,
 li.is-dim .tag {
   opacity: 0.4;
 }

@@ -62,10 +62,12 @@ _ingredient_list = st.components.v2.component(
 def ingredient_list(*, items: list[dict], notes: list[dict], palette: dict, key: str = "ingredients") -> None:
     """Numbered ingredient list with an instant, in-browser search.
 
-    ``items`` and ``notes`` are ``{"text", "low", "fixed", "strong", "allergens"}``:
+    ``items`` and ``notes`` are ``{"text", "low", "fixed", "chips", "allergens", "maybe"}``:
     character ranges inside ``text`` of words to check (``[start, end]``), of
-    corrected words (``[start, end, word as read]``) and of allergen words, plus
-    the allergen groups. ``palette`` maps each group to its tag colors.
+    corrected words (``[start, end, word as read]``) and of allergen words
+    (``[start, end, group]``, shown in the colors of their group), the groups
+    shown as tags, and whether the row is a "may contain" statement (outlined
+    words and tags). ``palette`` maps each group to its colors.
     """
     _ingredient_list(key=key, data={"items": items, "notes": notes, "palette": palette})
 
