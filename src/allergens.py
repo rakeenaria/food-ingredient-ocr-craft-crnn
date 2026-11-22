@@ -17,7 +17,7 @@ from __future__ import annotations
 
 import re
 from collections.abc import Sequence
-from dataclasses import dataclass, field
+from dataclasses import dataclass, field, replace
 
 # Display order of the groups.
 GROUPS = ("Milk", "Egg", "Peanut", "Tree nuts", "Soy", "Wheat / gluten", "Fish", "Shellfish", "Sesame")
@@ -35,7 +35,8 @@ _TERMS: dict[str, tuple[str, ...]] = {
     "Peanut": (r"peanuts?", r"groundnuts?", r"arachis", r"monkey\s+nuts?"),
     "Tree nuts": (
         r"almonds?", r"badam", r"cashews?", r"hazelnuts?", r"filberts?", r"walnuts?", r"pecans?", r"pistachios?",
-        r"macadamias?", r"brazil\s+nuts?", r"pine\s+nuts?", r"chestnuts?", r"praline", r"marzipan", r"nuts?",
+        r"macadamias?", r"brazil\s+nuts?", r"pine\s+nuts?", r"chestnuts?", r"praline", r"marzipan", r"tree\s+nuts?",
+        r"nuts?",
     ),
     "Soy": (r"soy", r"soya", r"soja", r"soybeans?", r"soyabeans?", r"tofu", r"edamame", r"miso", r"tempeh", r"shoyu", r"tamari"),
     "Wheat / gluten": (
@@ -81,6 +82,7 @@ class AllergenHit:
     start: int
     end: int
     term: str  # the words as written in the text
+    precaution: bool = False  # inside a "may contain" statement (see find_in_list)
 
 
 def _previous_word(text: str, start: int) -> str:
@@ -130,6 +132,23 @@ def groups_in(text: str) -> list[str]:
 def is_precautionary(statement: str) -> bool:
     """True for "may contain" style statements (traces, shared equipment)."""
     return bool(_PRECAUTION.search(statement))
+
+
+def find_in_list(text: str, items: Sequence[tuple[int, int]], notes: Sequence[tuple[int, int]] = ()) -> list[AllergenHit]:
+    """The allergen words of a parsed ingredient list, placed in ``text``.
+
+    ``items`` and ``notes`` are the (start, end) ranges of the ingredients and of
+    the statements after them (see ``postprocess.parse_ingredients``). Each range
+    is searched on its own, as ``summarize`` does, and the words of a "may
+    contain" statement get ``precaution=True``.
+    """
+    pieces = [(start, end, False) for start, end in items]
+    pieces += [(start, end, is_precautionary(text[start:end])) for start, end in notes]
+    hits = []
+    for start, end, precaution in pieces:
+        for hit in find_allergens(text[start:end]):
+            hits.append(replace(hit, start=start + hit.start, end=start + hit.end, precaution=precaution))
+    return sorted(hits, key=lambda hit: hit.start)
 
 
 @dataclass

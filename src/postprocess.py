@@ -87,6 +87,33 @@ def compose_text(words: Sequence[WordLike], *, as_lines: bool = False) -> Compos
     return ComposedText("".join(parts), tuple(spans))
 
 
+def remap_spans(spans: Sequence[tuple[int, int]], source: str, target: str) -> list[tuple[int, int] | None]:
+    """Move character ranges of ``source`` onto ``target``, a copy that differs only in whitespace.
+
+    The paragraph that is parsed and the text that is shown can differ in line
+    breaks and spaces (the label's lines, or the user's own edit). Ranges are
+    matched through their first and last non-space characters. A range that
+    starts or ends on whitespace gives None, and so does every range when the
+    two texts differ in more than whitespace.
+    """
+    source_chars = [index for index, char in enumerate(source) if not char.isspace()]
+    target_chars = [index for index, char in enumerate(target) if not char.isspace()]
+    if len(source_chars) != len(target_chars) or any(
+        source[i] != target[j] for i, j in zip(source_chars, target_chars)
+    ):
+        return [None] * len(spans)
+    rank = [-1] * len(source)
+    for number, index in enumerate(source_chars):
+        rank[index] = number
+    moved: list[tuple[int, int] | None] = []
+    for start, end in spans:
+        if not 0 <= start < end <= len(source) or rank[start] < 0 or rank[end - 1] < 0:
+            moved.append(None)
+            continue
+        moved.append((target_chars[rank[start]], target_chars[rank[end - 1]] + 1))
+    return moved
+
+
 # ---------------------------------------------------------- ingredient list
 @dataclass(frozen=True)
 class Span:

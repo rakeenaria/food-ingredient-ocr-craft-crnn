@@ -1,9 +1,9 @@
 """Visual system: a food-label look. White paper, black rules, Libre Franklin.
 
-Color is kept for meaning (PRD D8): highlighter yellow for words corrected
-automatically, and one color per allergen group. Words to check get a dotted
-underline. Blocks are rendered with st.html so OCR text is never parsed as
-Markdown.
+Color is kept for meaning (PRD D8): a red dotted underline for words to
+check, a purple one for words corrected automatically, and one color per
+allergen group. Blocks are rendered with st.html so OCR text is never parsed
+as Markdown.
 """
 
 from __future__ import annotations
@@ -21,12 +21,13 @@ _CSS = r"""
 .ir-title { margin: 0; font-size: clamp(2.3rem, 8vw, 3.4rem); font-weight: 900; line-height: 0.95; letter-spacing: -0.035em; color: #000; }
 .ir-lede { margin: 0.75rem 0 0; max-width: 34rem; font-size: 1.05rem; color: #3d3d3a; }
 .ir-rule { height: 12px; margin: 1rem 0 1.25rem; border: 0; background: #000; }
-.ir-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 1.25rem; padding: 0; list-style: none; border-top: 1px solid #111; border-bottom: 1px solid #111; counter-reset: step; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; }
+.ir-steps { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); margin: 0 0 0.5rem; padding: 0; list-style: none; border-top: 1px solid #111; border-bottom: 1px solid #111; counter-reset: step; font-size: 0.72rem; letter-spacing: 0.06em; text-transform: uppercase; }
 .ir-steps li { margin: 0; padding: 0.55rem 0.2rem 0.5rem; counter-increment: step; color: #5f5f5a; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ir-steps li::before { content: counter(step) "\00a0\00a0"; font-weight: 900; }
 .ir-steps li.is-done { color: #111; }
 .ir-steps li.is-active { color: #111; font-weight: 800; box-shadow: inset 0 -4px 0 #111; }
 .ir-section { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; margin: 1.75rem 0 0.5rem; padding-bottom: 0.35rem; border-bottom: 5px solid #000; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+.ir-section.is-first { margin-top: 0; }
 .ir-section .ir-aside { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; font-variant-numeric: tabular-nums; }
 .ir-facts { width: 100%; margin: 0; border-collapse: collapse; font-size: 0.98rem; }
 .ir-facts th, .ir-facts td { padding: 0.45rem 0; border: 0; border-bottom: 1px solid #111; background: transparent; }
@@ -36,11 +37,7 @@ _CSS = r"""
 .ir-facts tr:last-child th, .ir-facts tr:last-child td { border-bottom: 0; }
 .ir-text { padding: 1rem 1.1rem; border: 2px solid #111; background: #fff; font-size: 1.08rem; line-height: 1.75; overflow-wrap: anywhere; }
 .ir-text mark, .ir-note mark, .ir-words mark { background: #ffe14d; color: #000; padding: 0.05em 0.15em; box-shadow: inset 0 -2px 0 #000; }
-.ir-low { text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: #111; text-decoration-thickness: 2px; text-underline-offset: 0.24em; text-decoration-skip-ink: none; }
-.ir-fix { padding: 0.05em 0.12em; background: #ffe14d; color: #000; }
-.ir-box-key { display: inline-block; width: 1.5em; height: 0.8em; margin: 0 0.3em 0 0; vertical-align: -0.05em; border: 2px solid #111; }
-.ir-box-key.is-check { border-style: dashed; }
-.ir-box-key.is-fixed { border-color: #ffe14d; box-shadow: 0 0 0 1px #111, inset 0 0 0 1px #111; }
+.ir-box-key { display: inline-block; width: 1.5em; height: 0.8em; margin: 0 0.3em 0 0; vertical-align: -0.05em; border: 2px dashed #111; }
 .ir-key { white-space: nowrap; }
 .st-key-result_photo img { display: block; width: auto !important; height: auto !important; max-width: 100%; max-height: 40vh; margin: 0 auto; }
 .st-key-result_photo [data-testid="stFullScreenFrame"] > div { margin-left: auto; margin-right: auto; }
@@ -126,11 +123,23 @@ def allergen_palette() -> dict[str, dict[str, str]]:
     return {group: {"fill": fill, "ink": ink, "line": line} for group, (fill, ink, line) in ALLERGEN_COLORS.items()}
 
 
+# Marks on words, in the text, the ingredient list and the word details, and the
+# matching box colors on the photo (ui/imaging.py). Both are dotted lines, so the
+# color tells them apart; neither is used by an allergen group.
+CHECK_COLOR = "#E11D48"  # words to check: red, like a spelling mark
+FIXED_COLOR = "#7C3AED"  # words corrected automatically: purple
+
 _ALLERGEN_CSS = " ".join(
     f".ir-tag.a-{allergen_slug(group)} {{ --tag: {fill}; --tag-ink: {ink}; --tag-line: {line}; }}"
     for group, (fill, ink, line) in ALLERGEN_COLORS.items()
 )
-_PAGE_CSS = _CSS.replace("</style>", _ALLERGEN_CSS + "</style>")
+_MARK_CSS = (
+    f".ir-low {{ border-bottom: 2px dotted {CHECK_COLOR}; }} "
+    f".ir-fix {{ border-bottom: 2px dotted {FIXED_COLOR}; }} "
+    f".ir-box-key.is-check {{ border-color: {CHECK_COLOR}; }} "
+    f".ir-box-key.is-fixed {{ border-color: {FIXED_COLOR}; }} "
+)
+_PAGE_CSS = _CSS.replace("</style>", _ALLERGEN_CSS + " " + _MARK_CSS + "</style>")
 
 STEP_NAMES = ("Capture", "Crop & rotate", "Read", "Results")
 SHORT_STEP_NAMES = ("Capture", "Crop", "Read", "Results")
@@ -157,9 +166,11 @@ def steps(active: int) -> None:
     st.html(f'<ol class="ir-steps" aria-label="Progress">{"".join(items)}</ol>')
 
 
-def section(title: str, aside: str | None = None) -> None:
+def section(title: str, aside: str | None = None, *, first: bool = False) -> None:
+    """A section heading. ``first`` drops the space above it, for the one right under the steps."""
     extra = f'<span class="ir-aside">{escape(aside)}</span>' if aside else ""
-    st.html(f'<p class="ir-section"><span>{escape(title)}</span>{extra}</p>')
+    css = "ir-section is-first" if first else "ir-section"
+    st.html(f'<p class="{css}"><span>{escape(title)}</span>{extra}</p>')
 
 
 def facts(rows: list[tuple[str, str]]) -> None:
@@ -256,8 +267,8 @@ def word_table(rows: Iterable[tuple], *, low_style: str = "mark") -> None:
 
     ``note`` is ``("fixed", word)`` for a word corrected automatically or
     ``("suggested", word)`` for a correction the user undid. ``low_style``
-    "underline" gives words to check a dotted underline (public app) instead of
-    the yellow highlight (researcher app).
+    "underline" gives words to check a red dotted underline (public app) instead
+    of the yellow highlight (researcher app).
     """
     body = []
     for number, thumbnail, text, confidence, low, *extra in rows:

@@ -19,6 +19,7 @@ from src.postprocess import (  # noqa: E402
     compose_text,
     join_wrapped_lines,
     parse_ingredients,
+    remap_spans,
     to_lines_text,
     to_paragraph,
 )
@@ -205,6 +206,16 @@ def test_compose_text_matches_line_and_paragraph_text():
                 assert composed.text[span[0] : span[1]] == word.text
             else:
                 assert span is None
+
+
+def test_remap_spans_follows_line_breaks_and_edits():
+    paragraph = "Ingredients: sugar, Expeller-pressed oil, tree nuts."
+    shown = "Ingredients: sugar,\nExpeller-\npressed oil,   tree\nnuts."
+    spans = [(13, 18), (20, 36), (42, 51), (12, 13)]  # sugar, the hyphenated word, "tree nuts", a space
+    moved = remap_spans(spans, paragraph, shown)
+    assert [shown[a:b] for a, b in moved[:3]] == ["sugar", "Expeller-\npressed", "tree\nnuts"]
+    assert moved[3] is None  # starts on whitespace
+    assert remap_spans([(0, 5)], paragraph, paragraph.replace("sugar", "sugur")) == [None]  # not the same text
 
 
 if __name__ == "__main__":

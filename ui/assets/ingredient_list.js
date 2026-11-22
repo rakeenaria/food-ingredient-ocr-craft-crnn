@@ -1,13 +1,14 @@
 // Ingredient list with an instant search. Everything runs in the browser.
 //
 // Data from Python:
-//   items: [{ text, low, fixed, strong, allergens }]   ingredients in label order
-//   notes: [{ text, low, fixed, strong, allergens }]   statements such as "Contains: milk"
+//   items: [{ text, low, fixed, strong, allergens }]          ingredients in label order
+//   notes: [{ text, low, fixed, strong, allergens, maybe }]   statements such as "Contains: milk"
 //   palette: { group: { fill, ink, line } }            allergen tag colors
-// "low" are character ranges of words read with low confidence (dotted
+// "low" are character ranges of words read with low confidence (red dotted
 // underline), "fixed" ranges of words corrected automatically ([start, end,
-// word as read], yellow), "strong" the ranges of allergen words (bold, as on
-// real labels) and "allergens" the group names shown as colored tags.
+// word as read], purple dotted underline), "strong" the ranges of allergen
+// words (bold, as on real labels) and "allergens" the group names shown as
+// colored tags (outlined for a "may contain" statement, "maybe").
 // Searching matches the text and the group names.
 
 const instances = new WeakMap();
@@ -34,8 +35,8 @@ const LOW = 1;
 const ALLERGEN = 2;
 const FIXED = 4;
 
-// Text with dotted (low confidence), <mark> (corrected) and <strong> (allergen)
-// ranges plus colored allergen tags, built without innerHTML.
+// Text with dotted (low confidence, corrected) and <strong> (allergen) ranges
+// plus colored allergen tags, built without innerHTML.
 function fill(target, entry, palette) {
   const text = String(entry.text || "");
   const flags = new Uint8Array(text.length);
@@ -63,10 +64,11 @@ function fill(target, entry, palette) {
       node = strong;
     }
     if (flags[i] & FIXED) {
-      const mark = document.createElement("mark");
-      mark.title = `Corrected automatically. Read as “${readAs[i]}”.`;
-      mark.append(node);
-      node = mark;
+      const fixed = document.createElement("span");
+      fixed.className = "fixed";
+      fixed.title = `Corrected automatically. Read as “${readAs[i]}”.`;
+      fixed.append(node);
+      node = fixed;
     } else if (flags[i] & LOW) {
       const low = document.createElement("span");
       low.className = "low";
@@ -83,12 +85,13 @@ function fill(target, entry, palette) {
     box.className = "tags";
     for (const group of groups) {
       const tag = document.createElement("span");
-      tag.className = "tag";
+      tag.className = entry.maybe ? "tag is-maybe" : "tag";
       tag.textContent = group;
       const colors = palette && palette[group];
       if (colors) {
         tag.style.setProperty("--tag", colors.fill);
         tag.style.setProperty("--tag-ink", colors.ink);
+        tag.style.setProperty("--tag-line", colors.line);
       }
       box.append(tag);
     }

@@ -61,7 +61,8 @@ def to_display_rgb(image_bgr: np.ndarray, max_side: int = 1600) -> np.ndarray:
 
 INK_BGR = (17, 17, 17)
 PAPER_BGR = (255, 255, 255)
-HIGHLIGHT_BGR = (77, 225, 255)  # #FFE14D, the highlighter yellow of corrected words
+CHECK_BGR = (72, 29, 225)  # #E11D48, style.CHECK_COLOR: words to check
+FIXED_BGR = (237, 58, 124)  # #7C3AED, style.FIXED_COLOR: words corrected automatically
 
 
 def _dashed_polygon(canvas: np.ndarray, points: np.ndarray, color, thickness: int, dash: float, gap: float) -> None:
@@ -84,9 +85,9 @@ def _dashed_polygon(canvas: np.ndarray, points: np.ndarray, color, thickness: in
 def draw_result_boxes(image_bgr: np.ndarray, words, *, check: Collection[int] = (), fixed: Collection[int] = ()) -> np.ndarray:
     """A copy of the photo with a box around each word read.
 
-    Words to check get a dashed box, matching their dotted underline in the
-    text; corrected words a yellow one. ``check`` and ``fixed`` are indices
-    into ``words``. A light halo keeps boxes visible on dark packaging.
+    Words to check and corrected words get a dashed box in the color of their
+    dotted underline in the text: red and purple. ``check`` and ``fixed`` are
+    indices into ``words``. A light halo keeps boxes visible on dark packaging.
     """
     canvas = image_bgr.copy()
     longest = max(canvas.shape[:2])
@@ -96,12 +97,9 @@ def draw_result_boxes(image_bgr: np.ndarray, words, *, check: Collection[int] = 
         if not word.text.strip():
             continue
         points = np.round(word.box).astype(np.int32)
-        if index in fixed:
-            cv.polylines(canvas, [points.reshape(-1, 1, 2)], True, INK_BGR, thickness + 2, cv.LINE_AA)
-            cv.polylines(canvas, [points.reshape(-1, 1, 2)], True, HIGHLIGHT_BGR, thickness, cv.LINE_AA)
-        elif index in check:
+        if index in fixed or index in check:
             _dashed_polygon(canvas, points, PAPER_BGR, thickness + 2, dash, gap)
-            _dashed_polygon(canvas, points, INK_BGR, thickness, dash, gap)
+            _dashed_polygon(canvas, points, FIXED_BGR if index in fixed else CHECK_BGR, thickness, dash, gap)
         else:
             cv.polylines(canvas, [points.reshape(-1, 1, 2)], True, PAPER_BGR, thickness + 2, cv.LINE_AA)
             cv.polylines(canvas, [points.reshape(-1, 1, 2)], True, INK_BGR, thickness, cv.LINE_AA)

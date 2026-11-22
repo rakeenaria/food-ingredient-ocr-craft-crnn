@@ -17,7 +17,7 @@ from ui import style
 from ui.imaging import to_display_rgb, word_thumbnail
 
 LOW_CONFIDENCE = 0.80
-HIGHLIGHT_BGR = (77, 225, 255)  # the public app's highlighter yellow
+HIGHLIGHT_BGR = (77, 225, 255)  # highlighter yellow, as for low confidence in the word table
 ss = st.session_state
 
 

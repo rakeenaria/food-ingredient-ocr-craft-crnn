@@ -82,6 +82,8 @@ def label_text(
     *,
     text: str,
     marks: list[dict],
+    allergens: list[dict],
+    palette: dict,
     rejected: list[int],
     editing: bool,
     edit_text: str,
@@ -97,15 +99,19 @@ def label_text(
 
     ``marks`` are ``{"start", "end", "kind", ...}`` ranges inside ``text``:
     ``low`` (to check), ``fixed`` (corrected, with ``id``, ``original`` and
-    ``replacement``) or ``undone`` (a correction the user undid). State sent
-    back: ``rejected`` (ids of undone corrections) and ``draft`` (``{"token",
-    "text"}``, the editor's text when it loses focus); trigger: ``revert``.
+    ``replacement``) or ``undone`` (a correction the user undid).
+    ``allergens`` are ``{"start", "end", "group", "maybe"}`` ranges of allergen
+    words, shown in the colors of ``palette``. State sent back: ``rejected``
+    (ids of undone corrections) and ``draft`` (``{"token", "text"}``, the
+    editor's text when it loses focus); trigger: ``revert``.
     """
     return _label_text(
         key=key,
         data={
             "text": text,
             "marks": marks,
+            "allergens": allergens,
+            "palette": palette,
             "rejected": rejected,
             "editing": editing,
             "editText": edit_text,

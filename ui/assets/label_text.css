@@ -4,8 +4,10 @@
   --muted: #4a4a46;
   --soft: #f3f3f1;
   --rule: #e4e4e0;
-  --fix: #ffe14d;
-  --fix-hover: #ffd21f;
+  --check: #e11d48; /* style.CHECK_COLOR */
+  --check-soft: #ffe4e6;
+  --fixed: #7c3aed; /* style.FIXED_COLOR */
+  --fixed-soft: #ede9fe;
   font-family: var(--st-font, "Libre Franklin", system-ui, sans-serif);
   color: var(--ink);
 }
@@ -76,41 +78,73 @@
   overflow-wrap: anywhere;
 }
 
-/* Words to check: a dotted underline. */
+/* Words to check (red) and words corrected automatically (purple; tap for what
+   was read): a dotted line. It is a border, not an underline, so it also runs
+   just below the allergen colors of a word inside it. */
+.low,
+.fix {
+  border-bottom: 2px dotted var(--mark);
+}
 .low,
 .fix.is-undone {
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: var(--ink);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.24em;
-  text-decoration-skip-ink: none;
+  --mark: var(--check);
 }
-
-/* Words corrected automatically: highlighter yellow; tap for what was read. */
 .fix {
-  border-radius: 1px;
+  --mark: var(--fixed);
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
 }
-.fix:not(.is-undone) {
-  padding: 0.05em 0.12em;
-  background: var(--fix);
-  color: #000000;
-  -webkit-box-decoration-break: clone;
-  box-decoration-break: clone;
-}
-.fix:not(.is-undone):hover,
-.fix:not(.is-undone)[aria-expanded="true"] {
-  background: var(--fix-hover);
+.fix:hover,
+.fix[aria-expanded="true"] {
+  background: var(--fixed-soft);
 }
 .fix.is-undone:hover,
 .fix.is-undone[aria-expanded="true"] {
-  background: var(--soft);
+  background: var(--check-soft);
 }
 .fix:focus-visible {
   outline: 2px solid var(--ink);
   outline-offset: 1px;
+}
+
+/* Allergen words: the colors of their group, as in the allergen box; outlined
+   when the label only says "may contain". No vertical padding, so a dotted
+   line under the word stays visible. */
+.chip {
+  padding: 0 0.22em;
+  background: var(--tag, var(--ink));
+  color: var(--tag-ink, var(--paper));
+  font-weight: 700;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.chip.is-maybe {
+  --left: 0px;
+  --right: 0px;
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow:
+    inset 0 2px 0 var(--tag-line, var(--ink)),
+    inset 0 -2px 0 var(--tag-line, var(--ink)),
+    inset var(--left) 0 0 var(--tag-line, var(--ink)),
+    inset calc(-1 * var(--right)) 0 0 var(--tag-line, var(--ink));
+}
+.chip.is-maybe.is-start {
+  --left: 2px;
+}
+.chip.is-maybe.is-end {
+  --right: 2px;
+}
+/* An allergen word cut in two by a mark keeps only its outer edges. */
+.chip:not(.is-start) {
+  padding-left: 0;
+}
+.chip:not(.is-end) {
+  padding-right: 0;
+}
+.fix:hover .chip,
+.fix[aria-expanded="true"] .chip {
+  filter: brightness(0.92);
 }
 
 .edit-hint {
@@ -220,7 +254,7 @@
   background: #e9e9e6;
 }
 .pop-action:focus-visible {
-  outline: 2px solid var(--fix);
+  outline: 2px solid var(--paper);
   outline-offset: 2px;
 }
 

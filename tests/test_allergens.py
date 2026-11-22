@@ -13,7 +13,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.allergens import find_allergens, groups_in, is_precautionary, summarize  # noqa: E402
+from src.allergens import find_allergens, find_in_list, groups_in, is_precautionary, summarize  # noqa: E402
 
 
 def test_each_group_is_found():
@@ -81,6 +81,26 @@ def test_thesis_ground_truth_label():
     summary = summarize(items, ["CONTAINS: WHEAT, MILK"])
     assert list(summary.contains) == ["Milk", "Wheat / gluten"]
     assert summary.may_contain == {}
+
+
+def test_find_in_list_places_words_and_marks_may_contain():
+    text = "Ingredients: sugar, whey powder. Contains: soy. May contain traces of nuts."
+    piece = lambda words: (text.index(words), text.index(words) + len(words))  # noqa: E731
+    hits = find_in_list(
+        text,
+        [piece("sugar"), piece("whey powder")],
+        [piece("Contains: soy"), piece("May contain traces of nuts")],
+    )
+    assert [(text[hit.start : hit.end], hit.group, hit.precaution) for hit in hits] == [
+        ("whey", "Milk", False),
+        ("soy", "Soy", False),
+        ("nuts", "Tree nuts", True),
+    ]
+
+
+def test_group_names_are_found_whole():
+    # The text box colors the whole name, as on the label: "Tree Nuts", not just "Nuts".
+    assert [hit.term for hit in find_allergens("Processes Peanuts, Tree Nuts, Milk")] == ["Peanuts", "Tree Nuts", "Milk"]
 
 
 if __name__ == "__main__":

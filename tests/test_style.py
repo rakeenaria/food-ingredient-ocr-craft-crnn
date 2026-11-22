@@ -1,4 +1,4 @@
-"""Checks for the allergen colors in ui/style.py (PRD D8).
+"""Checks for the colors in ui/style.py: allergen groups and word marks (PRD D8, D10).
 
 Run with plain Python:
     python tests/test_style.py
@@ -14,7 +14,10 @@ if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
 from src.allergens import GROUPS  # noqa: E402
-from ui.style import ALLERGEN_COLORS, allergen_slug  # noqa: E402
+from ui import imaging  # noqa: E402
+from ui.style import ALLERGEN_COLORS, CHECK_COLOR, FIXED_COLOR, allergen_slug  # noqa: E402
+
+ASSETS = ROOT / "ui" / "assets"
 
 
 def _luminance(color: str) -> float:
@@ -43,6 +46,23 @@ def test_slugs_are_css_safe_and_unique():
     assert slugs[GROUPS.index("Wheat / gluten")] == "wheat-gluten"
     assert all(slug.replace("-", "").isalpha() for slug in slugs)
     assert len(set(slugs)) == len(slugs)
+
+
+def test_mark_colors_are_readable_and_not_allergen_colors():
+    allergen = {color.upper() for colors in ALLERGEN_COLORS.values() for color in colors}
+    for color in (CHECK_COLOR, FIXED_COLOR):
+        assert _contrast(color, "#FFFFFF") >= 4.5, color  # a 2px dotted line, and legend text
+        assert color.upper() not in allergen, color
+    assert CHECK_COLOR.upper() != FIXED_COLOR.upper()
+
+
+def test_mark_colors_match_the_components_and_the_photo():
+    for name in ("label_text.css", "ingredient_list.css"):
+        css = (ASSETS / name).read_text(encoding="utf-8").lower()
+        assert CHECK_COLOR.lower() in css and FIXED_COLOR.lower() in css, name
+    to_bgr = lambda color: tuple(int(color.lstrip("#")[i : i + 2], 16) for i in (4, 2, 0))  # noqa: E731
+    assert imaging.CHECK_BGR == to_bgr(CHECK_COLOR)
+    assert imaging.FIXED_BGR == to_bgr(FIXED_COLOR)
 
 
 if __name__ == "__main__":

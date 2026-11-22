@@ -7,9 +7,25 @@ from dataclasses import dataclass
 
 import streamlit as st
 
-from src.allergens import GROUPS, AllergenSummary, find_allergens, groups_in, summarize
+from src.allergens import (
+    GROUPS,
+    AllergenSummary,
+    find_allergens,
+    find_in_list,
+    groups_in,
+    is_precautionary,
+    summarize,
+)
 from src.correction import Suggestion, apply_suggestions, suggest_for_words
-from src.postprocess import ComposedText, IngredientList, Span, compose_text, join_wrapped_lines, parse_ingredients
+from src.postprocess import (
+    ComposedText,
+    IngredientList,
+    Span,
+    compose_text,
+    join_wrapped_lines,
+    parse_ingredients,
+    remap_spans,
+)
 from ui import style
 from ui.components import ingredient_list, label_capture, label_text
 from ui.engine import engine_ready, get_engine, log_scan
@@ -23,7 +39,7 @@ from ui.imaging import (
     word_thumbnail,
 )
 
-# Words read with less confidence than this get a dotted underline (PRD P4). Checked
+# Words read with less confidence than this get a red dotted underline (PRD P4). Checked
 # on the thesis splits: on the test set it flags 6% of words and catches 12 of the 14
 # words with misread letters or digits; 0.9 catches no more, 0.7 misses two more.
 LOW_CONFIDENCE = 0.80
@@ -147,8 +163,8 @@ class Reading:
     words: list  # words as read, in reading order
     corrected: list  # the same words with the corrections that were kept
     fixes: dict[int, Suggestion]  # word index -> suggested correction
-    fixed: set[int]  # corrected words (yellow)
-    check: set[int]  # words to check (dotted underline): low confidence or a correction undone
+    fixed: set[int]  # corrected words (purple dotted underline)
+    check: set[int]  # words to check (red dotted underline): low confidence or a correction undone
     seconds: float
 
 
@@ -189,6 +205,7 @@ def text_marks(reading: Reading, composed: ComposedText) -> list[dict]:
 class Analysis:
     """The ingredient list and allergens of the text shown."""
 
+    text: str  # the paragraph that was parsed
     parsed: IngredientList
     low: list[tuple[int, int]]  # words to check, inside the parsed text
     fixed: list[tuple[int, int, str]]  # corrected words with the word as read
@@ -222,11 +239,37 @@ def analyse(reading: Reading, edited: str | None) -> Analysis:
             new = [g for g in groups_in(fix.replacement) if g not in groups_in(fix.original) and g not in allergens.contains]
             if new:
                 checks.append((fix.original, fix.replacement, new))
-    return Analysis(parsed, low, fixed, allergens, checks)
+    return Analysis(text, parsed, low, fixed, allergens, checks)
 
 
-def list_entries(spans: list[Span], low: list[tuple[int, int]], fixed: list[tuple[int, int, str]]) -> list[dict]:
-    """Ingredient list rows with their words to check, corrected words and allergens."""
+def text_allergens(analysis: Analysis, shown: str) -> list[dict]:
+    """Where the allergen words sit in the text shown, and whether only "may contain" (P8).
+
+    The words come from the same ingredients and statements as the allergen box,
+    found in the parsed paragraph and moved onto ``shown``, which can differ in
+    line breaks (the label's lines, or the user's edit).
+    """
+    parsed = analysis.parsed
+    if parsed.items:
+        ranges = lambda spans: [(span.start, span.end) for span in spans]  # noqa: E731
+        hits = find_in_list(analysis.text, ranges(parsed.items), ranges(parsed.notes))
+    else:
+        hits = find_allergens(analysis.text)  # no list found: the box reads the whole text too
+    moved = remap_spans([(hit.start, hit.end) for hit in hits], analysis.text, shown)
+    return [
+        {"start": span[0], "end": span[1], "group": hit.group, "maybe": hit.precaution}
+        for hit, span in zip(hits, moved)
+        if span is not None
+    ]
+
+
+def list_entries(
+    spans: list[Span], low: list[tuple[int, int]], fixed: list[tuple[int, int, str]], *, notes: bool = False
+) -> list[dict]:
+    """Ingredient list rows with their words to check, corrected words and allergens.
+
+    For ``notes``, a "may contain" statement gets outlined allergen tags, as in the allergen box.
+    """
     entries = []
     for span in spans:
         hits = find_allergens(span.text)
@@ -246,6 +289,7 @@ def list_entries(spans: list[Span], low: list[tuple[int, int]], fixed: list[tupl
                 ],
                 "strong": [[hit.start, hit.end] for hit in hits],
                 "allergens": [group for group in GROUPS if group in found],
+                "maybe": notes and is_precautionary(span.text),
             }
         )
     return entries
@@ -327,7 +371,7 @@ def process_submission() -> None:
 
 
 def render_no_text() -> None:
-    style.section("No text found")
+    style.section("No text found", first=True)
     st.html(
         '<ul class="ir-list">'
         "<li>Crop the photo so only the ingredient list is inside.</li>"
@@ -340,7 +384,7 @@ def render_no_text() -> None:
 
 def render_photo(image, reading: Reading) -> None:
     """The photo first, kept short, with the words found boxed (P6)."""
-    style.section("Photo")
+    style.section("Photo", first=True)
     view = st.segmented_control(
         "Photo view",
         ["Detected words", "Original"],
@@ -371,8 +415,8 @@ def render_photo(image, reading: Reading) -> None:
     style.note(summary)
 
 
-def render_text(reading: Reading, edited: str | None) -> None:
-    """The label text with corrections, copy, download and editing (P3, P4, P9)."""
+def render_text(reading: Reading, edited: str | None, analysis: Analysis) -> None:
+    """The label text with allergens, corrections, copy, download and editing (P3, P4, P8, P9)."""
     style.section("Label text")
     with st.container(horizontal=True, gap="medium", key="text_toggles"):
         show_lines = st.toggle("Show original lines", key="show_lines")
@@ -385,6 +429,8 @@ def render_text(reading: Reading, edited: str | None) -> None:
     label_text(
         text=text,
         marks=marks,
+        allergens=[] if editing else text_allergens(analysis, text),
+        palette=style.allergen_palette(),
         rejected=sorted(set(reading.fixes) - reading.fixed),
         editing=editing,
         edit_text=ss.edit_start,
@@ -399,10 +445,10 @@ def render_text(reading: Reading, edited: str | None) -> None:
         return
     legend = []
     if reading.check:
-        legend.append('<span class="ir-low">Dotted</span> words were read with low confidence. Check them on the label.')
+        legend.append('<span class="ir-low">Red dotted</span> words were read with low confidence. Check them on the label.')
     if reading.fixed:
         legend.append(
-            '<span class="ir-fix">Yellow</span> words were corrected automatically. '
+            '<span class="ir-fix">Purple dotted</span> words were corrected automatically. '
             "Hover or tap one to see what was read, or to undo it."
         )
     if legend:
@@ -422,7 +468,7 @@ def render_ingredients(analysis: Analysis) -> None:
         return
     ingredient_list(
         items=list_entries(parsed.items, analysis.low, analysis.fixed),
-        notes=list_entries(parsed.notes, analysis.low, analysis.fixed),
+        notes=list_entries(parsed.notes, analysis.low, analysis.fixed, notes=True),
         palette=style.allergen_palette(),
         key="ingredient_list",
     )
@@ -433,8 +479,8 @@ def render_word_details(reading: Reading) -> None:
     with st.expander("Word details"):
         style.note(
             "How each word looked to the reader, what it read and how sure it was. Flagged words were "
-            f'read with less than {LOW_CONFIDENCE:.0%} confidence (<span class="ir-low">dotted underline</span>) '
-            "or corrected automatically."
+            f'read with less than {LOW_CONFIDENCE:.0%} confidence (<span class="ir-low">red dotted underline</span>) '
+            'or <span class="ir-fix">corrected automatically</span>.'
         )
         numbered = [(index, word) for index, word in enumerate(reading.words) if word.text.strip()]
         flagged = reading.check | reading.fixed
@@ -474,7 +520,7 @@ def render_results() -> None:
     # What matters most comes first: the photo, the allergens, then the text.
     render_photo(ss.ocr["image"], reading)
     style.allergen_panel(list(analysis.allergens.contains), list(analysis.allergens.may_contain), analysis.checks)
-    render_text(reading, edited)
+    render_text(reading, edited, analysis)
     render_ingredients(analysis)
     render_word_details(reading)
 

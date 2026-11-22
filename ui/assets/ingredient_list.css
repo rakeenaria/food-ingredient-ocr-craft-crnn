@@ -113,32 +113,26 @@
   text-transform: uppercase;
   vertical-align: 0.12em;
 }
+.tag.is-maybe {
+  background: var(--paper);
+  color: var(--ink);
+  box-shadow: inset 0 0 0 2px var(--tag-line, var(--ink));
+}
 li.is-dim .tag {
   opacity: 0.4;
 }
 
-/* Words read with low confidence: a dotted underline. */
+/* Words read with low confidence (red) and words corrected automatically
+   (purple): a dotted line, as in the label text. */
 .low {
-  text-decoration-line: underline;
-  text-decoration-style: dotted;
-  text-decoration-color: var(--ink);
-  text-decoration-thickness: 2px;
-  text-underline-offset: 0.24em;
-  text-decoration-skip-ink: none;
+  border-bottom: 2px dotted #e11d48; /* style.CHECK_COLOR */
 }
-li.is-dim .low {
-  text-decoration-color: var(--faint);
+.fixed {
+  border-bottom: 2px dotted #7c3aed; /* style.FIXED_COLOR */
 }
-
-/* Words corrected automatically: highlighter yellow. */
-mark {
-  padding: 0.05em 0.12em;
-  background: #ffe14d;
-  color: #000000;
-}
-li.is-dim mark {
-  background: #fff4bf;
-  color: inherit;
+li.is-dim .low,
+li.is-dim .fixed {
+  border-bottom-color: var(--faint);
 }
 
 .notes {

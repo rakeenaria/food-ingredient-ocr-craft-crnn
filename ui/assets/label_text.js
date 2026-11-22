@@ -1,11 +1,14 @@
-// The label text box: the text as read, with words to check (dotted underline)
-// and words corrected automatically (yellow). Hovering or tapping a corrected
-// word shows what was read, with Undo. Copy, download and editing all happen in
-// the browser.
+// The label text box: the text as read, with allergen words in the colors of
+// their group (outlined when the label only says "may contain"), words to check
+// (red dotted underline) and words corrected automatically (purple dotted
+// underline). Hovering or tapping a corrected word shows what was read, with
+// Undo. Copy, download and editing all happen in the browser.
 //
 // Data from Python:
 //   text       the text to show
 //   marks      [{ start, end, kind: "low" | "fixed" | "undone", id, original, replacement, tip }]
+//   allergens  [{ start, end, group, maybe }]   allergen words
+//   palette    { group: { fill, ink, line } }   allergen colors
 //   rejected   ids of the words whose correction was undone
 //   editing    show the editor instead of the text
 //   editText   the text to start editing with; editToken changes for each new edit
@@ -59,41 +62,101 @@ function createInstance(root) {
   let copyTimer = 0;
 
   // ------------------------------------------------------------------ text
+  // Ranges in text order, without overlaps or ranges past the end of the text.
+  function ranges(list, length) {
+    const kept = [];
+    let cursor = 0;
+    const sorted = (Array.isArray(list) ? list : [])
+      .filter((item) => item && Number(item.end) > Number(item.start))
+      .sort((a, b) => Number(a.start) - Number(b.start));
+    for (const item of sorted) {
+      const start = Number(item.start);
+      const end = Number(item.end);
+      if (start < cursor || start < 0 || end > length) continue;
+      kept.push({ ...item, start, end });
+      cursor = end;
+    }
+    return kept;
+  }
+
+  // A word to check or a corrected word; it holds the pieces of that word.
+  function markElement(mark, piece) {
+    const span = document.createElement("span");
+    if (mark.kind === "fixed" || mark.kind === "undone") {
+      span.className = mark.kind === "fixed" ? "fix" : "fix is-undone";
+      span.tabIndex = 0;
+      span.setAttribute("role", "button");
+      span.setAttribute("aria-haspopup", "dialog");
+      span.setAttribute("aria-expanded", "false");
+      span.setAttribute(
+        "aria-label",
+        mark.kind === "fixed" ? `${piece}, corrected from ${mark.original}` : `${piece}, could be ${mark.replacement}`,
+      );
+      span._mark = mark;
+    } else {
+      span.className = "low";
+      if (mark.tip) span.title = mark.tip;
+    }
+    return span;
+  }
+
+  // An allergen word, or the part of one that falls inside or outside a mark.
+  function chipElement(piece, chip, isStart, isEnd, palette, titled) {
+    const span = document.createElement("span");
+    span.className = `chip${chip.maybe ? " is-maybe" : ""}${isStart ? " is-start" : ""}${isEnd ? " is-end" : ""}`;
+    const colors = palette[chip.group];
+    if (colors) {
+      span.style.setProperty("--tag", colors.fill);
+      span.style.setProperty("--tag-ink", colors.ink);
+      span.style.setProperty("--tag-line", colors.line);
+    }
+    if (titled) span.title = chip.maybe ? `May contain: ${chip.group}` : `Allergen: ${chip.group}`;
+    span.textContent = piece;
+    return span;
+  }
+
   function renderText() {
     closePop();
     const text = String(data.text || "");
-    const marks = (Array.isArray(data.marks) ? data.marks : [])
-      .filter((mark) => mark && Number(mark.end) > Number(mark.start))
-      .sort((a, b) => a.start - b.start);
-    const nodes = [];
-    let cursor = 0;
-    for (const mark of marks) {
-      const start = Number(mark.start);
-      const end = Number(mark.end);
-      if (start < cursor || end > text.length) continue;
-      if (start > cursor) nodes.push(document.createTextNode(text.slice(cursor, start)));
-      const piece = text.slice(start, end);
-      const span = document.createElement("span");
-      span.textContent = piece;
-      if (mark.kind === "fixed" || mark.kind === "undone") {
-        span.className = mark.kind === "fixed" ? "fix" : "fix is-undone";
-        span.tabIndex = 0;
-        span.setAttribute("role", "button");
-        span.setAttribute("aria-haspopup", "dialog");
-        span.setAttribute("aria-expanded", "false");
-        span.setAttribute(
-          "aria-label",
-          mark.kind === "fixed" ? `${piece}, corrected from ${mark.original}` : `${piece}, could be ${mark.replacement}`,
-        );
-        span._mark = mark;
-      } else {
-        span.className = "low";
-        if (mark.tip) span.title = mark.tip;
-      }
-      nodes.push(span);
-      cursor = end;
+    const marks = ranges(data.marks, text.length);
+    const chips = ranges(data.allergens, text.length);
+    const palette = data.palette && typeof data.palette === "object" ? data.palette : {};
+    // Cut the text wherever a mark or an allergen word starts or ends, then
+    // give each mark (one word) its pieces.
+    const cuts = new Set([0, text.length]);
+    for (const range of [...marks, ...chips]) {
+      cuts.add(range.start);
+      cuts.add(range.end);
     }
-    if (cursor < text.length) nodes.push(document.createTextNode(text.slice(cursor)));
+    const points = [...cuts].sort((a, b) => a - b);
+    const nodes = [];
+    let m = 0;
+    let c = 0;
+    let markEl = null;
+    let markOf = null;
+    for (let k = 0; k + 1 < points.length; k++) {
+      const start = points[k];
+      const end = points[k + 1];
+      while (m < marks.length && marks[m].end <= start) m++;
+      while (c < chips.length && chips[c].end <= start) c++;
+      const mark = m < marks.length && marks[m].start <= start ? marks[m] : null;
+      const chip = c < chips.length && chips[c].start <= start ? chips[c] : null;
+      const piece = text.slice(start, end);
+      const node = chip
+        ? chipElement(piece, chip, start === chip.start, end === chip.end, palette, !mark)
+        : document.createTextNode(piece);
+      if (!mark) {
+        markEl = markOf = null;
+        nodes.push(node);
+        continue;
+      }
+      if (markOf !== mark) {
+        markOf = mark;
+        markEl = markElement(mark, text.slice(mark.start, mark.end));
+        nodes.push(markEl);
+      }
+      markEl.append(node);
+    }
     textEl.replaceChildren(...nodes);
   }
 
@@ -294,7 +357,7 @@ function createInstance(root) {
       signature = null;
       return;
     }
-    const nextSignature = JSON.stringify([next.text, next.marks]);
+    const nextSignature = JSON.stringify([next.text, next.marks, next.allergens, next.palette]);
     if (nextSignature !== signature) {
       signature = nextSignature;
       renderText();
