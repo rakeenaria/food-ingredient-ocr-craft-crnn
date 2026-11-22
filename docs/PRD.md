@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | v0.6, approved (renamed; first deploy feedback incorporated) |
+| Status | v0.7, approved (M5 done: live at ingredient-facts.streamlit.app) |
 | Date | 2026-11-21 |
 | Owner | Rakeen Aria Alireza |
 | Name | Ingredient Facts (named Ingredient Reader until 2026-11-22) |
@@ -235,4 +235,13 @@ First deploy feedback (2026-11-22):
   - The first scan takes 3.9 s when the visitor spends a few seconds cropping, because the models load meanwhile.
   - Server-side rendering is not available in Streamlit and would not have helped: the time was spent in Python before the first screen, not in rendering.
 - **Fact tables keep figures on one line on phones.** Long labels wrap instead.
+
+M5 results, measured on Streamlit Community Cloud (2026-11-22):
+
+- **The public app is live at <https://ingredient-facts.streamlit.app>,** deployed from `master`. The weights are served from `rakeenarya/ingredient-reader`.
+- **N1, speed.** The cropped sample labels take 3.5 to 4.9 s per scan in the engine, and the median from Read to results is 4.9 s over the 5 samples. A dense 1080 × 1920 phone photo with 112 words took 9.4 s. A smaller detection canvas for large photos could speed this up, but it needs an accuracy check first.
+- **N2, responsiveness.** After results, "Show original lines" responds in 0.45 s and the photo view switch in 0.44 s. Word details opens in 0.04 s and the search answers in 0.01 s.
+- **N3, memory.** The peak memory is 1,691 MB, which meets the 2.0 GB target within the 2.7 GB limit.
+- **Phones.** The iPhone test passed (Safari, camera and upload). An Android phone was not available, so it is part of the tester round in section 9.
+- **Still open: the success criteria in section 9.** 3 to 5 testers, including one Android user, need to complete a scan-to-copy on their own phones.
 
