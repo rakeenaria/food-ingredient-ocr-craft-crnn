@@ -93,6 +93,30 @@
   color: var(--faint);
 }
 
+.items strong,
+.note-list strong {
+  font-weight: 800;
+}
+.tags {
+  margin-left: 0.4rem;
+}
+.tag {
+  display: inline-block;
+  margin: 0.1rem 0.25rem 0 0;
+  padding: 0 0.35rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.66rem;
+  font-weight: 800;
+  letter-spacing: 0.05em;
+  line-height: 1.6;
+  text-transform: uppercase;
+  vertical-align: 0.12em;
+}
+li.is-dim .tag {
+  background: var(--faint);
+}
+
 mark {
   padding: 0.05em 0.15em;
   background: #ffe14d;

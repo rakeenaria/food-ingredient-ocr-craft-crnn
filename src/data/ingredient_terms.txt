@@ -1,0 +1,87 @@
+# Common ingredient words, written from general food-label knowledge (not from
+# the thesis test split). scripts/build_vocabulary.py merges them with the words
+# of the train and validation labels into ingredient_vocabulary.txt.
+# Mixed-case spellings (NaCl) are kept as written; everything else is lower case.
+
+# basics and descriptors
+water sugar salt flour oil butter milk cream cheese egg eggs yeast honey vinegar starch syrup juice
+extract extracts concentrate concentrates powder powders solids flakes pieces seeds kernels puree paste
+sauce spices spice herbs herb flavour flavor flavours flavors flavouring flavoring flavourings flavorings
+colour color colours colors natural artificial identical nature added permitted edible vegetable refined
+hydrogenated partially fractionated interesterified modified roasted toasted dried dehydrated freeze frozen
+condensed evaporated skimmed skim whole full low fat fats reduced enriched fortified iodised iodized rock
+sea cane brown white raw organic pure instant malted fermented cultured pasteurised pasteurized homogenised
+homogenized concentrated crystallised crystallized invert liquid
+glucose fructose dextrose sucrose lactose maltose maltodextrin dextrin polydextrose inulin oligofructose
+isomalt maltitol sorbitol xylitol erythritol mannitol glycerol glycerin glycerine stevia steviol glycosides
+sucralose aspartame acesulfame saccharin cyclamate neotame thaumatin
+
+# fats and oils
+palm palmolein olein kernel coconut sunflower safflower canola rapeseed soybean soyabean soya soy corn maize
+cottonseed groundnut peanut olive sesame gingelly rice bran mustard linseed flaxseed shortening margarine
+lard tallow ghee butterfat vanaspati
+
+# grains, flours and pulses
+wheat maida atta semolina suji sooji durum spelt rye barley oat oats oatmeal millet sorghum jowar bajra ragi
+quinoa buckwheat tapioca cassava arrowroot potato potatoes cornflour cornstarch gram besan chickpea chickpeas
+lentil lentils pea peas bean beans gluten bread crumbs breadcrumbs noodles pasta vermicelli macaroni cereal
+cereals germ malt
+
+# dairy and egg
+buttermilk whey casein caseinate caseinates yogurt yoghurt curd paneer khoa lactalbumin lactoglobulin dairy
+yolk albumen albumin ovalbumin lysozyme mayonnaise meringue
+
+# nuts and seeds
+almond almonds badam cashew cashews hazelnut hazelnuts walnut walnuts pecan pecans pistachio pistachios
+macadamia brazil chestnut chestnuts peanuts groundnuts nut nuts pumpkin chia flax poppy tahini praline
+marzipan desiccated
+
+# fruit and vegetables
+apple banana mango orange lemon lime strawberry strawberries raspberry blueberry cranberry cranberries grape
+grapes raisin raisins sultanas currants dates fig figs apricot peach pear pineapple papaya guava cherry
+cherries tomato tomatoes onion onions garlic ginger carrot carrots celery spinach cabbage cucumber pepper
+peppers capsicum chilli chili chillies chilies paprika mushroom mushrooms olives beetroot sweetcorn
+
+# spices and herbs
+black cinnamon clove cloves cardamom nutmeg mace cumin coriander turmeric fenugreek fennel aniseed saffron
+kesar vanilla vanillin ethyl mint basil oregano thyme rosemary parsley dill sage bay leaves leaf curry masala
+asafoetida ajwain tamarind garam condiments seasoning
+
+# meat, fish and shellfish
+chicken beef pork lamb mutton turkey ham bacon gelatin gelatine fish anchovy anchovies tuna salmon cod sardine
+sardines mackerel shrimp prawn prawns crab lobster squid oyster mussel clam shellfish crustacean broth stock
+meat
+
+# cocoa and confectionery
+cocoa chocolate cacao caramel toffee fudge nougat candy candied glazing shellac carnauba beeswax gum arabic
+acacia
+
+# additives and processing aids
+acid acids citric ascorbic acetic lactic malic tartaric fumaric phosphoric sorbic benzoic propionic ascorbate
+citrate citrates phosphate phosphates diphosphate pyrophosphate polyphosphate triphosphate carbonate
+carbonates bicarbonate hydrogen sodium potassium calcium magnesium ammonium iron ferrous ferric zinc copper
+manganese iodide iodate chloride sulphate sulfate sulphite sulfite sulphites sulfites metabisulphite
+metabisulfite bisulphite bisulfite nitrite nitrate benzoate sorbate propionate acetate lactate malate tartrate
+glutamate monosodium disodium inosinate guanylate ribonucleotides lecithin lecithins emulsifier emulsifiers
+emulsifying stabiliser stabilizer stabilisers stabilizers thickener thickeners gelling agent agents raising
+leavening baking soda preservative preservatives antioxidant antioxidants acidity regulator regulators
+anticaking humectant humectants sweetener sweeteners enhancer enhancers improver conditioner treatment
+firming bulking carrier foaming colouring coloring colourings colorings carrageenan xanthan guar locust carob
+pectin agar alginate alginates cellulose methylcellulose carboxymethylcellulose hydroxypropyl pregelatinised
+mono diglycerides glycerides esters polysorbate sorbitan stearate stearoyl lactylate tocopherol tocopherols
+tocopheryl ascorbyl palmitate butylated hydroxyanisole hydroxytoluene annatto curcumin carotene carotenes
+beta apocarotenal carmine cochineal anthocyanins chlorophyll chlorophyllin riboflavin tartrazine sunset
+yellow allura red ponceau brilliant blue indigo carmoisine erythrosine titanium dioxide class silica talc
+NaCl KCl
+
+# vitamins and minerals
+vitamin vitamins mineral minerals thiamine thiamin niacin niacinamide nicotinamide pantothenate pantothenic
+pyridoxine biotin folic folate cobalamin cyanocobalamin cholecalciferol ergocalciferol retinol retinyl
+phylloquinone mononitrate hydrochloride premix
+
+# other common words on ingredient lists
+ice culture cultures live active probiotic bacteria enzyme enzymes rennet lactase protein proteins isolate
+hydrolysed hydrolyzed hydrolysate fibre fiber dietary oligosaccharide oligosaccharides collagen nitrogen
+carbon gas packaging contains contain may traces trace ingredients ingredient and or with from of the as in
+less than more each per cent percent used only total allergen allergens allergy advice information product
+products facility shared equipment processes manufactured produced packed

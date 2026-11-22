@@ -61,6 +61,17 @@ button[data-testid="stBaseButton-secondary"] p, button[data-testid="stBaseButton
 .ir-diff .ir-text { font-size: 0.98rem; line-height: 1.65; }
 .ir-diff-label { margin: 0 0 0.3rem; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
 @media (max-width: 640px) { .ir-meter { grid-template-columns: 1fr auto; } .ir-meter-name { grid-column: 1 / -1; } .ir-diff { grid-template-columns: 1fr; } }
+.ir-allergens { margin: 0.25rem 0 1rem; padding: 0.75rem 0.9rem 0.6rem; border: 2px solid #111; }
+.ir-allergens-title { margin: 0 0 0.45rem; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
+dl.ir-allergens-row { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0.3rem 0.75rem; align-items: baseline; margin: 0 !important; padding: 0.35rem 0 !important; border-top: 1px solid #e4e4e0; }
+.ir-allergens-row dt { margin: 0 !important; padding: 0 !important; font-weight: 800; }
+.ir-allergens-row dd { margin: 0 !important; padding: 0 !important; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem; }
+.ir-tag { display: inline-block; padding: 0.1rem 0.4rem; background: #111; color: #fff; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+.ir-tag.is-maybe { background: #fff; color: #111; box-shadow: inset 0 0 0 1.5px #111; }
+.ir-allergens .ir-note { margin-top: 0.45rem; }
+.ir-subhead { margin: 1rem 0 0.25rem; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
+.ir-words .fix { display: block; margin-top: 0.15rem; font-size: 0.82rem; font-weight: 500; color: #4a4a46; }
+@media (max-width: 480px) { .ir-allergens-row { grid-template-columns: 1fr; } }
 [data-testid="stExpander"] details { border: 2px solid #111111; }
 [data-testid="stExpander"] summary p { font-weight: 800; }
 .ir-steps .short, .ir-words .short { display: none; }
@@ -185,13 +196,44 @@ def text_diff(reference: str, candidate: str, *, reference_label: str, candidate
     )
 
 
-def word_table(rows: Iterable[tuple[int, str, str, float, bool]]) -> None:
-    """Word details: (number, thumbnail data URL, text, confidence, needs checking)."""
+def allergen_panel(contains: list[str], may_contain: list[str], checks: list[tuple[str, str, list[str]]]) -> None:
+    """The allergen box above the ingredient list (PRD P8).
+
+    ``checks`` are (word as read, suggested word, groups) for allergens that only
+    appear once a suggested fix is applied.
+    """
+    def tags(groups, maybe=False):
+        css = "ir-tag is-maybe" if maybe else "ir-tag"
+        return "".join(f'<span class="{css}">{escape(group)}</span>' for group in groups)
+
+    rows = []
+    if contains:
+        rows.append(("Contains", tags(contains)))
+    if may_contain:
+        rows.append(("May contain", tags(may_contain, maybe=True)))
+    for original, replacement, groups in checks:
+        rows.append(("Check", f"“{escape(original)}” may be “{escape(replacement)}” {tags(groups, maybe=True)}"))
+    if rows:
+        body = "".join(f'<dl class="ir-allergens-row"><dt>{label}</dt><dd>{value}</dd></dl>' for label, value in rows)
+        small = "Found by matching words in the text. Unusual names and misread words can be missed, so check the label."
+    else:
+        body = '<p class="ir-note" style="margin:0">No common allergens were found in the text.</p>'
+        small = "Unusual names and misread words can be missed, so check the label."
+    st.html(
+        f'<div class="ir-allergens"><p class="ir-allergens-title">Allergens</p>{body}'
+        f'<p class="ir-note">{escape(small)}</p></div>'
+    )
+
+
+def word_table(rows: Iterable[tuple]) -> None:
+    """Word details: (number, thumbnail data URL, text, confidence, needs checking[, suggested fix])."""
     body = []
-    for number, thumbnail, text, confidence, low in rows:
+    for number, thumbnail, text, confidence, low, *extra in rows:
         read = escape(text) or "&nbsp;"
         if low:
             read = f"<mark>{read}</mark>"
+        if extra and extra[0]:
+            read += f'<span class="fix">Suggested: {escape(extra[0])}</span>'
         image = f'<img src="{thumbnail}" alt="Word {number} as photographed">' if thumbnail else ""
         body.append(
             f'<tr><td class="n">{number}</td><td class="crop">{image}</td>'

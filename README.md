@@ -149,7 +149,7 @@ python scripts/run_demo.py --saved_model saved_models/FT_801010_off/best_accurac
 streamlit run app_streamlit.py     # Ingredient Facts: camera/upload -> crop & rotate -> read
 streamlit run researcher_app.py    # local researcher tools: run, inspect, evaluate, edit images
 ```
-- **Ingredient Facts** is the public app. Photos are cropped and rotated in the browser, the models load once, and results highlight words read with low confidence. The text is also split into a numbered, searchable ingredient list (statements such as "Contains: milk" are kept apart), and a word details table shows every word crop with its confidence.
+- **Ingredient Facts** is the public app. Photos are cropped and rotated in the browser, the models load once, and results highlight words read with low confidence. The text is also split into a numbered, searchable ingredient list (statements such as "Contains: milk" are kept apart), and a word details table shows every word crop with its confidence. Common allergens are flagged (contains / may contain), and likely misread words get a suggested fix you can apply.
 - **Researcher app** is for local experiments only and is never deployed. It has three pages:
   - **Run**: read a folder with any checkpoint in `saved_models/`. Inspect the overlay, CRAFT heatmaps, line crops, word crops with confidence, and the log. Save a run in the CLI layout to `outputs/runs/`.
   - **Evaluate**: compare checkpoints with the thesis protocols. Photos are scored end to end against an image-level `gt*.txt` (`test2.py`), and word images against an LMDB split (`test.py`). It reproduces the thesis numbers: 94.693% on the test split and 92.248% on the 5 photos.
@@ -169,13 +169,19 @@ streamlit run researcher_app.py    # local researcher tools: run, inspect, evalu
 |  |- ocr_pipeline.py                # canonical OCR pipeline implementation (CLI)
 |  |- ocr_engine.py                  # in-memory engine (models loaded once) for the web apps
 |  |- postprocess.py                 # reading-order text and the ingredient list parser
+|  |- allergens.py                   # allergen groups found in ingredient text
+|  |- correction.py                  # suggested fixes for misread words
+|  |- data/                          # ingredient vocabulary for the suggestions
 |- tests/
 |  |- test_engine_regression.py      # engine output must match the thesis pipeline
 |  |- test_postprocess.py            # ingredient list parser (no weights needed)
 |  |- test_research.py               # evaluation metrics (vs test2.py) and image editing
+|  |- test_allergens.py              # allergen matching
+|  |- test_correction.py             # suggested fixes
 |- research/                         # researcher app: checkpoints, evaluation, runs, pages
 |- scripts/
 |  |- run_demo.py                    # canonical runnable entrypoint
+|  |- build_vocabulary.py            # rebuilds src/data/ingredient_vocabulary.txt
 |- app_streamlit.py                  # public web app (Ingredient Facts)
 |- researcher_app.py                 # local researcher UI (not deployed)
 |- ui/                               # web app pages, styles and the camera/crop component

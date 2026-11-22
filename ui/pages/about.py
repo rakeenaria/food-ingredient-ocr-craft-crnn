@@ -27,6 +27,11 @@ st.html(
     "letters or digits.</li>"
     "<li><b>Split the list.</b> Commas outside brackets separate the ingredients. Statements such as "
     "“Contains: milk” are listed apart.</li>"
+    "<li><b>Spot allergens.</b> Words for nine common allergen groups are marked: milk, egg, peanut, tree nuts, "
+    "soy, wheat and other gluten cereals, fish, shellfish and sesame. “May contain” statements are kept "
+    "apart from the ingredients.</li>"
+    "<li><b>Suggest fixes.</b> A word that is not in an ingredient vocabulary but is a letter or two away from "
+    "a word that is gets a suggestion, such as “Vilater” to “Water”. You choose which fixes to apply.</li>"
     "</ol>"
 )
 
@@ -52,6 +57,8 @@ st.html(
     "<li>Printed English ingredient lists. Handwriting and other languages are not supported.</li>"
     "<li>One still photo at a time. There is no live video scanning.</li>"
     "<li>Small, blurry, glossy or curved text lowers accuracy. Crop to the list and use good light.</li>"
+    "<li>Allergens are found by matching words. Unusual names and misread words can be missed, "
+    "and a suggested fix can be wrong.</li>"
     "<li>OCR can be wrong. Always check the physical label, especially if you have an allergy.</li>"
     "</ul>"
 )

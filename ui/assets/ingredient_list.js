@@ -1,9 +1,11 @@
 // Ingredient list with an instant search. Everything runs in the browser.
 //
 // Data from Python:
-//   items: [{ text, marks: [[start, end], ...] }]   ingredients in label order
-//   notes: [{ text, marks }]                         statements such as "Contains: milk"
-// "marks" are character ranges of words read with low confidence.
+//   items: [{ text, marks, strong, allergens }]   ingredients in label order
+//   notes: [{ text, marks, strong, allergens }]   statements such as "Contains: milk"
+// "marks" are character ranges of words read with low confidence, "strong" the
+// ranges of allergen words (bold, as on real labels) and "allergens" the group
+// names shown as tags. Searching matches the text and the group names.
 
 const instances = new WeakMap();
 
@@ -25,23 +27,58 @@ function normalize(text) {
     .trim();
 }
 
-// Text with <mark> around low-confidence ranges, built without innerHTML.
+const LOW = 1;
+const ALLERGEN = 2;
+
+// Text with <mark> (low confidence) and <strong> (allergen) ranges plus allergen
+// tags, built without innerHTML.
 function fill(target, entry) {
   const text = String(entry.text || "");
-  const marks = (Array.isArray(entry.marks) ? entry.marks : [])
-    .filter((m) => Array.isArray(m) && m[0] < m[1])
-    .sort((a, b) => a[0] - b[0]);
-  let cursor = 0;
-  for (const [start, end] of marks) {
-    if (start < cursor) continue;
-    if (start > cursor) target.append(text.slice(cursor, start));
-    const mark = document.createElement("mark");
-    mark.textContent = text.slice(start, end);
-    mark.title = "Read with low confidence. Check it on the label.";
-    target.append(mark);
-    cursor = end;
+  const flags = new Uint8Array(text.length);
+  const flag = (ranges, bit) => {
+    for (const range of Array.isArray(ranges) ? ranges : []) {
+      if (!Array.isArray(range)) continue;
+      const end = Math.min(text.length, Number(range[1]) || 0);
+      for (let i = Math.max(0, Number(range[0]) || 0); i < end; i++) flags[i] |= bit;
+    }
+  };
+  flag(entry.marks, LOW);
+  flag(entry.strong, ALLERGEN);
+  for (let i = 0; i < text.length; ) {
+    let j = i + 1;
+    while (j < text.length && flags[j] === flags[i]) j++;
+    let node = document.createTextNode(text.slice(i, j));
+    if (flags[i] & ALLERGEN) {
+      const strong = document.createElement("strong");
+      strong.append(node);
+      node = strong;
+    }
+    if (flags[i] & LOW) {
+      const mark = document.createElement("mark");
+      mark.title = "Read with low confidence. Check it on the label.";
+      mark.append(node);
+      node = mark;
+    }
+    target.append(node);
+    i = j;
   }
-  if (cursor < text.length) target.append(text.slice(cursor));
+  const groups = Array.isArray(entry.allergens) ? entry.allergens : [];
+  if (groups.length) {
+    const box = document.createElement("span");
+    box.className = "tags";
+    for (const group of groups) {
+      const tag = document.createElement("span");
+      tag.className = "tag";
+      tag.textContent = group;
+      box.append(tag);
+    }
+    target.append(box);
+  }
+}
+
+function searchKey(entry) {
+  const groups = Array.isArray(entry.allergens) ? entry.allergens : [];
+  return normalize(`${entry.text || ""} ${groups.join(" ")}`);
 }
 
 function plural(count, one, many) {
@@ -65,14 +102,14 @@ function createInstance(root) {
       txt.className = "txt";
       fill(txt, item);
       li.append(txt);
-      return { el: li, key: normalize(item.text) };
+      return { el: li, key: searchKey(item) };
     });
     list.replaceChildren(...rows.map((row) => row.el));
     list.hidden = rows.length === 0;
     noteRows = notes.map((note) => {
       const li = document.createElement("li");
       fill(li, note);
-      return { el: li, key: normalize(note.text) };
+      return { el: li, key: searchKey(note) };
     });
     noteList.replaceChildren(...noteRows.map((row) => row.el));
     notesBox.hidden = noteRows.length === 0;

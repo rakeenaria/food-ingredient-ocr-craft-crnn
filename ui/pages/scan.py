@@ -6,6 +6,8 @@ import logging
 
 import streamlit as st
 
+from src.allergens import GROUPS, find_allergens, groups_in, summarize
+from src.correction import Suggestion, suggest_for_words
 from src.postprocess import ComposedText, Span, compose_text, join_wrapped_lines, parse_ingredients
 from ui import style
 from ui.components import copy_button, ingredient_list, label_capture
@@ -64,6 +66,8 @@ def reset() -> None:
     ss.editing = False
     for key in ("show_lines", "edit_area", "photo_view", "word_filter"):
         ss.pop(key, None)
+    for key in [key for key in ss if str(key).startswith("fix_")]:  # suggested-fix checkboxes
+        ss.pop(key, None)
 
 
 def current_base_text() -> str:
@@ -85,6 +89,21 @@ def undo_edits() -> None:
     ss.edited_text = None
 
 
+def apply_fixes() -> None:
+    """Apply the ticked suggestions to the text shown (PRD P9). Undo brings back the reading."""
+    if not ss.ocr:
+        return
+    chosen = {fix.index: fix.replacement for number, fix in enumerate(suggestions()) if ss.get(f"fix_{number}", True)}
+    composed = compose_text(ss.ocr["result"].words, as_lines=bool(ss.get("show_lines")))
+    text = composed.text
+    for index in sorted(chosen, key=lambda key: composed.spans[key][0] if composed.spans[key] else -1, reverse=True):
+        span = composed.spans[index]
+        if span is not None:
+            text = text[: span[0]] + chosen[index] + text[span[1] :]
+    if chosen:
+        ss.edited_text = text
+
+
 def fail(message: str) -> None:
     """Return to the capture step and show ``message`` inside the component."""
     ss.notice_token += 1
@@ -104,8 +123,23 @@ def low_confidence_marks(words, composed: ComposedText) -> list[style.Mark]:
     ]
 
 
+def suggestions() -> list[Suggestion]:
+    """Suggested fixes for the words that were probably misread (computed once per scan)."""
+    if "suggestions" not in ss.ocr:
+        ss.ocr["suggestions"] = suggest_for_words(ss.ocr["result"].words)
+    return ss.ocr["suggestions"]
+
+
+_MARKDOWN_CHARACTERS = set("\\`*_{}[]()#+-.!|<>~")
+
+
+def md_escape(text: str) -> str:
+    """Widget labels are Markdown; OCR text must show literally."""
+    return "".join("\\" + char if char in _MARKDOWN_CHARACTERS else char for char in text)
+
+
 def list_entries(spans: list[Span], marks: list[style.Mark]) -> list[dict]:
-    """Ingredient list rows with the marks that fall inside each of them."""
+    """Ingredient list rows with their low-confidence marks and allergen words."""
     entries = []
     for span in spans:
         inside = [
@@ -113,7 +147,16 @@ def list_entries(spans: list[Span], marks: list[style.Mark]) -> list[dict]:
             for start, end, _ in marks
             if start < span.end and end > span.start
         ]
-        entries.append({"text": span.text, "marks": inside})
+        hits = find_allergens(span.text)
+        found = {hit.group for hit in hits}
+        entries.append(
+            {
+                "text": span.text,
+                "marks": inside,
+                "strong": [[hit.start, hit.end] for hit in hits],
+                "allergens": [group for group in GROUPS if group in found],
+            }
+        )
     return entries
 
 
@@ -198,6 +241,21 @@ def render_no_text() -> None:
     st.button("Try another photo", type="primary", on_click=reset, width="stretch")
 
 
+def render_fixes() -> None:
+    """P9: suggested fixes for words that were probably misread, applied only on request."""
+    fixes = suggestions()
+    if not fixes:
+        return
+    st.html('<p class="ir-subhead">Possible misreadings</p>')
+    for number, fix in enumerate(fixes):
+        st.checkbox(f"{md_escape(fix.original)}  →  {md_escape(fix.replacement)}", value=True, key=f"fix_{number}")
+    st.button("Apply the ticked fixes", on_click=apply_fixes)
+    style.note(
+        "These words are not in the ingredient vocabulary but are a letter or two away from a word that is. "
+        "Applying them edits the text; <b>Undo my edits</b> brings back what was read."
+    )
+
+
 def render_text(all_words, to_check) -> str | None:
     """The label text with edit, copy and download. Returns the text if the user edited it."""
     style.section("Label text")
@@ -221,6 +279,7 @@ def render_text(all_words, to_check) -> str | None:
         if to_check:
             style.note("<mark>Highlighted</mark> words were read with low confidence. Check them against the label.")
         final_text = composed.text
+        render_fixes()
 
     copy_column, download_column = st.columns(2)
     with copy_column:
@@ -246,6 +305,20 @@ def render_ingredients(all_words, edited: str | None) -> None:
     parsed = parse_ingredients(text)
     count = len(parsed.items)
     style.section("Ingredients", f"{count} item" if count == 1 else f"{count} items")
+
+    # P8: allergens named in the list and its statements, plus ones a suggested fix would reveal.
+    if parsed.items:
+        summary = summarize([item.text for item in parsed.items], [note.text for note in parsed.notes])
+    else:
+        summary = summarize([text])
+    checks = []
+    if edited is None:
+        for fix in suggestions():
+            new = [g for g in groups_in(fix.replacement) if g not in groups_in(fix.original) and g not in summary.contains]
+            if new:
+                checks.append((fix.original, fix.replacement, new))
+    style.allergen_panel(list(summary.contains), list(summary.may_contain), checks)
+
     if not parsed.items:
         style.note(
             "No ingredient list was found in this text. Lists usually start with "
@@ -306,8 +379,10 @@ def render_word_details(words, to_check) -> None:
                 label_visibility="collapsed",
             )
         low = {id(word) for word in to_check}
+        all_words = ss.ocr["result"].words
+        fix_for = {id(all_words[fix.index]): fix.replacement for fix in suggestions()}
         rows = [
-            (number, thumbnail(word), word.text, word.confidence, id(word) in low)
+            (number, thumbnail(word), word.text, word.confidence, id(word) in low, fix_for.get(id(word)))
             for number, word in enumerate(words, start=1)
             if choice == "all" or id(word) in low
         ]

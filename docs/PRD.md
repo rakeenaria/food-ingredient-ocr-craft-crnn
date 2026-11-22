@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | v0.7, approved (M5 done: live at ingredient-facts.streamlit.app) |
+| Status | v0.8, approved (M6 built: allergens and suggested fixes) |
 | Date | 2026-11-21 |
 | Owner | Rakeen Aria Alireza |
 | Name | Ingredient Facts (named Ingredient Reader until 2026-11-22) |
@@ -103,9 +103,25 @@ Priorities use MoSCoW: Must, Should, Could.
 
 **P8. Allergen highlighting (Could, v1.1)**
 - Flag common allergens (milk, egg, peanut, tree nuts, soy, wheat/gluten, fish, shellfish, sesame) with a clear disclaimer.
+- Groups:
+  - The gluten group follows the Codex list of cereals containing gluten: wheat, rye, barley, oats, spelt and their malts and flours.
+  - Shellfish covers crustaceans and molluscs.
+- Matching:
+  - Matching is by whole words. Phrases naming another food ("coconut milk", "cocoa butter", "cream of tartar") and statements such as "gluten-free" or "free from milk" are ignored.
+  - "May contain" and shared-equipment statements are listed apart from what the product contains.
+- Display:
+  - An allergen box above the ingredient list shows what the product contains and what it may contain.
+  - Allergen words are bold in the list and each item carries tags. Searching an allergen name (for example "milk") also finds "whey" and "caseinate".
+  - When a suggested fix (P9) would reveal an allergen, the box shows it under "Check".
 
 **P9. Post-OCR correction (Could, v1.1)**
 - Suggest fixes from an ingredient vocabulary, for example `Vilater` to `Water` and `NaCI` to `NaCl`. The raw OCR text is always kept.
+- The vocabulary (`src/data/ingredient_vocabulary.txt`, built by `scripts/build_vocabulary.py`) holds about 1,000 words. It comes from the thesis train and validation labels plus hand-written common ingredient terms. The test split is left out so the feature can be evaluated on it.
+- A word is checked only when it is not in the vocabulary.
+  - The edit distance is cheaper for OCR slips such as I/l, O/0 and rn/m.
+  - A low-confidence word may be one or two edits away from the suggestion.
+  - A word the model was sure about only gets look-alike fixes.
+- The user ticks which fixes to apply. Applying edits the text, and Undo brings back the reading.
 
 ### Researcher app (local only)
 
@@ -244,4 +260,20 @@ M5 results, measured on Streamlit Community Cloud (2026-11-22):
 - **N3, memory.** The peak memory is 1,691 MB, which meets the 2.0 GB target within the 2.7 GB limit.
 - **Phones.** The iPhone test passed (Safari, camera and upload). An Android phone was not available, so it is part of the tester round in section 9.
 - **Still open: the success criteria in section 9.** 3 to 5 testers, including one Android user, need to complete a scan-to-copy on their own phones.
+
+M6 results (2026-11-22, built on `web-revamp`):
+
+- **Suggested fixes on the test split.** Of the 603 test words, which the vocabulary has never seen, 3 got a suggestion:
+  - 1 fixed a misreading (`INATURE` to `NATURE`).
+  - 1 corrected a misspelling printed on the label itself (`PERMITED` to `PERMITTED`).
+  - 1 was wrong (`basted` to `based`, the label said `Toasted`).
+  - Word accuracy stays at 94.693%: the feature is conservative and never applies anything on its own.
+- **Suggested fixes on photos, applying every suggestion.**
+  - On `gt10` (10 photos not used while building the feature), one fix (`manutactured`) raised word accuracy from 95.098% to 95.261%.
+  - On the 5 thesis photos, three fixes (`Vilater`, `NaCI`, `tocopheroi`) raised it from 92.248% to 94.574%. This is optimistic, because these photos were known during development.
+- **An option was dropped:** splitting merged words ("WHEATFLOUR"). It only matched words the labels themselves print merged ("Antifoaming", "ANDADDED").
+- **Allergens on the 191 OCR results from M3:**
+  - Milk and the gluten cereals were found in 92 photos each, soy in 45 and tree nuts in 40.
+  - "May contain" and shared-equipment statements were separated correctly in the spot checks.
+- **Tests:** 8 unit tests for allergens and 6 for the suggestions. The other suites and the engine regression (5/5) still pass.
 
