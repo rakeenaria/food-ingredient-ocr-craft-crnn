@@ -222,7 +222,7 @@ Resolved in review (v0.2):
 
 Decided for M5:
 
-- **The app was renamed "Ingredient Facts" after the first deploy (2026-11-22).** The name echoes the food-label design. The app is served at `ingredient-reader.streamlit.app` until the subdomain is changed.
+- **The app was renamed "Ingredient Facts" after the first deploy (2026-11-22).** The name echoes the food-label design. Its URL moves to `ingredient-facts.streamlit.app`; the Hugging Face weights repo keeps the name `rakeenarya/ingredient-reader`.
 - **The app deploys first from the `web-revamp` branch.** It is merged into `master` once it works online.
 - **Only an iPhone is available for testing now.** The Android check moves to the tester round in section 9.
 

@@ -35,7 +35,7 @@ git push -u origin web-revamp
    - Repository: `rakeenaria/food-ingredient-ocr-craft-crnn`
    - Branch: `web-revamp` (later `master`)
    - Main file path: `app_streamlit.py`
-   - App URL: `ingredient-reader`, which gives <https://ingredient-reader.streamlit.app>
+   - App URL: `ingredient-facts`, which gives <https://ingredient-facts.streamlit.app>. To change it later: the app's **⋮** menu → **Settings → General → App URL**.
 3. Open **Advanced settings**:
    - Choose Python **3.11**.
    - Add secrets only if the weights repository differs, for example `INGREDIENT_FACTS_WEIGHTS_REPO = "your-name/ingredient-reader"`.

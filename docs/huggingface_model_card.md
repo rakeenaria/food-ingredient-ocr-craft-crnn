@@ -14,7 +14,7 @@ tags:
 
 # Ingredient Facts: OCR weights for food ingredient labels
 
-These are the weights behind [Ingredient Facts](https://ingredient-reader.streamlit.app), which reads the ingredient list on a food label from a photo. They come from the undergraduate thesis *Pengembangan Sistem OCR Berbasis CRAFT dan CRNN untuk Pengenalan Teks Daftar Bahan pada Label Makanan* by Rakeen Aria Alireza. The code is at [github.com/rakeenaria/food-ingredient-ocr-craft-crnn](https://github.com/rakeenaria/food-ingredient-ocr-craft-crnn).
+These are the weights behind [Ingredient Facts](https://ingredient-facts.streamlit.app), which reads the ingredient list on a food label from a photo. They come from the undergraduate thesis *Pengembangan Sistem OCR Berbasis CRAFT dan CRNN untuk Pengenalan Teks Daftar Bahan pada Label Makanan* by Rakeen Aria Alireza. The code is at [github.com/rakeenaria/food-ingredient-ocr-craft-crnn](https://github.com/rakeenaria/food-ingredient-ocr-craft-crnn).
 
 ## Files
 
