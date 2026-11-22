@@ -1,4 +1,4 @@
-# Deploying Ingredient Reader
+# Deploying Ingredient Facts
 
 The public app (`app_streamlit.py`) runs on Streamlit Community Cloud, which is free and serves it over HTTPS (needed for the camera). The model weights are not in git: the app downloads them once from a public Hugging Face model repository. Neither service needs a token for this setup.
 
@@ -18,7 +18,7 @@ The researcher app (`researcher_app.py`) is never deployed. Only `app_streamlit.
 4. Add the model card the same way: upload `docs/huggingface_model_card.md` renamed to `README.md`. You can also paste its content into **Model card → Edit**.
 5. Compare each file's SHA-256 on the Hub with the table in the model card.
 
-The app looks for `rakeenarya/ingredient-reader` (the Hugging Face username differs from the GitHub one, `rakeenaria`). If you use another repository, change `WEIGHTS_REPO` in `ui/engine.py`, or set the `INGREDIENT_READER_WEIGHTS_REPO` secret in step 3.
+The app looks for `rakeenarya/ingredient-reader` (the Hugging Face username differs from the GitHub one, `rakeenaria`). If you use another repository, change `WEIGHTS_REPO` in `ui/engine.py`, or set the `INGREDIENT_FACTS_WEIGHTS_REPO` secret in step 3.
 
 ## 2. GitHub: push the branch
 
@@ -38,7 +38,7 @@ git push -u origin web-revamp
    - App URL: `ingredient-reader`, which gives <https://ingredient-reader.streamlit.app>
 3. Open **Advanced settings**:
    - Choose Python **3.11**.
-   - Add secrets only if the weights repository differs, for example `INGREDIENT_READER_WEIGHTS_REPO = "your-name/ingredient-reader"`.
+   - Add secrets only if the weights repository differs, for example `INGREDIENT_FACTS_WEIGHTS_REPO = "your-name/ingredient-reader"`.
 4. Click **Deploy**. The first build installs PyTorch (CPU) and takes several minutes. On its first start the app downloads the weights (about 280 MB) once.
 
 ## 4. Check the live app

@@ -1,1 +1,1 @@
-"""Streamlit UI for the public Ingredient Reader app (pages, components, styles)."""
+"""Streamlit UI for the public Ingredient Facts app (pages, components, styles)."""

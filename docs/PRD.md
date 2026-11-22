@@ -1,11 +1,11 @@
-# Product Requirements Document: Ingredient Reader
+# Product Requirements Document: Ingredient Facts
 
 | | |
 |---|---|
-| Status | v0.5, approved (M5 decisions incorporated) |
+| Status | v0.6, approved (renamed; first deploy feedback incorporated) |
 | Date | 2026-11-21 |
 | Owner | Rakeen Aria Alireza |
-| Name | Ingredient Reader |
+| Name | Ingredient Facts (named Ingredient Reader until 2026-11-22) |
 
 ## 1. Background
 
@@ -222,6 +222,17 @@ Resolved in review (v0.2):
 
 Decided for M5:
 
-- **The name "Ingredient Reader" is final.** The app URL is `ingredient-reader.streamlit.app`.
+- **The app was renamed "Ingredient Facts" after the first deploy (2026-11-22).** The name echoes the food-label design. The app is served at `ingredient-reader.streamlit.app` until the subdomain is changed.
 - **The app deploys first from the `web-revamp` branch.** It is merged into `master` once it works online.
 - **Only an iPhone is available for testing now.** The Android check moves to the tester round in section 9.
+
+First deploy feedback (2026-11-22):
+
+- **The web and iPhone tests passed.**
+- **The first screen no longer waits for PyTorch.**
+  - The models now load on a background thread as soon as any page is opened.
+  - Before the change, on a fresh CPU server the first screen took 5.9 s and the first scan 5.9 s. After it, the first screen takes 1.9 s.
+  - The first scan takes 3.9 s when the visitor spends a few seconds cropping, because the models load meanwhile.
+  - Server-side rendering is not available in Streamlit and would not have helped: the time was spent in Python before the first screen, not in rendering.
+- **Fact tables keep figures on one line on phones.** Long labels wrap instead.
+

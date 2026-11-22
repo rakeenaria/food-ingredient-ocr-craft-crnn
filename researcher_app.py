@@ -7,7 +7,7 @@ files by path.
 
 import streamlit as st
 
-st.set_page_config(page_title="Researcher · Ingredient Reader", page_icon=":material/biotech:", layout="wide")
+st.set_page_config(page_title="Researcher · Ingredient Facts", page_icon=":material/biotech:", layout="wide")
 
 pages = [
     st.Page("research/pages/run.py", title="Run", default=True),

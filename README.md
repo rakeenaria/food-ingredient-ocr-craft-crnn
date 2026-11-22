@@ -146,10 +146,10 @@ python scripts/run_demo.py --saved_model saved_models/FT_801010_off/best_accurac
 
 5. Web apps (Streamlit):
 ```bash
-streamlit run app_streamlit.py     # Ingredient Reader: camera/upload -> crop & rotate -> read
+streamlit run app_streamlit.py     # Ingredient Facts: camera/upload -> crop & rotate -> read
 streamlit run researcher_app.py    # local researcher tools: run, inspect, evaluate, edit images
 ```
-- **Ingredient Reader** is the public app. Photos are cropped and rotated in the browser, the models load once, and results highlight words read with low confidence. The text is also split into a numbered, searchable ingredient list (statements such as "Contains: milk" are kept apart), and a word details table shows every word crop with its confidence.
+- **Ingredient Facts** is the public app. Photos are cropped and rotated in the browser, the models load once, and results highlight words read with low confidence. The text is also split into a numbered, searchable ingredient list (statements such as "Contains: milk" are kept apart), and a word details table shows every word crop with its confidence.
 - **Researcher app** is for local experiments only and is never deployed. It has three pages:
   - **Run**: read a folder with any checkpoint in `saved_models/`. Inspect the overlay, CRAFT heatmaps, line crops, word crops with confidence, and the log. Save a run in the CLI layout to `outputs/runs/`.
   - **Evaluate**: compare checkpoints with the thesis protocols. Photos are scored end to end against an image-level `gt*.txt` (`test2.py`), and word images against an LMDB split (`test.py`). It reproduces the thesis numbers: 94.693% on the test split and 92.248% on the 5 photos.
@@ -176,7 +176,7 @@ streamlit run researcher_app.py    # local researcher tools: run, inspect, evalu
 |- research/                         # researcher app: checkpoints, evaluation, runs, pages
 |- scripts/
 |  |- run_demo.py                    # canonical runnable entrypoint
-|- app_streamlit.py                  # public web app (Ingredient Reader)
+|- app_streamlit.py                  # public web app (Ingredient Facts)
 |- researcher_app.py                 # local researcher UI (not deployed)
 |- ui/                               # web app pages, styles and the camera/crop component
 |- .streamlit/config.toml            # theme and server settings

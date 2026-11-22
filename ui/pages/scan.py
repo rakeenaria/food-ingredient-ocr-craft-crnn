@@ -6,11 +6,10 @@ import logging
 
 import streamlit as st
 
-from src.ocr_engine import draw_word_boxes
 from src.postprocess import ComposedText, Span, compose_text, join_wrapped_lines, parse_ingredients
 from ui import style
 from ui.components import copy_button, ingredient_list, label_capture
-from ui.engine import get_engine, log_scan
+from ui.engine import engine_ready, get_engine, log_scan
 from ui.imaging import (
     ImageError,
     decode_data_url,
@@ -136,11 +135,7 @@ def render_capture() -> None:
         on_submit=on_submit,
     )
     style.note("Works best with printed English ingredient lists. Photos are processed in memory and never stored.")
-    # Load the models while the visitor frames the photo, so the first scan is quick.
-    try:
-        get_engine()
-    except Exception:
-        logger.exception("Could not preload the OCR engine")
+    # The models are already loading in the background (app_streamlit.py), so nothing waits here.
 
 
 def process_submission() -> None:
@@ -154,6 +149,8 @@ def process_submission() -> None:
 
     st.image(to_display_rgb(image, max_side=1000), width="stretch")
     with st.status("Reading the label…", expanded=True) as status:
+        if not engine_ready():
+            status.write("Getting the reader ready. After a restart this takes a little longer…")
         try:
             engine = get_engine()
         except Exception:
@@ -270,6 +267,8 @@ def render_photo(image, words, to_check) -> None:
     if view == "Original":
         shown = image
     else:
+        from src.ocr_engine import draw_word_boxes  # results exist, so PyTorch is already loaded
+
         thickness = max(2, round(max(image.shape[:2]) / 700))
         shown = draw_word_boxes(
             image,
@@ -346,7 +345,7 @@ def render_results() -> None:
 # ---------------------------------------------------------------------- page
 style.inject()
 style.masthead(
-    "Ingredient Reader",
+    "Ingredient Facts",
     "Photograph the ingredient list on a food label. Get it back as clean text and a searchable list.",
 )
 

@@ -27,8 +27,9 @@ _CSS = r"""
 .ir-section .ir-aside { font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em; text-transform: none; font-variant-numeric: tabular-nums; }
 .ir-facts { width: 100%; margin: 0; border-collapse: collapse; font-size: 0.98rem; }
 .ir-facts th, .ir-facts td { padding: 0.45rem 0; border: 0; border-bottom: 1px solid #111; background: transparent; }
-.ir-facts th { text-align: left; font-weight: 800; white-space: nowrap; padding-right: 1rem; }
-.ir-facts td { text-align: right; font-variant-numeric: tabular-nums; overflow-wrap: anywhere; }
+.ir-facts th { text-align: left; font-weight: 800; padding-right: 1rem; }
+.ir-facts td { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.ir-facts td.ir-wrap { white-space: normal; overflow-wrap: anywhere; }
 .ir-facts tr:last-child th, .ir-facts tr:last-child td { border-bottom: 0; }
 .ir-text { padding: 1rem 1.1rem; border: 2px solid #111; background: #fff; font-size: 1.08rem; line-height: 1.75; overflow-wrap: anywhere; }
 .ir-text mark, .ir-note mark, .ir-words mark { background: #ffe14d; color: #000; padding: 0.05em 0.15em; box-shadow: inset 0 -2px 0 #000; }
@@ -107,8 +108,13 @@ def section(title: str, aside: str | None = None) -> None:
 
 
 def facts(rows: list[tuple[str, str]]) -> None:
-    body = "".join(f'<tr><th scope="row">{escape(label)}</th><td>{escape(value)}</td></tr>' for label, value in rows)
-    st.html(f'<table class="ir-facts">{body}</table>')
+    """A label-style table. Values stay on one line (numbers never break),
+    except long ones such as file paths, which may wrap anywhere."""
+    cells = []
+    for label, value in rows:
+        wrap = ' class="ir-wrap"' if len(value) > 24 or "/" in value or "\\" in value else ""
+        cells.append(f'<tr><th scope="row">{escape(label)}</th><td{wrap}>{escape(value)}</td></tr>')
+    st.html(f'<table class="ir-facts">{"".join(cells)}</table>')
 
 
 def note(html_text: str) -> None:

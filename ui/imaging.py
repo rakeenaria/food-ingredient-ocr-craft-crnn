@@ -4,13 +4,13 @@ from __future__ import annotations
 
 import base64
 import binascii
+from pathlib import Path
 
 import cv2 as cv
 import numpy as np
 import streamlit as st
 
-from src.ocr_engine import PROJECT_ROOT
-
+PROJECT_ROOT = Path(__file__).resolve().parents[1]  # not imported from src: that would load PyTorch
 SAMPLES_DIR = PROJECT_ROOT / "images" / "gambar_simulasi"
 SAMPLE_MIME = {".jpg": "image/jpeg", ".jpeg": "image/jpeg", ".png": "image/png", ".webp": "image/webp"}
 MAX_IMAGE_BYTES = 20 * 1024 * 1024
