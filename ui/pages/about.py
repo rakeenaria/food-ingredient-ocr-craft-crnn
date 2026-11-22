@@ -22,7 +22,7 @@ st.html(
     "<li><b>Read each word.</b> A CRNN (TPS-ResNet-BiLSTM-Attention), fine-tuned on 6,081 word images "
     "from food labels, recognizes the characters.</li>"
     "<li><b>Put it back together.</b> Words are reassembled in reading order, left to right and top to bottom.</li>"
-    "<li><b>Flag doubtful words.</b> Every word gets a confidence score, and words under 80% are highlighted. "
+    "<li><b>Flag doubtful words.</b> Every word gets a confidence score, and words under 80% get a dotted underline. "
     "On the thesis test set this flagged 6% of the words and caught 12 of the 14 words with misread "
     "letters or digits.</li>"
     "<li><b>Split the list.</b> Commas outside brackets separate the ingredients. Statements such as "
@@ -30,8 +30,9 @@ st.html(
     "<li><b>Spot allergens.</b> Words for nine common allergen groups are marked: milk, egg, peanut, tree nuts, "
     "soy, wheat and other gluten cereals, fish, shellfish and sesame. “May contain” statements are kept "
     "apart from the ingredients.</li>"
-    "<li><b>Suggest fixes.</b> A word that is not in an ingredient vocabulary but is a letter or two away from "
-    "a word that is gets a suggestion, such as “Vilater” to “Water”. You choose which fixes to apply.</li>"
+    "<li><b>Fix misreadings.</b> A word that is not in an ingredient vocabulary but is a letter or two away from "
+    "a word that is gets corrected, such as “Vilater” to “Water”. Corrections are marked in yellow, and you can "
+    "undo each one.</li>"
     "</ol>"
 )
 
@@ -58,7 +59,7 @@ st.html(
     "<li>One still photo at a time. There is no live video scanning.</li>"
     "<li>Small, blurry, glossy or curved text lowers accuracy. Crop to the list and use good light.</li>"
     "<li>Allergens are found by matching words. Unusual names and misread words can be missed, "
-    "and a suggested fix can be wrong.</li>"
+    "and an automatic correction can be wrong.</li>"
     "<li>OCR can be wrong. Always check the physical label, especially if you have an allergy.</li>"
     "</ul>"
 )

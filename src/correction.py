@@ -6,14 +6,15 @@ the thesis train and validation labels plus common ingredient terms). The
 closest vocabulary word by an OCR-aware edit distance is suggested when it is
 close enough: within one or two edits for a low-confidence word, but only a
 look-alike letter (I/l, O/0, rn/m...) for a word the model was sure about.
-Nothing here changes the OCR text; the caller decides what to apply.
+Nothing here changes the OCR result; ``apply_suggestions`` returns corrected
+copies of the words, and the caller decides which suggestions to apply.
 """
 
 from __future__ import annotations
 
 import re
-from collections.abc import Sequence
-from dataclasses import dataclass
+from collections.abc import Collection, Sequence
+from dataclasses import dataclass, replace
 from functools import lru_cache
 from pathlib import Path
 from typing import Protocol
@@ -165,3 +166,16 @@ def suggest_for_words(words: Sequence[WordLike]) -> list[Suggestion]:
         if replacement is not None:
             suggestions.append(Suggestion(index, word.text, replacement))
     return suggestions
+
+
+def apply_suggestions(words: Sequence[WordLike], suggestions: Sequence[Suggestion], *, skip: Collection[int] = ()) -> list:
+    """The words with each suggestion applied, except those whose index is in ``skip``.
+
+    Words must be dataclasses (such as ``Word``); a corrected word is a copy with
+    the new text, so its position and confidence stay as read.
+    """
+    corrected = list(words)
+    for fix in suggestions:
+        if fix.index not in skip:
+            corrected[fix.index] = replace(words[fix.index], text=fix.replacement)
+    return corrected

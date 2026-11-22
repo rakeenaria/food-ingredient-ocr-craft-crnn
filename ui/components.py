@@ -59,74 +59,61 @@ _ingredient_list = st.components.v2.component(
 )
 
 
-def ingredient_list(*, items: list[dict], notes: list[dict], key: str = "ingredients") -> None:
+def ingredient_list(*, items: list[dict], notes: list[dict], palette: dict, key: str = "ingredients") -> None:
     """Numbered ingredient list with an instant, in-browser search.
 
-    ``items`` and ``notes`` are ``{"text": str, "marks": [[start, end], ...]}``;
-    marks are character ranges of low-confidence words inside ``text``.
+    ``items`` and ``notes`` are ``{"text", "low", "fixed", "strong", "allergens"}``:
+    character ranges inside ``text`` of words to check (``[start, end]``), of
+    corrected words (``[start, end, word as read]``) and of allergen words, plus
+    the allergen groups. ``palette`` maps each group to its tag colors.
     """
-    _ingredient_list(key=key, data={"items": items, "notes": notes})
+    _ingredient_list(key=key, data={"items": items, "notes": notes, "palette": palette})
 
 
-_COPY_HTML ='<button type="button" class="copy"><span class="label">Copy text</span></button>'
-
-_COPY_CSS = """
-.copy {
-  appearance: none;
-  width: 100%;
-  min-height: 2.75rem;
-  padding: 0.55rem 1rem;
-  border: 2px solid #111111;
-  border-radius: 0;
-  background: #ffffff;
-  color: #111111;
-  font-family: var(--st-font, "Libre Franklin", sans-serif);
-  font-size: 0.95rem;
-  font-weight: 700;
-  cursor: pointer;
-}
-.copy:hover { background: #f3f3f1; }
-.copy.is-done { background: #111111; color: #ffffff; }
-.copy:focus-visible { outline: 3px solid #111111; outline-offset: 2px; }
-"""
-
-_COPY_JS = """
-export default function ({ parentElement, data }) {
-  const button = parentElement.querySelector("button");
-  const label = button.querySelector(".label");
-  const idle = (data && data.label) || "Copy text";
-  if (!button.classList.contains("is-done")) label.textContent = idle;
-  button.onclick = async () => {
-    const text = (data && data.text) || "";
-    let copied = false;
-    try {
-      await navigator.clipboard.writeText(text);
-      copied = true;
-    } catch (_) {
-      const area = document.createElement("textarea");
-      area.value = text;
-      area.setAttribute("readonly", "");
-      area.style.position = "fixed";
-      area.style.opacity = "0";
-      document.body.appendChild(area);
-      area.select();
-      try { copied = document.execCommand("copy"); } catch (_) { copied = false; }
-      area.remove();
-    }
-    label.textContent = copied ? "Copied" : "Copy failed";
-    button.classList.toggle("is-done", copied);
-    clearTimeout(button._resetTimer);
-    button._resetTimer = setTimeout(() => {
-      label.textContent = idle;
-      button.classList.remove("is-done");
-    }, 1600);
-  };
-}
-"""
-
-_copy_button = st.components.v2.component("copy_text_button", html=_COPY_HTML, css=_COPY_CSS, js=_COPY_JS)
+_label_text = st.components.v2.component(
+    "label_text",
+    html=_asset("label_text.html"),
+    css=_asset("label_text.css"),
+    js=_asset("label_text.js"),
+)
 
 
-def copy_button(text: str, *, key: str, label: str = "Copy text") -> None:
-    """A button that copies ``text`` to the clipboard (client-side)."""
-    _copy_button(key=key, data={"text": text, "label": label})
+def label_text(
+    *,
+    text: str,
+    marks: list[dict],
+    rejected: list[int],
+    editing: bool,
+    edit_text: str,
+    edit_token: int,
+    edited: bool,
+    key: str,
+    on_rejected: Callable[[], None],
+    on_draft: Callable[[], None],
+    on_revert: Callable[[], None],
+    file_name: str = "ingredients.txt",
+):
+    """The label text box with copy and download icons, corrections and an editor.
+
+    ``marks`` are ``{"start", "end", "kind", ...}`` ranges inside ``text``:
+    ``low`` (to check), ``fixed`` (corrected, with ``id``, ``original`` and
+    ``replacement``) or ``undone`` (a correction the user undid). State sent
+    back: ``rejected`` (ids of undone corrections) and ``draft`` (``{"token",
+    "text"}``, the editor's text when it loses focus); trigger: ``revert``.
+    """
+    return _label_text(
+        key=key,
+        data={
+            "text": text,
+            "marks": marks,
+            "rejected": rejected,
+            "editing": editing,
+            "editText": edit_text,
+            "editToken": edit_token,
+            "edited": edited,
+            "fileName": file_name,
+        },
+        on_rejected_change=on_rejected,
+        on_draft_change=on_draft,
+        on_revert_change=on_revert,
+    )

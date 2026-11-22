@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import base64
 import binascii
+from collections.abc import Collection
 from pathlib import Path
 
 import cv2 as cv
@@ -56,6 +57,55 @@ def to_display_rgb(image_bgr: np.ndarray, max_side: int = 1600) -> np.ndarray:
     if scale < 1.0:
         image_bgr = cv.resize(image_bgr, (round(width * scale), round(height * scale)), interpolation=cv.INTER_AREA)
     return cv.cvtColor(image_bgr, cv.COLOR_BGR2RGB)
+
+
+INK_BGR = (17, 17, 17)
+PAPER_BGR = (255, 255, 255)
+HIGHLIGHT_BGR = (77, 225, 255)  # #FFE14D, the highlighter yellow of corrected words
+
+
+def _dashed_polygon(canvas: np.ndarray, points: np.ndarray, color, thickness: int, dash: float, gap: float) -> None:
+    """Draw a closed polygon as dashes; every edge starts with a dash so corners show."""
+    for i in range(len(points)):
+        start = points[i].astype(np.float64)
+        end = points[(i + 1) % len(points)].astype(np.float64)
+        length = float(np.hypot(*(end - start)))
+        if length < 1:
+            continue
+        step = (end - start) / length
+        position = 0.0
+        while position < length:
+            a = start + step * position
+            b = start + step * min(position + dash, length)
+            cv.line(canvas, (round(a[0]), round(a[1])), (round(b[0]), round(b[1])), color, thickness, cv.LINE_AA)
+            position += dash + gap
+
+
+def draw_result_boxes(image_bgr: np.ndarray, words, *, check: Collection[int] = (), fixed: Collection[int] = ()) -> np.ndarray:
+    """A copy of the photo with a box around each word read.
+
+    Words to check get a dashed box, matching their dotted underline in the
+    text; corrected words a yellow one. ``check`` and ``fixed`` are indices
+    into ``words``. A light halo keeps boxes visible on dark packaging.
+    """
+    canvas = image_bgr.copy()
+    longest = max(canvas.shape[:2])
+    thickness = max(2, round(longest / 700))
+    dash, gap = max(8.0, longest / 70), max(5.0, longest / 120)
+    for index, word in enumerate(words):
+        if not word.text.strip():
+            continue
+        points = np.round(word.box).astype(np.int32)
+        if index in fixed:
+            cv.polylines(canvas, [points.reshape(-1, 1, 2)], True, INK_BGR, thickness + 2, cv.LINE_AA)
+            cv.polylines(canvas, [points.reshape(-1, 1, 2)], True, HIGHLIGHT_BGR, thickness, cv.LINE_AA)
+        elif index in check:
+            _dashed_polygon(canvas, points, PAPER_BGR, thickness + 2, dash, gap)
+            _dashed_polygon(canvas, points, INK_BGR, thickness, dash, gap)
+        else:
+            cv.polylines(canvas, [points.reshape(-1, 1, 2)], True, PAPER_BGR, thickness + 2, cv.LINE_AA)
+            cv.polylines(canvas, [points.reshape(-1, 1, 2)], True, INK_BGR, thickness, cv.LINE_AA)
+    return canvas
 
 
 def word_thumbnail(crop_bgr: np.ndarray, height: int = 48, max_width: int = 480) -> str:

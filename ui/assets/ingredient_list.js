@@ -1,11 +1,14 @@
 // Ingredient list with an instant search. Everything runs in the browser.
 //
 // Data from Python:
-//   items: [{ text, marks, strong, allergens }]   ingredients in label order
-//   notes: [{ text, marks, strong, allergens }]   statements such as "Contains: milk"
-// "marks" are character ranges of words read with low confidence, "strong" the
-// ranges of allergen words (bold, as on real labels) and "allergens" the group
-// names shown as tags. Searching matches the text and the group names.
+//   items: [{ text, low, fixed, strong, allergens }]   ingredients in label order
+//   notes: [{ text, low, fixed, strong, allergens }]   statements such as "Contains: milk"
+//   palette: { group: { fill, ink, line } }            allergen tag colors
+// "low" are character ranges of words read with low confidence (dotted
+// underline), "fixed" ranges of words corrected automatically ([start, end,
+// word as read], yellow), "strong" the ranges of allergen words (bold, as on
+// real labels) and "allergens" the group names shown as colored tags.
+// Searching matches the text and the group names.
 
 const instances = new WeakMap();
 
@@ -29,35 +32,47 @@ function normalize(text) {
 
 const LOW = 1;
 const ALLERGEN = 2;
+const FIXED = 4;
 
-// Text with <mark> (low confidence) and <strong> (allergen) ranges plus allergen
-// tags, built without innerHTML.
-function fill(target, entry) {
+// Text with dotted (low confidence), <mark> (corrected) and <strong> (allergen)
+// ranges plus colored allergen tags, built without innerHTML.
+function fill(target, entry, palette) {
   const text = String(entry.text || "");
   const flags = new Uint8Array(text.length);
+  const readAs = new Array(text.length).fill("");
   const flag = (ranges, bit) => {
     for (const range of Array.isArray(ranges) ? ranges : []) {
       if (!Array.isArray(range)) continue;
       const end = Math.min(text.length, Number(range[1]) || 0);
-      for (let i = Math.max(0, Number(range[0]) || 0); i < end; i++) flags[i] |= bit;
+      for (let i = Math.max(0, Number(range[0]) || 0); i < end; i++) {
+        flags[i] |= bit;
+        if (bit === FIXED) readAs[i] = String(range[2] || "");
+      }
     }
   };
-  flag(entry.marks, LOW);
+  flag(entry.low, LOW);
   flag(entry.strong, ALLERGEN);
+  flag(entry.fixed, FIXED);
   for (let i = 0; i < text.length; ) {
     let j = i + 1;
-    while (j < text.length && flags[j] === flags[i]) j++;
+    while (j < text.length && flags[j] === flags[i] && readAs[j] === readAs[i]) j++;
     let node = document.createTextNode(text.slice(i, j));
     if (flags[i] & ALLERGEN) {
       const strong = document.createElement("strong");
       strong.append(node);
       node = strong;
     }
-    if (flags[i] & LOW) {
+    if (flags[i] & FIXED) {
       const mark = document.createElement("mark");
-      mark.title = "Read with low confidence. Check it on the label.";
+      mark.title = `Corrected automatically. Read as “${readAs[i]}”.`;
       mark.append(node);
       node = mark;
+    } else if (flags[i] & LOW) {
+      const low = document.createElement("span");
+      low.className = "low";
+      low.title = "Read with low confidence. Check it on the label.";
+      low.append(node);
+      node = low;
     }
     target.append(node);
     i = j;
@@ -70,6 +85,11 @@ function fill(target, entry) {
       const tag = document.createElement("span");
       tag.className = "tag";
       tag.textContent = group;
+      const colors = palette && palette[group];
+      if (colors) {
+        tag.style.setProperty("--tag", colors.fill);
+        tag.style.setProperty("--tag-ink", colors.ink);
+      }
       box.append(tag);
     }
     target.append(box);
@@ -95,12 +115,12 @@ function createInstance(root) {
   let noteRows = [];
   let signature = null;
 
-  function render(items, notes) {
+  function render(items, notes, palette) {
     rows = items.map((item) => {
       const li = document.createElement("li");
       const txt = document.createElement("span");
       txt.className = "txt";
-      fill(txt, item);
+      fill(txt, item, palette);
       li.append(txt);
       return { el: li, key: searchKey(item) };
     });
@@ -108,7 +128,7 @@ function createInstance(root) {
     list.hidden = rows.length === 0;
     noteRows = notes.map((note) => {
       const li = document.createElement("li");
-      fill(li, note);
+      fill(li, note, palette);
       return { el: li, key: searchKey(note) };
     });
     noteList.replaceChildren(...noteRows.map((row) => row.el));
@@ -162,10 +182,11 @@ function createInstance(root) {
     update(data) {
       const items = Array.isArray(data.items) ? data.items : [];
       const notes = Array.isArray(data.notes) ? data.notes : [];
-      const next = JSON.stringify([items, notes]);
+      const palette = data.palette && typeof data.palette === "object" ? data.palette : {};
+      const next = JSON.stringify([items, notes, palette]);
       if (next !== signature) {
         signature = next;
-        render(items, notes);
+        render(items, notes, palette);
       }
       search();
     },

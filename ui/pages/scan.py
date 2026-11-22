@@ -3,29 +3,30 @@
 from __future__ import annotations
 
 import logging
+from dataclasses import dataclass
 
 import streamlit as st
 
-from src.allergens import GROUPS, find_allergens, groups_in, summarize
-from src.correction import Suggestion, suggest_for_words
-from src.postprocess import ComposedText, Span, compose_text, join_wrapped_lines, parse_ingredients
+from src.allergens import GROUPS, AllergenSummary, find_allergens, groups_in, summarize
+from src.correction import Suggestion, apply_suggestions, suggest_for_words
+from src.postprocess import ComposedText, IngredientList, Span, compose_text, join_wrapped_lines, parse_ingredients
 from ui import style
-from ui.components import copy_button, ingredient_list, label_capture
+from ui.components import ingredient_list, label_capture, label_text
 from ui.engine import engine_ready, get_engine, log_scan
 from ui.imaging import (
     ImageError,
     decode_data_url,
+    draw_result_boxes,
     sample_catalog,
     sample_data_url,
     to_display_rgb,
     word_thumbnail,
 )
 
-# Words read with less confidence than this are highlighted (PRD P4). Checked on the
-# thesis splits: on the test set it flags 6% of words and catches 12 of the 14 words
-# with misread letters or digits; 0.9 catches no more, 0.7 misses two more.
+# Words read with less confidence than this get a dotted underline (PRD P4). Checked
+# on the thesis splits: on the test set it flags 6% of words and catches 12 of the 14
+# words with misread letters or digits; 0.9 catches no more, 0.7 misses two more.
 LOW_CONFIDENCE = 0.80
-HIGHLIGHT_BGR = (77, 225, 255)  # #FFE14D, the highlighter yellow
 logger = logging.getLogger(__name__)
 
 ss = st.session_state
@@ -36,7 +37,11 @@ ss.setdefault("submission", None)  # payload received from the capture component
 ss.setdefault("notice", None)
 ss.setdefault("notice_token", 0)
 ss.setdefault("ocr", None)
-ss.setdefault("edited_text", None)
+ss.setdefault("scan_id", 0)  # every scan gets a fresh label text component
+ss.setdefault("edited_text", None)  # the user's own edit of the text
+ss.setdefault("rejected_fixes", frozenset())  # words whose automatic correction was undone
+ss.setdefault("edit_token", 0)  # changes each time editing starts
+ss.setdefault("edit_start", "")  # the text the editor starts with
 
 
 # ----------------------------------------------------------------- callbacks
@@ -60,48 +65,62 @@ def reset() -> None:
     ss.pending_image = None
     ss.notice = None
     ss.edited_text = None
+    ss.rejected_fixes = frozenset()
+    ss.edit_start = ""
     # Set, don't pop, the toggle that has a callback: popping drops its key mapping,
     # and a late toggle event from the browser would then call on_toggle_edit with
     # no "editing" key (AttributeError).
     ss.editing = False
-    for key in ("show_lines", "edit_area", "photo_view", "word_filter"):
-        ss.pop(key, None)
-    for key in [key for key in ss if str(key).startswith("fix_")]:  # suggested-fix checkboxes
+    for key in ("show_lines", "photo_view", "word_filter"):
         ss.pop(key, None)
 
 
-def current_base_text() -> str:
-    return compose_text(ss.ocr["result"].words, as_lines=bool(ss.get("show_lines"))).text
+def text_key() -> str:
+    return f"label_text_{ss.scan_id}"
+
+
+def text_state(name: str):
+    """A state value the label text component sent back."""
+    value = ss.get(text_key())
+    return value.get(name) if isinstance(value, dict) else None
+
+
+def auto_text() -> str:
+    """The text as shown before any edit: corrected words, as lines or as a paragraph."""
+    words = apply_suggestions(ss.ocr["result"].words, suggestions(), skip=ss.rejected_fixes)
+    return compose_text(words, as_lines=bool(ss.get("show_lines"))).text
 
 
 def on_toggle_edit() -> None:
     if not ss.ocr:  # a late toggle event after "Scan another label"
         return
     if ss.get("editing"):
-        ss.edit_area = ss.edited_text if ss.edited_text is not None else current_base_text()
-    else:
-        text = ss.get("edit_area", "")
-        changed = text.strip() and text.strip() != current_base_text().strip()
-        ss.edited_text = text if changed else None
+        ss.edit_token += 1
+        ss.edit_start = ss.edited_text if ss.edited_text is not None else auto_text()
 
 
-def undo_edits() -> None:
-    ss.edited_text = None
-
-
-def apply_fixes() -> None:
-    """Apply the ticked suggestions to the text shown (PRD P9). Undo brings back the reading."""
+def on_rejected() -> None:
+    """Undo or redo of an automatic correction (PRD P9)."""
     if not ss.ocr:
         return
-    chosen = {fix.index: fix.replacement for number, fix in enumerate(suggestions()) if ss.get(f"fix_{number}", True)}
-    composed = compose_text(ss.ocr["result"].words, as_lines=bool(ss.get("show_lines")))
-    text = composed.text
-    for index in sorted(chosen, key=lambda key: composed.spans[key][0] if composed.spans[key] else -1, reverse=True):
-        span = composed.spans[index]
-        if span is not None:
-            text = text[: span[0]] + chosen[index] + text[span[1] :]
-    if chosen:
-        ss.edited_text = text
+    value = text_state("rejected")
+    ids = value if isinstance(value, list) else []
+    ss.rejected_fixes = frozenset(int(item) for item in ids if isinstance(item, (int, float)))
+
+
+def on_draft() -> None:
+    """The editor lost focus: keep its text if it differs from the text as read."""
+    if not ss.ocr:
+        return
+    draft = text_state("draft")
+    if not isinstance(draft, dict) or draft.get("token") != ss.edit_token:
+        return  # from an earlier edit
+    text = str(draft.get("text") or "")
+    ss.edited_text = text if text.strip() and text.strip() != auto_text().strip() else None
+
+
+def on_revert() -> None:
+    ss.edited_text = None
 
 
 def fail(message: str) -> None:
@@ -114,50 +133,126 @@ def fail(message: str) -> None:
 
 
 # ------------------------------------------------------------------ helpers
-def low_confidence_marks(words, composed: ComposedText) -> list[style.Mark]:
-    """Where the words to check sit in ``composed.text``."""
-    return [
-        (span[0], span[1], f"Confidence {word.confidence:.0%}. Check it on the label.")
-        for word, span in zip(words, composed.spans)
-        if span is not None and word.confidence < LOW_CONFIDENCE
-    ]
-
-
 def suggestions() -> list[Suggestion]:
-    """Suggested fixes for the words that were probably misread (computed once per scan)."""
+    """Corrections for the words that were probably misread (computed once per scan)."""
     if "suggestions" not in ss.ocr:
         ss.ocr["suggestions"] = suggest_for_words(ss.ocr["result"].words)
     return ss.ocr["suggestions"]
 
 
-_MARKDOWN_CHARACTERS = set("\\`*_{}[]()#+-.!|<>~")
+@dataclass
+class Reading:
+    """The scan with the user's choices applied, worked out once per run."""
+
+    words: list  # words as read, in reading order
+    corrected: list  # the same words with the corrections that were kept
+    fixes: dict[int, Suggestion]  # word index -> suggested correction
+    fixed: set[int]  # corrected words (yellow)
+    check: set[int]  # words to check (dotted underline): low confidence or a correction undone
+    seconds: float
 
 
-def md_escape(text: str) -> str:
-    """Widget labels are Markdown; OCR text must show literally."""
-    return "".join("\\" + char if char in _MARKDOWN_CHARACTERS else char for char in text)
+def current_reading() -> Reading:
+    result = ss.ocr["result"]
+    fixes = {fix.index: fix for fix in suggestions()}
+    undone = ss.rejected_fixes & fixes.keys()
+    fixed = set(fixes) - undone
+    check = {
+        index
+        for index, word in enumerate(result.words)
+        if word.text.strip() and index not in fixed and (word.confidence < LOW_CONFIDENCE or index in undone)
+    }
+    corrected = apply_suggestions(result.words, list(fixes.values()), skip=undone)
+    return Reading(result.words, corrected, fixes, fixed, check, result.timings["total"])
 
 
-def list_entries(spans: list[Span], marks: list[style.Mark]) -> list[dict]:
-    """Ingredient list rows with their low-confidence marks and allergen words."""
+def text_marks(reading: Reading, composed: ComposedText) -> list[dict]:
+    """Where the corrected words and the words to check sit in ``composed.text``."""
+    marks = []
+    for index, span in enumerate(composed.spans):
+        if span is None:
+            continue
+        start, end = span
+        if index in reading.fixes:
+            fix = reading.fixes[index]
+            kind = "fixed" if index in reading.fixed else "undone"
+            marks.append(
+                {"start": start, "end": end, "kind": kind, "id": index, "original": fix.original, "replacement": fix.replacement}
+            )
+        elif index in reading.check:
+            tip = f"Confidence {reading.words[index].confidence:.0%}. Check it on the label."
+            marks.append({"start": start, "end": end, "kind": "low", "tip": tip})
+    return marks
+
+
+@dataclass
+class Analysis:
+    """The ingredient list and allergens of the text shown."""
+
+    parsed: IngredientList
+    low: list[tuple[int, int]]  # words to check, inside the parsed text
+    fixed: list[tuple[int, int, str]]  # corrected words with the word as read
+    allergens: AllergenSummary
+    checks: list[tuple[str, str, list[str]]]  # undone corrections that would name an allergen
+
+
+def analyse(reading: Reading, edited: str | None) -> Analysis:
+    """P5 and P8 on the corrected text, or on the user's edit."""
+    paragraph = compose_text(reading.corrected)
+    if edited is not None and join_wrapped_lines(edited) != paragraph.text:
+        text, low, fixed = join_wrapped_lines(edited), [], []
+    else:
+        text = paragraph.text
+        low = [paragraph.spans[index] for index in sorted(reading.check) if paragraph.spans[index]]
+        fixed = [
+            (*paragraph.spans[index], reading.fixes[index].original)
+            for index in sorted(reading.fixed)
+            if paragraph.spans[index]
+        ]
+    parsed = parse_ingredients(text)
+    if parsed.items:
+        allergens = summarize([item.text for item in parsed.items], [note.text for note in parsed.notes])
+    else:
+        allergens = summarize([text])
+    checks = []
+    if edited is None:
+        for index, fix in reading.fixes.items():
+            if index in reading.fixed:
+                continue  # applied, so already in the summary
+            new = [g for g in groups_in(fix.replacement) if g not in groups_in(fix.original) and g not in allergens.contains]
+            if new:
+                checks.append((fix.original, fix.replacement, new))
+    return Analysis(parsed, low, fixed, allergens, checks)
+
+
+def list_entries(spans: list[Span], low: list[tuple[int, int]], fixed: list[tuple[int, int, str]]) -> list[dict]:
+    """Ingredient list rows with their words to check, corrected words and allergens."""
     entries = []
     for span in spans:
-        inside = [
-            [max(start, span.start) - span.start, min(end, span.end) - span.start]
-            for start, end, _ in marks
-            if start < span.end and end > span.start
-        ]
         hits = find_allergens(span.text)
         found = {hit.group for hit in hits}
         entries.append(
             {
                 "text": span.text,
-                "marks": inside,
+                "low": [
+                    [max(start, span.start) - span.start, min(end, span.end) - span.start]
+                    for start, end in low
+                    if start < span.end and end > span.start
+                ],
+                "fixed": [
+                    [max(start, span.start) - span.start, min(end, span.end) - span.start, original]
+                    for start, end, original in fixed
+                    if start < span.end and end > span.start
+                ],
                 "strong": [[hit.start, hit.end] for hit in hits],
                 "allergens": [group for group in GROUPS if group in found],
             }
         )
     return entries
+
+
+def plural(count: int, word: str) -> str:
+    return f"{count} {word if count == 1 else word + 's'}"
 
 
 def thumbnail(word) -> str:
@@ -221,10 +316,12 @@ def process_submission() -> None:
     log_scan(result.timings["total"], len(result.words), result.image_size)
 
     ss.ocr = {"result": result, "image": image}
+    ss.scan_id += 1
     ss.submission = None
     ss.pending_image = None
     ss.notice = None
     ss.edited_text = None
+    ss.rejected_fixes = frozenset()
     ss.stage = "results"
     st.rerun()
 
@@ -241,94 +338,8 @@ def render_no_text() -> None:
     st.button("Try another photo", type="primary", on_click=reset, width="stretch")
 
 
-def render_fixes() -> None:
-    """P9: suggested fixes for words that were probably misread, applied only on request."""
-    fixes = suggestions()
-    if not fixes:
-        return
-    st.html('<p class="ir-subhead">Possible misreadings</p>')
-    for number, fix in enumerate(fixes):
-        st.checkbox(f"{md_escape(fix.original)}  →  {md_escape(fix.replacement)}", value=True, key=f"fix_{number}")
-    st.button("Apply the ticked fixes", on_click=apply_fixes)
-    style.note(
-        "These words are not in the ingredient vocabulary but are a letter or two away from a word that is. "
-        "Applying them edits the text; <b>Undo my edits</b> brings back what was read."
-    )
-
-
-def render_text(all_words, to_check) -> str | None:
-    """The label text with edit, copy and download. Returns the text if the user edited it."""
-    style.section("Label text")
-    lines_column, edit_column = st.columns(2)
-    with lines_column:
-        show_lines = st.toggle("Show original lines", key="show_lines")
-    with edit_column:
-        editing = st.toggle("Edit text", key="editing", on_change=on_toggle_edit)
-    composed = compose_text(all_words, as_lines=show_lines)
-    edited = None
-    if editing:
-        st.text_area("Edit the text", key="edit_area", height=240, label_visibility="collapsed")
-        final_text = edited = ss.get("edit_area", composed.text)
-    elif ss.edited_text is not None:
-        style.marked_text(ss.edited_text)
-        style.note("You edited this text.")
-        st.button("Undo my edits", type="tertiary", on_click=undo_edits)
-        final_text = edited = ss.edited_text
-    else:
-        style.marked_text(composed.text, low_confidence_marks(all_words, composed))
-        if to_check:
-            style.note("<mark>Highlighted</mark> words were read with low confidence. Check them against the label.")
-        final_text = composed.text
-        render_fixes()
-
-    copy_column, download_column = st.columns(2)
-    with copy_column:
-        copy_button(final_text, key="copy_text")
-    with download_column:
-        st.download_button(
-            "Download .txt",
-            final_text,
-            file_name="ingredients.txt",
-            mime="text/plain",
-            width="stretch",
-        )
-    return edited
-
-
-def render_ingredients(all_words, edited: str | None) -> None:
-    """P5: the text split into ingredients, with an instant search."""
-    paragraph = compose_text(all_words)
-    if edited is not None and join_wrapped_lines(edited) != paragraph.text:
-        text, marks = join_wrapped_lines(edited), []
-    else:
-        text, marks = paragraph.text, low_confidence_marks(all_words, paragraph)
-    parsed = parse_ingredients(text)
-    count = len(parsed.items)
-    style.section("Ingredients", f"{count} item" if count == 1 else f"{count} items")
-
-    # P8: allergens named in the list and its statements, plus ones a suggested fix would reveal.
-    if parsed.items:
-        summary = summarize([item.text for item in parsed.items], [note.text for note in parsed.notes])
-    else:
-        summary = summarize([text])
-    checks = []
-    if edited is None:
-        for fix in suggestions():
-            new = [g for g in groups_in(fix.replacement) if g not in groups_in(fix.original) and g not in summary.contains]
-            if new:
-                checks.append((fix.original, fix.replacement, new))
-    style.allergen_panel(list(summary.contains), list(summary.may_contain), checks)
-
-    if not parsed.items:
-        style.note(
-            "No ingredient list was found in this text. Lists usually start with "
-            "“Ingredients:” and separate the items with commas."
-        )
-        return
-    ingredient_list(items=list_entries(parsed.items, marks), notes=list_entries(parsed.notes, marks), key="ingredient_list")
-
-
-def render_photo(image, words, to_check) -> None:
+def render_photo(image, reading: Reading) -> None:
+    """The photo first, kept short, with the words found boxed (P6)."""
     style.section("Photo")
     view = st.segmented_control(
         "Photo view",
@@ -337,80 +348,135 @@ def render_photo(image, words, to_check) -> None:
         key="photo_view",
         label_visibility="collapsed",
     )
-    if view == "Original":
-        shown = image
+    detected = view != "Original"
+    shown = draw_result_boxes(image, reading.words, check=reading.check, fixed=reading.fixed) if detected else image
+    with st.container(key="result_photo"):
+        st.image(to_display_rgb(shown), width="stretch")
+
+    count = sum(1 for word in reading.words if word.text.strip())
+    summary = f"<b>{plural(count, 'word')}</b> read in {reading.seconds:.1f} s."
+    if detected:
+        keys = []
+        if reading.check:
+            keys.append(f'<span class="ir-key"><span class="ir-box-key is-check"></span>{len(reading.check)} to check</span>')
+        if reading.fixed:
+            keys.append(f'<span class="ir-key"><span class="ir-box-key is-fixed"></span>{len(reading.fixed)} corrected</span>')
+        if keys:
+            summary += " &nbsp;" + " &nbsp; ".join(keys)
     else:
-        from src.ocr_engine import draw_word_boxes  # results exist, so PyTorch is already loaded
+        details = [f"{len(reading.check)} to check"] if reading.check else []
+        details += [f"{len(reading.fixed)} corrected"] if reading.fixed else []
+        if details:
+            summary += " " + ", ".join(details).capitalize() + "."
+    style.note(summary)
 
-        thickness = max(2, round(max(image.shape[:2]) / 700))
-        shown = draw_word_boxes(
-            image,
-            words,
-            color=(0, 0, 0),
-            thickness=thickness,
-            low_confidence_threshold=LOW_CONFIDENCE,
-            low_confidence_color=HIGHLIGHT_BGR,
-            outline_color=(255, 255, 255),
+
+def render_text(reading: Reading, edited: str | None) -> None:
+    """The label text with corrections, copy, download and editing (P3, P4, P9)."""
+    style.section("Label text")
+    with st.container(horizontal=True, gap="medium", key="text_toggles"):
+        show_lines = st.toggle("Show original lines", key="show_lines")
+        editing = st.toggle("Edit text", key="editing", on_change=on_toggle_edit)
+    composed = compose_text(reading.corrected, as_lines=show_lines)
+    if editing or edited is not None:
+        text, marks = (edited if edited is not None else composed.text), []
+    else:
+        text, marks = composed.text, text_marks(reading, composed)
+    label_text(
+        text=text,
+        marks=marks,
+        rejected=sorted(set(reading.fixes) - reading.fixed),
+        editing=editing,
+        edit_text=ss.edit_start,
+        edit_token=ss.edit_token,
+        edited=edited is not None,
+        key=text_key(),
+        on_rejected=on_rejected,
+        on_draft=on_draft,
+        on_revert=on_revert,
+    )
+    if editing or edited is not None:
+        return
+    legend = []
+    if reading.check:
+        legend.append('<span class="ir-low">Dotted</span> words were read with low confidence. Check them on the label.')
+    if reading.fixed:
+        legend.append(
+            '<span class="ir-fix">Yellow</span> words were corrected automatically. '
+            "Hover or tap one to see what was read, or to undo it."
         )
-    st.image(to_display_rgb(shown), width="stretch")
-    if view != "Original":
-        legend = "Black boxes are the words the reader found."
-        if to_check:
-            legend += " <mark>Yellow</mark> boxes are words to check."
-        style.note(legend)
+    if legend:
+        style.note(" ".join(legend))
 
 
-def render_word_details(words, to_check) -> None:
+def render_ingredients(analysis: Analysis) -> None:
+    """P5: the text split into ingredients, with an instant search."""
+    parsed = analysis.parsed
+    count = len(parsed.items)
+    style.section("Ingredients", plural(count, "item"))
+    if not parsed.items:
+        style.note(
+            "No ingredient list was found in this text. Lists usually start with "
+            "“Ingredients:” and separate the items with commas."
+        )
+        return
+    ingredient_list(
+        items=list_entries(parsed.items, analysis.low, analysis.fixed),
+        notes=list_entries(parsed.notes, analysis.low, analysis.fixed),
+        palette=style.allergen_palette(),
+        key="ingredient_list",
+    )
+
+
+def render_word_details(reading: Reading) -> None:
     """P6: each word crop next to what was read and how sure the reader was."""
     with st.expander("Word details"):
         style.note(
-            f"How each word looked to the reader, what it read and how sure it was. "
-            f"Words under {LOW_CONFIDENCE:.0%} confidence are <mark>highlighted</mark>."
+            "How each word looked to the reader, what it read and how sure it was. Flagged words were "
+            f'read with less than {LOW_CONFIDENCE:.0%} confidence (<span class="ir-low">dotted underline</span>) '
+            "or corrected automatically."
         )
+        numbered = [(index, word) for index, word in enumerate(reading.words) if word.text.strip()]
+        flagged = reading.check | reading.fixed
         choice = "all"
-        if to_check:
-            labels = {"check": f"Words to check ({len(to_check)})", "all": f"All words ({len(words)})"}
+        if flagged:
+            labels = {"flagged": f"Flagged ({len(flagged)})", "all": f"All words ({len(numbered)})"}
             choice = st.segmented_control(
                 "Words to show",
                 list(labels),
                 format_func=labels.get,
-                default="check",
+                default="flagged",
                 key="word_filter",
                 label_visibility="collapsed",
             )
-        low = {id(word) for word in to_check}
-        all_words = ss.ocr["result"].words
-        fix_for = {id(all_words[fix.index]): fix.replacement for fix in suggestions()}
-        rows = [
-            (number, thumbnail(word), word.text, word.confidence, id(word) in low, fix_for.get(id(word)))
-            for number, word in enumerate(words, start=1)
-            if choice == "all" or id(word) in low
-        ]
-        style.word_table(rows)
+        rows = []
+        for number, (index, word) in enumerate(numbered, start=1):
+            if choice != "all" and index not in flagged:
+                continue
+            note = None
+            if index in reading.fixes:
+                note = ("fixed" if index in reading.fixed else "suggested", reading.fixes[index].replacement)
+            rows.append((number, thumbnail(word), word.text, word.confidence, index in reading.check, note))
+        style.word_table(rows, low_style="underline")
 
 
 def render_results() -> None:
     result = ss.ocr["result"]
-    image = ss.ocr["image"]
     style.steps(4)
-
-    words = [word for word in result.words if word.text.strip()]  # in reading order
-    if not words:
+    if not any(word.text.strip() for word in result.words):
         render_no_text()
         return
-    to_check = [word for word in words if word.confidence < LOW_CONFIDENCE]
-    style.facts(
-        [
-            ("Words read", str(len(words))),
-            ("Words to check", str(len(to_check))),
-            ("Reading time", f"{result.timings['total']:.1f} s"),
-        ]
-    )
 
-    edited = render_text(result.words, to_check)
-    render_ingredients(result.words, edited)
-    render_photo(image, words, to_check)
-    render_word_details(words, to_check)
+    reading = current_reading()
+    edited = ss.edited_text
+    analysis = analyse(reading, edited)
+
+    # What matters most comes first: the photo, the allergens, then the text.
+    render_photo(ss.ocr["image"], reading)
+    style.allergen_panel(list(analysis.allergens.contains), list(analysis.allergens.may_contain), analysis.checks)
+    render_text(reading, edited)
+    render_ingredients(analysis)
+    render_word_details(reading)
 
     st.html('<hr class="ir-rule">')
     st.button("Scan another label", type="primary", on_click=reset, width="stretch")

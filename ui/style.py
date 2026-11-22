@@ -1,11 +1,14 @@
 """Visual system: a food-label look. White paper, black rules, Libre Franklin.
 
-The only color is the highlighter yellow that marks words to check (PRD D8).
-Blocks are rendered with st.html so OCR text is never parsed as Markdown.
+Color is kept for meaning (PRD D8): highlighter yellow for words corrected
+automatically, and one color per allergen group. Words to check get a dotted
+underline. Blocks are rendered with st.html so OCR text is never parsed as
+Markdown.
 """
 
 from __future__ import annotations
 
+import re
 from collections.abc import Iterable
 from html import escape
 
@@ -33,6 +36,18 @@ _CSS = r"""
 .ir-facts tr:last-child th, .ir-facts tr:last-child td { border-bottom: 0; }
 .ir-text { padding: 1rem 1.1rem; border: 2px solid #111; background: #fff; font-size: 1.08rem; line-height: 1.75; overflow-wrap: anywhere; }
 .ir-text mark, .ir-note mark, .ir-words mark { background: #ffe14d; color: #000; padding: 0.05em 0.15em; box-shadow: inset 0 -2px 0 #000; }
+.ir-low { text-decoration-line: underline; text-decoration-style: dotted; text-decoration-color: #111; text-decoration-thickness: 2px; text-underline-offset: 0.24em; text-decoration-skip-ink: none; }
+.ir-fix { padding: 0.05em 0.12em; background: #ffe14d; color: #000; }
+.ir-box-key { display: inline-block; width: 1.5em; height: 0.8em; margin: 0 0.3em 0 0; vertical-align: -0.05em; border: 2px solid #111; }
+.ir-box-key.is-check { border-style: dashed; }
+.ir-box-key.is-fixed { border-color: #ffe14d; box-shadow: 0 0 0 1px #111, inset 0 0 0 1px #111; }
+.ir-key { white-space: nowrap; }
+.st-key-result_photo img { display: block; width: auto !important; height: auto !important; max-width: 100%; max-height: 40vh; margin: 0 auto; }
+.st-key-result_photo [data-testid="stFullScreenFrame"] > div { margin-left: auto; margin-right: auto; }
+@media (max-width: 360px) {
+  .st-key-text_toggles { gap: 0.75rem !important; }
+  .st-key-text_toggles [data-testid="stWidgetLabel"] p { font-size: 0.9rem; }
+}
 .ir-note { margin: 0.5rem 0 0; font-size: 0.86rem; color: #4a4a46; }
 .ir-list { margin: 0.25rem 0 0; padding-left: 1.3rem; }
 .ir-list li { margin: 0.3rem 0; }
@@ -61,13 +76,13 @@ button[data-testid="stBaseButton-secondary"] p, button[data-testid="stBaseButton
 .ir-diff .ir-text { font-size: 0.98rem; line-height: 1.65; }
 .ir-diff-label { margin: 0 0 0.3rem; font-size: 0.72rem; font-weight: 800; letter-spacing: 0.06em; text-transform: uppercase; }
 @media (max-width: 640px) { .ir-meter { grid-template-columns: 1fr auto; } .ir-meter-name { grid-column: 1 / -1; } .ir-diff { grid-template-columns: 1fr; } }
-.ir-allergens { margin: 0.25rem 0 1rem; padding: 0.75rem 0.9rem 0.6rem; border: 2px solid #111; }
+.ir-allergens { margin: 1.25rem 0 0.25rem; padding: 0.75rem 0.9rem 0.6rem; border: 2px solid #111; }
 .ir-allergens-title { margin: 0 0 0.45rem; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; }
 dl.ir-allergens-row { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr); gap: 0.3rem 0.75rem; align-items: baseline; margin: 0 !important; padding: 0.35rem 0 !important; border-top: 1px solid #e4e4e0; }
 .ir-allergens-row dt { margin: 0 !important; padding: 0 !important; font-weight: 800; }
 .ir-allergens-row dd { margin: 0 !important; padding: 0 !important; display: flex; flex-wrap: wrap; align-items: baseline; gap: 0.3rem; }
-.ir-tag { display: inline-block; padding: 0.1rem 0.4rem; background: #111; color: #fff; font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
-.ir-tag.is-maybe { background: #fff; color: #111; box-shadow: inset 0 0 0 1.5px #111; }
+.ir-tag { display: inline-block; padding: 0.1rem 0.4rem; background: var(--tag, #111); color: var(--tag-ink, #fff); font-size: 0.74rem; font-weight: 800; letter-spacing: 0.04em; text-transform: uppercase; }
+.ir-tag.is-maybe { background: #fff; color: #111; box-shadow: inset 0 0 0 2px var(--tag-line, #111); }
 .ir-allergens .ir-note { margin-top: 0.45rem; }
 .ir-subhead { margin: 1rem 0 0.25rem; font-size: 0.78rem; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; }
 .ir-words .fix { display: block; margin-top: 0.15rem; font-size: 0.82rem; font-weight: 500; color: #4a4a46; }
@@ -86,15 +101,44 @@ dl.ir-allergens-row { display: grid; grid-template-columns: 7.5rem minmax(0, 1fr
 </style>
 """
 
+# One color per allergen group, matched to the food: (fill, text on the fill,
+# outline for "may contain"). Every text color passes WCAG AA (4.5:1) on its fill.
+ALLERGEN_COLORS = {
+    "Milk": ("#1F5FBF", "#FFFFFF", "#1F5FBF"),  # milk-carton blue
+    "Egg": ("#F2A007", "#111111", "#C98700"),  # yolk
+    "Peanut": ("#8A5A2B", "#FFFFFF", "#8A5A2B"),  # roasted peanut
+    "Tree nuts": ("#2E7D32", "#FFFFFF", "#2E7D32"),  # green
+    "Soy": ("#A3B83A", "#111111", "#7F9420"),  # edamame
+    "Wheat / gluten": ("#C99A2E", "#111111", "#A87C1C"),  # ripe wheat
+    "Fish": ("#0E7490", "#FFFFFF", "#0E7490"),  # sea blue
+    "Shellfish": ("#C8442B", "#FFFFFF", "#C8442B"),  # cooked shrimp
+    "Sesame": ("#E8D6A6", "#111111", "#A88B4E"),  # sesame seed
+}
+
+
+def allergen_slug(group: str) -> str:
+    """CSS-safe name of an allergen group: "Wheat / gluten" -> "wheat-gluten"."""
+    return re.sub(r"[^a-z]+", "-", group.lower()).strip("-")
+
+
+def allergen_palette() -> dict[str, dict[str, str]]:
+    """The allergen colors for the ingredient list component."""
+    return {group: {"fill": fill, "ink": ink, "line": line} for group, (fill, ink, line) in ALLERGEN_COLORS.items()}
+
+
+_ALLERGEN_CSS = " ".join(
+    f".ir-tag.a-{allergen_slug(group)} {{ --tag: {fill}; --tag-ink: {ink}; --tag-line: {line}; }}"
+    for group, (fill, ink, line) in ALLERGEN_COLORS.items()
+)
+_PAGE_CSS = _CSS.replace("</style>", _ALLERGEN_CSS + "</style>")
+
 STEP_NAMES = ("Capture", "Crop & rotate", "Read", "Results")
 SHORT_STEP_NAMES = ("Capture", "Crop", "Read", "Results")
-
-Mark = tuple[int, int, str]  # (start, end, tooltip) inside a text
 
 
 def inject(*, wide: bool = False) -> None:
     """Add the styles. ``wide`` lets pages use the full width (researcher app)."""
-    st.markdown(_CSS.replace("max-width: 46rem;", "max-width: 104rem;") if wide else _CSS, unsafe_allow_html=True)
+    st.markdown(_PAGE_CSS.replace("max-width: 46rem;", "max-width: 104rem;") if wide else _PAGE_CSS, unsafe_allow_html=True)
 
 
 def masthead(title: str, lede: str) -> None:
@@ -131,24 +175,6 @@ def facts(rows: list[tuple[str, str]]) -> None:
 def note(html_text: str) -> None:
     """Small print. ``html_text`` must already be escaped."""
     st.html(f'<p class="ir-note">{html_text}</p>')
-
-
-def marked_html(text: str, marks: Iterable[Mark]) -> str:
-    """Escaped ``text`` with ``<mark>`` around each range; line breaks become <br>."""
-    parts, cursor = [], 0
-    for start, end, tooltip in sorted(marks):
-        if start < cursor or start >= end:
-            continue
-        parts.append(escape(text[cursor:start]))
-        parts.append(f'<mark title="{escape(tooltip)}">{escape(text[start:end])}</mark>')
-        cursor = end
-    parts.append(escape(text[cursor:]))
-    return "".join(parts).replace("\n", "<br>")
-
-
-def marked_text(text: str, marks: Iterable[Mark] = ()) -> None:
-    """The OCR text in a ruled box, with low-confidence words highlighted."""
-    st.html(f'<div class="ir-text">{marked_html(text, marks)}</div>')
 
 
 def meters(rows: Iterable[tuple[str, float, str]], *, maximum: float = 100.0, unit: str = "%", decimals: int = 3) -> None:
@@ -204,7 +230,7 @@ def allergen_panel(contains: list[str], may_contain: list[str], checks: list[tup
     """
     def tags(groups, maybe=False):
         css = "ir-tag is-maybe" if maybe else "ir-tag"
-        return "".join(f'<span class="{css}">{escape(group)}</span>' for group in groups)
+        return "".join(f'<span class="{css} a-{allergen_slug(group)}">{escape(group)}</span>' for group in groups)
 
     rows = []
     if contains:
@@ -225,15 +251,26 @@ def allergen_panel(contains: list[str], may_contain: list[str], checks: list[tup
     )
 
 
-def word_table(rows: Iterable[tuple]) -> None:
-    """Word details: (number, thumbnail data URL, text, confidence, needs checking[, suggested fix])."""
+def word_table(rows: Iterable[tuple], *, low_style: str = "mark") -> None:
+    """Word details: (number, thumbnail data URL, text, confidence, needs checking[, note]).
+
+    ``note`` is ``("fixed", word)`` for a word corrected automatically or
+    ``("suggested", word)`` for a correction the user undid. ``low_style``
+    "underline" gives words to check a dotted underline (public app) instead of
+    the yellow highlight (researcher app).
+    """
     body = []
     for number, thumbnail, text, confidence, low, *extra in rows:
         read = escape(text) or "&nbsp;"
         if low:
-            read = f"<mark>{read}</mark>"
-        if extra and extra[0]:
-            read += f'<span class="fix">Suggested: {escape(extra[0])}</span>'
+            read = f'<span class="ir-low">{read}</span>' if low_style == "underline" else f"<mark>{read}</mark>"
+        note = extra[0] if extra else None
+        if note:
+            kind, word = note
+            if kind == "fixed":
+                read += f'<span class="fix">Corrected to <span class="ir-fix">{escape(word)}</span></span>'
+            else:
+                read += f'<span class="fix">Suggested: {escape(word)}</span>'
         image = f'<img src="{thumbnail}" alt="Word {number} as photographed">' if thumbnail else ""
         body.append(
             f'<tr><td class="n">{number}</td><td class="crop">{image}</td>'

@@ -104,8 +104,8 @@
   display: inline-block;
   margin: 0.1rem 0.25rem 0 0;
   padding: 0 0.35rem;
-  background: var(--ink);
-  color: var(--paper);
+  background: var(--tag, var(--ink));
+  color: var(--tag-ink, var(--paper));
   font-size: 0.66rem;
   font-weight: 800;
   letter-spacing: 0.05em;
@@ -114,19 +114,31 @@
   vertical-align: 0.12em;
 }
 li.is-dim .tag {
-  background: var(--faint);
+  opacity: 0.4;
 }
 
+/* Words read with low confidence: a dotted underline. */
+.low {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--ink);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.24em;
+  text-decoration-skip-ink: none;
+}
+li.is-dim .low {
+  text-decoration-color: var(--faint);
+}
+
+/* Words corrected automatically: highlighter yellow. */
 mark {
-  padding: 0.05em 0.15em;
+  padding: 0.05em 0.12em;
   background: #ffe14d;
   color: #000000;
-  box-shadow: inset 0 -2px 0 #000000;
 }
 li.is-dim mark {
   background: #fff4bf;
   color: inherit;
-  box-shadow: none;
 }
 
 .notes {

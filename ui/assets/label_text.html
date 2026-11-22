@@ -1,0 +1,22 @@
+<div class="lt">
+  <div class="box">
+    <div class="tools">
+      <button type="button" class="tool" data-action="copy" aria-label="Copy text" title="Copy text">
+        <svg class="icon-copy" viewBox="0 0 24 24" aria-hidden="true"><rect x="9" y="9" width="11" height="11" /><path d="M15 9V4H4v11h5" /></svg>
+        <svg class="icon-done" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+      </button>
+      <button type="button" class="tool" data-action="download" aria-label="Download as a text file" title="Download .txt">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11" /><path d="M7 10.5l5 5 5-5" /><path d="M5 20h14" /></svg>
+      </button>
+    </div>
+    <p class="edit-hint" hidden>Editing. Changes apply when you leave the box.</p>
+    <div class="text"></div>
+    <textarea class="editor" hidden aria-label="Edit the text" autocapitalize="off" spellcheck="false"></textarea>
+    <p class="foot" hidden>You edited this text. <button type="button" class="link" data-action="revert">Undo my edits</button></p>
+    <div class="pop" role="dialog" aria-label="Corrected word" hidden>
+      <p class="pop-text"></p>
+      <button type="button" class="pop-action"></button>
+    </div>
+  </div>
+  <p class="sr" aria-live="polite"></p>
+</div>

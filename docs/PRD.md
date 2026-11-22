@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | v0.8, approved (M6 built: allergens and suggested fixes) |
+| Status | v0.9, approved (results page revised after M6: photo and allergens first, automatic corrections, colored allergen tags) |
 | Date | 2026-11-21 |
 | Owner | Rakeen Aria Alireza |
 | Name | Ingredient Facts (named Ingredient Reader until 2026-11-22) |
@@ -48,7 +48,7 @@ Non-goals for v1:
 1. **Capture**: take a photo in the app, upload one, or pick a sample image.
 2. **Crop & rotate**: frame only the ingredient list and straighten it if needed.
 3. **Read**: OCR runs and shows progress for each stage.
-4. **Results**: the text is shown with uncertain words highlighted, next to the detection overlay and the ingredient list. The user can edit, copy or download it.
+4. **Results**: the photo comes first, then the allergens and the text. Words to check have a dotted underline and words corrected automatically are yellow. The user can edit, copy or download the text and search the ingredient list.
 
 ## 5. Functional requirements
 
@@ -78,22 +78,23 @@ Priorities use MoSCoW: Must, Should, Could.
 - Acceptance: when no text is detected, the user gets a friendly message with photo tips instead of an error trace.
 
 **P4. Results (Must)**
+- Order: the photo, the allergen box (P8), the text, the ingredient list (P5) and the word details (P6). The photo takes at most 40% of the screen height.
 - Text reconstructed in reading order. By default it is shown as one paragraph, which is clean to copy. A "Show original lines" toggle shows the text line by line as on the label.
-- Words with confidence below 0.8 are highlighted. The threshold was validated in M3 (see section 10).
-- A toggle between the original image and the detected bounding boxes.
-- Edit, Copy, and Download as .txt.
-- A summary line with processing time, word count, and number of words to check.
+- Words with confidence below 0.8 get a dotted underline. The threshold was validated in M3 (see section 10).
+- A toggle between the original image and the detected bounding boxes. Words to check get a dashed box and corrected words a yellow one.
+- Edit, Copy, and Download as .txt. Copy and Download are icons in the top-right corner of the text box. The "Show original lines" and "Edit text" toggles stay on one row on phones.
+- A summary line under the photo with the word count, the processing time, and the number of words to check and corrected.
 - Acceptance: Copy and Download both contain the edited text.
 
 **P5. Ingredient list (Should)**
 - Split the text into items on top-level commas and semicolons (commas inside `()`, `[]` or `{}` do not split). Remove the "Ingredients:" heading, including common OCR misreadings such as `INCREDIENTS`, and join wrapped lines.
 - Statements after the list, such as "Contains: milk" or "May contain traces of nuts", are shown apart as label notes.
-- The list follows the user's edits. Low-confidence words stay highlighted in it.
+- The list follows the user's edits. Low-confidence words keep their dotted underline in it, and corrected words stay yellow.
 - A search box that highlights matching items and notes while the user types.
 - Acceptance: `milk (fresh milk (20%), milk powder), sugar` yields 2 items.
 
 **P6. Word details (Should)**
-- An expandable table showing each word crop thumbnail, the predicted text, and its confidence. It opens on the words to check and can switch to all words.
+- An expandable table showing each word crop thumbnail, the predicted text, and its confidence. It opens on the flagged words (to check or corrected) and can switch to all words.
 
 **P7. About page (Must)**
 - Pipeline overview, model and dataset summary, and thesis metrics.
@@ -110,18 +111,20 @@ Priorities use MoSCoW: Must, Should, Could.
   - Matching is by whole words. Phrases naming another food ("coconut milk", "cocoa butter", "cream of tartar") and statements such as "gluten-free" or "free from milk" are ignored.
   - "May contain" and shared-equipment statements are listed apart from what the product contains.
 - Display:
-  - An allergen box above the ingredient list shows what the product contains and what it may contain.
+  - An allergen box right below the photo shows what the product contains and what it may contain.
+  - Each group has its own color (D10). "May contain" tags are outlined in that color.
   - Allergen words are bold in the list and each item carries tags. Searching an allergen name (for example "milk") also finds "whey" and "caseinate".
-  - When a suggested fix (P9) would reveal an allergen, the box shows it under "Check".
+  - When an undone correction (P9) would reveal an allergen, the box shows it under "Check".
 
 **P9. Post-OCR correction (Could, v1.1)**
-- Suggest fixes from an ingredient vocabulary, for example `Vilater` to `Water` and `NaCI` to `NaCl`. The raw OCR text is always kept.
+- Correct likely misreadings from an ingredient vocabulary, for example `Vilater` to `Water` and `NaCI` to `NaCl`. The raw OCR result is always kept.
 - The vocabulary (`src/data/ingredient_vocabulary.txt`, built by `scripts/build_vocabulary.py`) holds about 1,000 words. It comes from the thesis train and validation labels plus hand-written common ingredient terms. The test split is left out so the feature can be evaluated on it.
 - A word is checked only when it is not in the vocabulary.
   - The edit distance is cheaper for OCR slips such as I/l, O/0 and rn/m.
   - A low-confidence word may be one or two edits away from the suggestion.
   - A word the model was sure about only gets look-alike fixes.
-- The user ticks which fixes to apply. Applying edits the text, and Undo brings back the reading.
+- Corrections are applied automatically (D11) and are yellow in the text and the ingredient list. The allergen box counts the corrected words.
+- Hovering (desktop) or tapping (phone) a corrected word shows the word as read, in a monospace face where I/l and O/0 look different, with Undo. An undone correction keeps a dotted underline and can be applied again.
 
 ### Researcher app (local only)
 
@@ -174,8 +177,10 @@ Priorities use MoSCoW: Must, Should, Could.
 | D5 | Model `saved_models/FT_801010_off/best_accuracy.pth`: case-sensitive charset, grayscale, no PAD, `batch_max_length` 60 (from `opt.txt`). Pretrained CRAFT with text threshold 0.8, low-text 0.4, link 0.25, canvas 1280, mag ratio 1.5, refiner off, single pass. | This matches the thesis configuration. With the refiner off, the current second CRAFT pass recomputes identical boxes and doubles detection time. |
 | D6 | No int8 quantization. | It made recognition only about 10% faster and introduced an error (`INGREDIENTS:` became `INCREDIENTS:`). |
 | D7 | English UI. | The labels are in English, and the app is a public portfolio piece. |
-| D8 | Minimal monochrome visual design: white background, black accents, typography-led layout. No gradients, emoji icons, glow effects or decorative illustrations. | The owner wants the app to look deliberate and clean, not like generic AI-generated UI. Color is reserved for meaning: highlighted low-confidence words, and later allergen flags. |
+| D8 | Minimal monochrome visual design: white background, black accents, typography-led layout. No gradients, emoji icons, glow effects or decorative illustrations. | The owner wants the app to look deliberate and clean, not like generic AI-generated UI. Color is reserved for meaning: yellow for words corrected automatically and one color per allergen group (D10). Words to check get a dotted black underline. |
 | D9 | Model weights are published publicly on the Hugging Face Hub. | They are already shared publicly through the README; the Drive copy of `best_accuracy.pth` is byte-identical (SHA-256) to `FT_801010_off/best_accuracy.pth`. A public repo means the host needs no access token. |
+| D10 | Allergen tags have one color per group, matched to the food: milk blue, egg yolk, peanut brown, tree nuts green, soy edamame green, wheat and gluten gold, fish sea blue, shellfish coral, sesame beige. The text on every tag passes WCAG AA (4.5:1). | The owner asked for colors that match how people picture each food. The tags still name the group, so color is never the only cue. |
+| D11 | Post-OCR corrections are applied automatically, each with Undo. Until 2026-11-22 the user ticked which fixes to apply. | The owner asked for it. Applying every suggestion raised accuracy on the photos and left the test split unchanged (M6 results in section 10). The yellow highlight and Undo keep every change visible and reversible. |
 
 ## 8. Milestones
 
@@ -277,3 +282,17 @@ M6 results (2026-11-22, built on `web-revamp`):
   - "May contain" and shared-equipment statements were separated correctly in the spot checks.
 - **Tests:** 8 unit tests for allergens and 6 for the suggestions. The other suites and the engine regression (5/5) still pass.
 
+Results page revision after M6 (2026-11-22, the owner's feedback):
+
+- **The photo, the allergens and the text come first.**
+  - The owner chose this order over text before allergens: the allergen box is short, so it shows on a phone without scrolling, while the text can be long.
+  - The photo is capped at 40% of the screen height. The fact table became a summary line under it.
+- **Words to check get a dotted black underline** instead of the yellow highlight. The owner chose it over a red wavy line, which could be mistaken for an allergen warning. On the photo their boxes are dashed.
+- **Corrections are applied automatically (D11).** Hovering or tapping a yellow word shows what was read, with Undo, and an undone correction can be applied again. The ingredient list, the allergen box and the photo follow at once.
+- **Copy and Download are icons inside the text box.** The download is made in the browser. Editing also happens inside the box, so both icons keep working while editing; the edit applies when the box loses focus.
+- **Allergen tags are colored (D10):** solid for "Contains", outlined for "May contain".
+- **Checked locally** at 320, 375 and 390 px and on a desktop:
+  - the two toggles stay on one row and the page never scrolls sideways;
+  - undo, apply again, edit, copy and download all work;
+  - switching Edit off right after typing keeps the edit.
+- **Tests:** 3 new tests check the allergen colors, and 1 checks that undone corrections are skipped.

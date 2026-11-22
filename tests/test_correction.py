@@ -14,7 +14,7 @@ ROOT = Path(__file__).resolve().parents[1]
 if str(ROOT) not in sys.path:
     sys.path.insert(0, str(ROOT))
 
-from src.correction import ocr_distance, suggest, suggest_for_words  # noqa: E402
+from src.correction import apply_suggestions, ocr_distance, suggest, suggest_for_words  # noqa: E402
 
 
 def test_prd_examples():
@@ -57,6 +57,16 @@ def test_suggestions_keep_the_word_positions():
     words = [FakeWord("INGREDIENTS:", 0.99), FakeWord("Vilater,", 0.40), FakeWord("Sugar,", 0.99), FakeWord("NaCI", 0.97)]
     suggestions = suggest_for_words(words)
     assert [(s.index, s.original, s.replacement) for s in suggestions] == [(1, "Vilater,", "Water,"), (3, "NaCI", "NaCl")]
+
+
+def test_apply_suggestions_skips_the_undone_ones():
+    words = [FakeWord("INGREDIENTS:", 0.99), FakeWord("Vilater,", 0.40), FakeWord("Sugar,", 0.99), FakeWord("NaCI", 0.97)]
+    suggestions = suggest_for_words(words)
+    assert [word.text for word in apply_suggestions(words, suggestions)] == ["INGREDIENTS:", "Water,", "Sugar,", "NaCl"]
+    corrected = apply_suggestions(words, suggestions, skip={3})
+    assert [word.text for word in corrected] == ["INGREDIENTS:", "Water,", "Sugar,", "NaCI"]
+    assert corrected[1].confidence == 0.40  # only the text changes
+    assert words[1].text == "Vilater,"  # the words as read are left alone
 
 
 if __name__ == "__main__":

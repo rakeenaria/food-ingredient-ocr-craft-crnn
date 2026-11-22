@@ -1,0 +1,237 @@
+.lt {
+  --ink: #111111;
+  --paper: #ffffff;
+  --muted: #4a4a46;
+  --soft: #f3f3f1;
+  --rule: #e4e4e0;
+  --fix: #ffe14d;
+  --fix-hover: #ffd21f;
+  font-family: var(--st-font, "Libre Franklin", system-ui, sans-serif);
+  color: var(--ink);
+}
+
+.box {
+  position: relative;
+  padding: 0.85rem 1rem 1rem 1.1rem;
+  border: 2px solid var(--ink);
+  background: var(--paper);
+}
+.box.is-editing:focus-within {
+  box-shadow: 0 0 0 2px var(--ink);
+}
+
+/* Copy and download sit in the top-right corner. The negative bottom margin
+   keeps the float within the first line, so only that line wraps around it. */
+.tools {
+  float: right;
+  display: flex;
+  gap: 0.1rem;
+  margin: -0.5rem -0.6rem -0.3rem 0.75rem;
+}
+.tool {
+  appearance: none;
+  display: grid;
+  place-items: center;
+  width: 2.3rem;
+  height: 2.3rem;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  color: var(--ink);
+  cursor: pointer;
+}
+.tool:hover {
+  background: var(--soft);
+}
+.tool:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: -2px;
+}
+.tool svg {
+  width: 1.15rem;
+  height: 1.15rem;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: square;
+}
+.tool .icon-done,
+.tool.is-done .icon-copy {
+  display: none;
+}
+.tool.is-done .icon-done {
+  display: block;
+}
+.tool.is-done,
+.tool.is-done:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.text {
+  font-size: 1.08rem;
+  line-height: 1.75;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* Words to check: a dotted underline. */
+.low,
+.fix.is-undone {
+  text-decoration-line: underline;
+  text-decoration-style: dotted;
+  text-decoration-color: var(--ink);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 0.24em;
+  text-decoration-skip-ink: none;
+}
+
+/* Words corrected automatically: highlighter yellow; tap for what was read. */
+.fix {
+  border-radius: 1px;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.fix:not(.is-undone) {
+  padding: 0.05em 0.12em;
+  background: var(--fix);
+  color: #000000;
+  -webkit-box-decoration-break: clone;
+  box-decoration-break: clone;
+}
+.fix:not(.is-undone):hover,
+.fix:not(.is-undone)[aria-expanded="true"] {
+  background: var(--fix-hover);
+}
+.fix.is-undone:hover,
+.fix.is-undone[aria-expanded="true"] {
+  background: var(--soft);
+}
+.fix:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 1px;
+}
+
+.edit-hint {
+  margin: 0 0 0.4rem;
+  font-size: 0.76rem;
+  font-weight: 800;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.editor {
+  box-sizing: border-box;
+  display: block;
+  width: 100%;
+  min-height: 12rem;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  outline: none;
+  resize: vertical;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  font-size: 1.08rem;
+  line-height: 1.75;
+}
+.editor[hidden],
+.text[hidden],
+.edit-hint[hidden],
+.foot[hidden] {
+  display: none;
+}
+
+.foot {
+  clear: both;
+  margin: 0.65rem 0 0;
+  padding-top: 0.5rem;
+  border-top: 1px solid var(--rule);
+  font-size: 0.86rem;
+  color: var(--muted);
+}
+.link {
+  appearance: none;
+  padding: 0;
+  border: 0;
+  background: none;
+  color: var(--ink);
+  font: inherit;
+  font-weight: 700;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+.link:focus-visible {
+  outline: 2px solid var(--ink);
+  outline-offset: 2px;
+}
+
+.pop {
+  position: absolute;
+  z-index: 10;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  width: max-content;
+  max-width: min(19rem, calc(100% - 1rem));
+  padding: 0.5rem 0.55rem 0.5rem 0.75rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-size: 0.88rem;
+  line-height: 1.35;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+}
+.pop[hidden] {
+  display: none;
+}
+.pop-text {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+.pop-text b {
+  font-weight: 800;
+}
+/* The word as read, in a face where I, l, 1 and O, 0 look different. */
+.pop-text code {
+  padding: 0 0.1em;
+  font-family: ui-monospace, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  font-size: 0.95em;
+  font-weight: 700;
+}
+.pop-action {
+  appearance: none;
+  flex: none;
+  min-height: 2.1rem;
+  padding: 0.2rem 0.75rem;
+  border: 0;
+  border-radius: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+.pop-action:hover {
+  background: #e9e9e6;
+}
+.pop-action:focus-visible {
+  outline: 2px solid var(--fix);
+  outline-offset: 2px;
+}
+
+.sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
