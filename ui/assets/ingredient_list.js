@@ -1,16 +1,15 @@
 // Ingredient list with an instant search. Everything runs in the browser.
 //
 // Data from Python:
-//   items: [{ text, low, fixed, chips, allergens }]          ingredients in label order
-//   notes: [{ text, low, fixed, chips, allergens, maybe }]   statements such as "Contains: milk"
-//   palette: { group: { fill, ink, line } }                  allergen colors
+//   items: [{ text, low, fixed, strong, allergens }]          ingredients in label order
+//   notes: [{ text, low, fixed, strong, allergens, maybe }]   statements such as "Contains: milk"
+//   palette: { group: { fill, ink, line } }            allergen tag colors
 // "low" are character ranges of words read with low confidence (yellow dotted
 // underline), "fixed" ranges of words corrected automatically ([start, end,
-// word as read], green dotted underline) and "chips" ranges of allergen words
-// ([start, end, group]), shown in the colors of their group as in the label
-// text, outlined in a "may contain" statement ("maybe"). "allergens" are the
-// group names: searching matches them as well as the text, so "milk" also
-// finds "whey".
+// word as read], green dotted underline), "strong" the ranges of allergen
+// words (bold, as on real labels) and "allergens" the group names shown as
+// colored tags (outlined for a "may contain" statement, "maybe").
+// Searching matches the text and the group names.
 
 const instances = new WeakMap();
 
@@ -32,102 +31,71 @@ function normalize(text) {
     .trim();
 }
 
-// [start, end, extra] ranges from Python, in text order, without overlaps or
-// ranges outside the text.
-function ranges(lists, length) {
-  const all = [];
-  for (const [list, kind] of lists) {
-    for (const range of Array.isArray(list) ? list : []) {
-      if (!Array.isArray(range)) continue;
-      all.push({ start: Number(range[0]), end: Number(range[1]), extra: String(range[2] || ""), kind });
-    }
-  }
-  const kept = [];
-  let cursor = 0;
-  for (const range of all.filter((r) => r.end > r.start).sort((a, b) => a.start - b.start)) {
-    if (range.start < cursor || range.start < 0 || range.end > length) continue;
-    kept.push(range);
-    cursor = range.end;
-  }
-  return kept;
-}
+const LOW = 1;
+const ALLERGEN = 2;
+const FIXED = 4;
 
-// A word to check or a corrected word; it holds the pieces of that word.
-function markElement(mark) {
-  const span = document.createElement("span");
-  if (mark.kind === "fixed") {
-    span.className = "fixed";
-    span.title = `Corrected automatically. Read as “${mark.extra}”.`;
-  } else {
-    span.className = "low";
-    span.title = "Read with low confidence. Check it on the label.";
-  }
-  return span;
-}
-
-// An allergen word, or the part of one that falls inside or outside a mark
-// (as in label_text.js).
-function chipElement(piece, group, maybe, isStart, isEnd, palette, titled) {
-  const span = document.createElement("span");
-  span.className = `chip${maybe ? " is-maybe" : ""}${isStart ? " is-start" : ""}${isEnd ? " is-end" : ""}`;
-  const colors = palette[group];
-  if (colors) {
-    span.style.setProperty("--tag", colors.fill);
-    span.style.setProperty("--tag-ink", colors.ink);
-    span.style.setProperty("--tag-line", colors.line);
-  }
-  if (titled) span.title = maybe ? `May contain: ${group}` : `Allergen: ${group}`;
-  span.textContent = piece;
-  return span;
-}
-
-// The text with its dotted words and colored allergen words, built without
-// innerHTML.
+// Text with dotted (low confidence, corrected) and <strong> (allergen) ranges
+// plus colored allergen tags, built without innerHTML.
 function fill(target, entry, palette) {
   const text = String(entry.text || "");
-  const maybe = Boolean(entry.maybe);
-  const marks = ranges(
-    [
-      [entry.low, "low"],
-      [entry.fixed, "fixed"],
-    ],
-    text.length,
-  );
-  const chips = ranges([[entry.chips, "chip"]], text.length);
-  // Cut the text wherever a mark or an allergen word starts or ends, then give
-  // each mark (one word) its pieces.
-  const cuts = new Set([0, text.length]);
-  for (const range of [...marks, ...chips]) {
-    cuts.add(range.start);
-    cuts.add(range.end);
+  const flags = new Uint8Array(text.length);
+  const readAs = new Array(text.length).fill("");
+  const flag = (ranges, bit) => {
+    for (const range of Array.isArray(ranges) ? ranges : []) {
+      if (!Array.isArray(range)) continue;
+      const end = Math.min(text.length, Number(range[1]) || 0);
+      for (let i = Math.max(0, Number(range[0]) || 0); i < end; i++) {
+        flags[i] |= bit;
+        if (bit === FIXED) readAs[i] = String(range[2] || "");
+      }
+    }
+  };
+  flag(entry.low, LOW);
+  flag(entry.strong, ALLERGEN);
+  flag(entry.fixed, FIXED);
+  for (let i = 0; i < text.length; ) {
+    let j = i + 1;
+    while (j < text.length && flags[j] === flags[i] && readAs[j] === readAs[i]) j++;
+    let node = document.createTextNode(text.slice(i, j));
+    if (flags[i] & ALLERGEN) {
+      const strong = document.createElement("strong");
+      strong.append(node);
+      node = strong;
+    }
+    if (flags[i] & FIXED) {
+      const fixed = document.createElement("span");
+      fixed.className = "fixed";
+      fixed.title = `Corrected automatically. Read as “${readAs[i]}”.`;
+      fixed.append(node);
+      node = fixed;
+    } else if (flags[i] & LOW) {
+      const low = document.createElement("span");
+      low.className = "low";
+      low.title = "Read with low confidence. Check it on the label.";
+      low.append(node);
+      node = low;
+    }
+    target.append(node);
+    i = j;
   }
-  const points = [...cuts].sort((a, b) => a - b);
-  let m = 0;
-  let c = 0;
-  let markEl = null;
-  let markOf = null;
-  for (let k = 0; k + 1 < points.length; k++) {
-    const start = points[k];
-    const end = points[k + 1];
-    while (m < marks.length && marks[m].end <= start) m++;
-    while (c < chips.length && chips[c].end <= start) c++;
-    const mark = m < marks.length && marks[m].start <= start ? marks[m] : null;
-    const chip = c < chips.length && chips[c].start <= start ? chips[c] : null;
-    const piece = text.slice(start, end);
-    const node = chip
-      ? chipElement(piece, chip.extra, maybe, start === chip.start, end === chip.end, palette, !mark)
-      : document.createTextNode(piece);
-    if (!mark) {
-      markEl = markOf = null;
-      target.append(node);
-      continue;
+  const groups = Array.isArray(entry.allergens) ? entry.allergens : [];
+  if (groups.length) {
+    const box = document.createElement("span");
+    box.className = "tags";
+    for (const group of groups) {
+      const tag = document.createElement("span");
+      tag.className = entry.maybe ? "tag is-maybe" : "tag";
+      tag.textContent = group;
+      const colors = palette && palette[group];
+      if (colors) {
+        tag.style.setProperty("--tag", colors.fill);
+        tag.style.setProperty("--tag-ink", colors.ink);
+        tag.style.setProperty("--tag-line", colors.line);
+      }
+      box.append(tag);
     }
-    if (markOf !== mark) {
-      markOf = mark;
-      markEl = markElement(mark);
-      target.append(markEl);
-    }
-    markEl.append(node);
+    target.append(box);
   }
 }
 

@@ -2,7 +2,7 @@
 
 | | |
 |---|---|
-| Status | v0.11, approved (results page revised after M6: photo and allergens first, automatic corrections, allergens colored in the text and the ingredient list) |
+| Status | v0.11, approved (results page revised after M6: photo and allergens first, automatic corrections, allergens colored in the text) |
 | Date | 2026-11-21 |
 | Owner | Rakeen Aria Alireza |
 | Name | Ingredient Facts (named Ingredient Reader until 2026-11-22) |
@@ -115,7 +115,7 @@ Priorities use MoSCoW: Must, Should, Could.
   - An allergen box right below the photo shows what the product contains and what it may contain.
   - Each group has its own color (D10). "May contain" tags are outlined in that color.
   - In the text, each allergen word gets the color of its group, outlined when it sits in a "may contain" statement. The words come from the same ingredients and statements as the box, so the two always agree, also in the label's lines and after an edit.
-  - In the ingredient list, allergen words get the same colors as in the text, outlined in a "may contain" statement. Searching an allergen name (for example "milk") also finds "whey" and "caseinate".
+  - Allergen words are bold in the list and each item carries tags; a "may contain" statement has outlined tags. Searching an allergen name (for example "milk") also finds "whey" and "caseinate".
   - When an undone correction (P9) would reveal an allergen, the box shows it under "Check".
 
 **P9. Post-OCR correction (Could, v1.1)**
@@ -183,7 +183,7 @@ Priorities use MoSCoW: Must, Should, Could.
 | D9 | Model weights are published publicly on the Hugging Face Hub. | They are already shared publicly through the README; the Drive copy of `best_accuracy.pth` is byte-identical (SHA-256) to `FT_801010_off/best_accuracy.pth`. A public repo means the host needs no access token. |
 | D10 | Allergen tags have one color per group, matched to the food: milk blue, egg yolk, peanut brown, tree nuts green, soy edamame green, wheat and gluten gold, fish sea blue, shellfish coral, sesame beige. The text on every tag passes WCAG AA (4.5:1). | The owner asked for colors that match how people picture each food. The tags still name the group, so color is never the only cue. |
 | D11 | Post-OCR corrections are applied automatically, each with Undo. Until 2026-11-22 the user ticked which fixes to apply. | The owner asked for it. Applying every suggestion raised accuracy on the photos and left the test split unchanged (M6 results in section 10). The green dotted underline and Undo keep every change visible and reversible. |
-| D12 | Words to check get a yellow dotted underline and corrected words a green one, in the text, the ingredient list and the word details; their boxes on the photo are dashed in the same colors. Allergen words in the text and the ingredient list look like the tags in the allergen box. | The owner asked for corrections as a dotted line instead of the yellow highlight, and for allergen words in the text, then in the ingredient list, to look like the allergen tags. After seeing red and purple, the owner chose yellow and green, like a traffic light: yellow to look again, green for fixed. The yellow is a deep gold (#E0A800), because a lighter yellow hardly shows on white; it stays below the 3:1 that WCAG asks for lines, so the legend names it and its boxes on the photo get a dark edge. The marks are dotted lines, never filled tags, so they do not read as allergens. They are drawn as borders, not underlines, so they also show under a colored allergen word. |
+| D12 | Words to check get a yellow dotted underline and corrected words a green one, in the text, the ingredient list and the word details; their boxes on the photo are dashed in the same colors. Allergen words in the text look like the tags in the allergen box. | The owner asked for corrections as a dotted line instead of the yellow highlight, and for allergen words in the text to look like the allergen tags. After seeing red and purple, the owner chose yellow and green, like a traffic light: yellow to look again, green for fixed. The yellow is a deep gold (#E0A800), because a lighter yellow hardly shows on white; it stays below the 3:1 that WCAG asks for lines, so the legend names it and its boxes on the photo get a dark edge. The marks are dotted lines, never filled tags, so they do not read as allergens. They are drawn as borders, not underlines, so they also show under a colored allergen word. The ingredient list keeps bold allergen words with colored tags: the owner tried colored words there too and preferred the tags (revision 3). |
 
 ## 8. Milestones
 
@@ -318,11 +318,6 @@ Results page revision 2 (2026-11-22, the owner's feedback):
 
 Results page revision 3 (2026-11-22, the owner's answer to an open question):
 
-- **Allergen words in the ingredient list are colored as in the text (P8)** instead of bold: solid in the color of their group, outlined in a "may contain" statement.
-  - The group tags after each item were removed. The owner saw them kept first, then chose the colors alone, as in the text.
-  - The allergen box still names every group, and hovering a word on a desktop names its group. A search for "milk" still finds "whey".
-  - An allergen word that is also corrected or uncertain keeps its color, with the dotted line below it, as in the text.
-- **Checked locally** on samples 2, 3 and 5 at 320 and 390 px and on a desktop:
-  - the list colors the same words as the text, in the same colors;
-  - a search fades them in the rows that do not match.
-- **Tests:** only the display changed, so there are no new tests. The unit suites still pass.
+- **Colored allergen words were tried in the ingredient list (P8) and dropped.**
+  - The owner saw them first with the group tags after each item, then without the tags.
+  - The owner then chose the original: bold allergen words with colored tags after each item, outlined in a "may contain" statement. The list is the same as in revision 2.
